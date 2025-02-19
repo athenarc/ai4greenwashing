@@ -1,2 +1,2 @@
 # ai4greenwashing
-Project for employign AI techniqies for detecting and justifying greenwashing claims.
+Project for employing AI techniques for detecting and justifying greenwashing claims.
