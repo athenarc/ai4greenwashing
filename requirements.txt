@@ -1,3 +1,5 @@
+torch==2.1.2
+torchvision==0.16.2
 absl-py==2.1.0
 aiofiles==23.2.1
 aiohappyeyeballs==2.4.6
@@ -17,30 +19,28 @@ charset-normalizer==2.0.12
 click==8.1.8
 cloudpathlib==0.16.0
 cloudpickle==3.1.1
-confection==0.1.5
+confection
 contourpy==1.2.1
 cycler==0.12.1
 cymem==2.0.11
 Cython==3.0.6
 dataclasses-json==0.6.7
 datasets==2.14.7
-deepdoctection==0.26
-detectron2 @ git+https://github.com/facebookresearch/detectron2.git@ff53992b1985b63bd3262b5a36167098e3dada02
 dill==0.3.7
 distro==1.9.0
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl#sha256=86cc141f63942d4b2c5fcee06630fd6f904788d2f0ab005cce45aadb8fb73889
 exceptiongroup==1.2.2
-fastapi==0.98.0
+fastapi
 ffmpy==0.5.0
 filelock==3.6.0
 fonttools==4.56.0
 frozenlist==1.5.0
 fsspec==2023.9.2
 fvcore==0.1.5.post20221221
-gradio==3.50.0
+gradio
 gradio_client==0.6.1
 greenlet==3.1.1
-groq==0.18.0
+groq
 grpcio==1.70.0
 h11==0.14.0
 httpcore==1.0.7
@@ -59,7 +59,7 @@ jsonpatch==1.33
 jsonpointer==3.0.0
 jsonschema==4.17.3
 kiwisolver==1.4.8
-langchain==0.3.18
+langchain
 langchain-community==0.3.17
 langchain-core==0.3.35
 langchain-groq==0.2.4
@@ -112,9 +112,9 @@ pyarrow==19.0.0
 pyarrow-hotfix==0.6
 pycocotools==2.0.8
 pycryptodome==3.19.0
-pydantic==2.10.6
-pydantic-settings==2.7.1
-pydantic_core==2.27.2
+pydantic
+pydantic-settings
+pydantic_core
 pydub==0.25.1
 PyMuPDF==1.23.22
 PyMuPDFb==1.23.22
@@ -152,8 +152,6 @@ timm==0.6.12
 tokenizers==0.13.3
 tomli==2.2.1
 toolz==1.0.0
-torch==2.1.2
-torchvision==0.16.2
 tqdm==4.64.0
 transformers @ git+https://github.com/huggingface/transformers.git@057e1d74733f52817dc05b673a340b4e3ebea08c
 triton==2.1.0
@@ -174,3 +172,5 @@ yacs==0.1.8
 yarl==1.18.3
 zipp==3.7.0
 zstandard==0.23.0
+deepdoctection==0.26
+detectron2 @ git+https://github.com/facebookresearch/detectron2.git@ff53992b1985b63bd3262b5a36167098e3dada02

@@ -17,11 +17,6 @@ class LLMAnnotator(BaseAnnotator):
     def call_llm(self, text): 
         import os 
         import time
-
-        print(os.getenv("GROQ_LLM_MODEL_1"))
-        print(os.getenv("GROQ_API_KEY_1"))
-        print(os.getenv("GROQ_LLM_MODEL_2"))
-        print(os.getenv("GROQ_API_KEY_2"))
         
         time.sleep(5)
 
