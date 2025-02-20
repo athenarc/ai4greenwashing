@@ -27,3 +27,7 @@ pip install "deepdoctection[pt]==0.26" --no-deps
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
+
+Additionally, for the llm API to work, you need to create your own private keys [here](https://console.groq.com/keys), and add them to the .env file that you must create in accordance with the .env.example file.
+
+Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted to the .env file can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
