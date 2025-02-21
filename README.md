@@ -31,3 +31,23 @@ python -m spacy download en_core_web_sm
 Additionally, for the llm API to work, you need to create your own private keys [here](https://console.groq.com/keys), and add them to the .env file that you must create in accordance with the .env.example file.
 
 Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted to the .env file can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
+
+For running locally, install ollama from https://ollama.com/ and then do
+
+```
+ollama pull llama3.2
+```
+
+This will have worse results due to using a smaller model, but does not need an API. Also, for Linux machines you should use:
+
+```
+systemctl disable ollama.service
+```
+
+so that it does not start on boot, and start/stop ollama using:
+
+```
+systemctl start/stop ollama.service
+```
+
+otherwise the process will keep restarting even if killed.

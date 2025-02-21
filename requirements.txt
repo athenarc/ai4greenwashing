@@ -174,3 +174,4 @@ zipp==3.7.0
 zstandard==0.23.0
 deepdoctection==0.26
 detectron2 @ git+https://github.com/facebookresearch/detectron2.git@ff53992b1985b63bd3262b5a36167098e3dada02
+langchain-ollama
