@@ -5,6 +5,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 import argparse
 import ollama
 from langchain_groq import ChatGroq
+from reportparse.annotator.rag_database import chroma_db
 from dotenv import load_dotenv
 
 @BaseAnnotator.register("llm")
@@ -12,6 +13,7 @@ class LLMAnnotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
+       self.db = chroma_db()
        return
     
     def call_llm(self, text): 
@@ -176,8 +178,13 @@ class LLMAnnotator(BaseAnnotator):
         level='block', target_layouts=('text', 'list', 'cell'),  annotator_name='llm-test',
     ) -> Document:
         annotator_name = args.llm_annotator_name if args is not None else annotator_name
+        #todo check if len is correct
+        max_pages_to_gw = args.max_pages_to_gw if args.max_pages_to_gw <= len(document.pages) else len(document.pages)
         level = args.llm_text_level if args is not None else level
         target_layouts = args.llm_target_layouts if args is not None else list(target_layouts)
+
+        print(f'THE DOCUMENT YOU PROVIDED HAS {len(document.pages)} PAGES')
+        print(f'SEARCHING GREENWASHING CLAIMS FOR { max_pages_to_gw} PAGES')
 
         def _annotate(_annotate_obj: AnnotatableLevel, _text: str):
             _annotate_obj.add_annotation(
@@ -188,26 +195,41 @@ class LLMAnnotator(BaseAnnotator):
                     meta={'score': 'This is the llm score field.'}
                 )
             )
+        
+        parsed_pages=0 #index to keep track of the number of pages that where checked for gw
+
+        #db insertion works page-wise only for now.
         for page in document.pages:
             if level == 'page':
-                #print('--------PAGE-----------')
-                #print(page.text)
-                #print('--------PAGE2-----------')
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                #print(text)
-                _annotate(_annotate_obj=page, _text=self.call_llm(text))
+                #store text in chromadb
+                self.db.store_text_in_chromadb(text)
+            else: break
+        for page in document.pages:
+            if level == 'page':
+                if parsed_pages <= max_pages_to_gw-1:
+                    #we loop through the 
+                    _annotate(_annotate_obj=page, _text=self.call_llm(text))
+                     #if we reach the limit inserted by the user, break the loop
+                    parsed_pages+=1
+                else:
+                    break
+              
             else:
-                for block in page.blocks + page.table_blocks:
-                    if target_layouts is not None and block.layout_type not in target_layouts:
-                        continue
-                    if level == 'block':
-                        _annotate(_annotate_obj=block, _text='This is block level result')
-                    elif level == 'sentence':
-                        for sentence in block.sentences:
-                            _annotate(_annotate_obj=sentence, _text='This is sentence level result')
-                    elif level == 'text':
-                        for text in block.texts:
-                            _annotate(_annotate_obj=text, _text='This is sentence level result')
+                    for block in page.blocks + page.table_blocks:
+                        if target_layouts is not None and block.layout_type not in target_layouts:
+                            continue
+                        if level == 'block':
+                            #todo: implement for block level too.
+                            _annotate(_annotate_obj=block, _text='This is block level result')
+                        elif level == 'sentence':
+                            #todo: implement for sentence level too.
+                            for sentence in block.sentences:
+                                _annotate(_annotate_obj=sentence, _text='This is sentence level result')
+                        elif level == 'text':
+                            #todo: implement for text level too.
+                            for text in block.texts:
+                                _annotate(_annotate_obj=text, _text='This is sentence level result')
 
         return document
     
@@ -219,12 +241,12 @@ class LLMAnnotator(BaseAnnotator):
             default='llm'
         )
 
-        #todo: add page level block
+        
         parser.add_argument(
             '--llm_text_level',
             type=str,
             choices=['page', 'sentence', 'block'],
-            default='sentence'
+            default='page'
         )
 
         parser.add_argument(
@@ -233,6 +255,13 @@ class LLMAnnotator(BaseAnnotator):
             nargs='+',
             default=['text', 'list', 'cell'],
             choices=LAYOUT_NAMES
+        )
+
+        parser.add_argument(
+            '--max_pages_to_gw',
+            type=int,
+            default=5,
+            help=f"Choose a value between 1 and the the number of pages on the esg-report you provided."
         )
 
 
