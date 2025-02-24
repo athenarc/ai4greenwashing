@@ -26,12 +26,20 @@ class OllamaLLMAnnotator(BaseAnnotator):
         messages = [
             (
                 "system",
-                "You are a fact-checker specializing in greenwashing. Fact-check the given text and find any greenwashing claims.\n"
-                "Your answer should follow this format:\n\n"
-                "Potential greenwashing claim: [the claim]\n"
-                "Justification: [short justification]\n\n"
-                "Write an annotation for everything:\n"
-                "DO NOT MAKE ANY COMMENTARY. JUST PROVIDE THE MENTIONED FORMAT.",
+                f"""You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
+         Your answer should follow the following format: 
+
+         Potential greenwashing claim: [the claim]
+         Justification: [short justification]
+
+         Another potential greenwashing claim: [another claim]
+         Justification for the second claim: [another justification]
+         
+         If no greenwashing claims are found, return this message:
+         "No greenwashing claims found"
+
+         DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
+         """,
             ),
             ("human", text),
         ]
@@ -39,12 +47,12 @@ class OllamaLLMAnnotator(BaseAnnotator):
         try:
             print("Invoking Llama3.2 (Ollama)...")
             ai_msg = self.llm.invoke(messages)
-            print(f"LLM response: {ai_msg.content}")  # Debugging LLM response
+            # print(f"LLM response: {ai_msg.content}")  # debugging
             return ai_msg.content
         except Exception as e:
             print("LLM invocation failed:", e)
             return None
-        
+
     def reduce_ollama_llm_input(self, text):
         """Splits large text into chunks and processes them separately, then combines results"""
         from langchain.prompts import PromptTemplate
@@ -62,7 +70,8 @@ class OllamaLLMAnnotator(BaseAnnotator):
             Potential greenwashing claim: [the claim]
             Justification: [short justification]
             
-            Write an annotation for everything
+            If no greenwashing claims are found, return:
+            "No greenwashing claims found"
             
             DO NOT MAKE ANY COMMENTARY. JUST PROVIDE THE MENTIONED FORMAT.
             Text to be examined: {docs}
@@ -73,8 +82,8 @@ class OllamaLLMAnnotator(BaseAnnotator):
             """
             Synthesize the following results into a single conclusion. Follow this format:
             
-            Write an annotation for everything
-            
+            If no greenwashing claims are found, return:
+            "No greenwashing claims found"
             Otherwise:
             Potential greenwashing claim: [the claim]
             Justification: [short justification]
@@ -108,39 +117,55 @@ class OllamaLLMAnnotator(BaseAnnotator):
         target_layouts=("text", "list", "cell"),
         annotator_name="ollama_llm",
     ) -> Document:
-        annotator_name = args.ollama_llm_annotator_name if args is not None else annotator_name
+        annotator_name = (
+            args.ollama_llm_annotator_name if args is not None else annotator_name
+        )
         level = args.ollama_llm_text_level if args is not None else level
-        target_layouts = args.ollama_llm_target_layouts if args is not None else list(target_layouts)
+        target_layouts = (
+            args.ollama_llm_target_layouts if args is not None else list(target_layouts)
+        )
 
         def _annotate(_annotate_obj: AnnotatableLevel, _text: str):
             _annotate_obj.add_annotation(
                 annotation=Annotation(
                     parent_object=_annotate_obj,
                     annotator=annotator_name,
-                    value= _text,
-                    meta={'score': 'This is the ollama_llm score field.'}
+                    value=_text,
+                    meta={"score": "This is the ollama_llm score field."},
                 )
             )
+
         for page in document.pages:
-            if level == 'page':
-                #print('--------PAGE-----------')
-                #print(page.text)
-                #print('--------PAGE2-----------')
+            if level == "page":
+                # print('--------PAGE-----------')
+                # print(page.text)
+                # print('--------PAGE2-----------')
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                #print(text)
+                # print(text)
                 _annotate(_annotate_obj=page, _text=self.call_ollama_llm(text))
             else:
                 for block in page.blocks + page.table_blocks:
-                    if target_layouts is not None and block.layout_type not in target_layouts:
+                    if (
+                        target_layouts is not None
+                        and block.layout_type not in target_layouts
+                    ):
                         continue
-                    if level == 'block':
-                        _annotate(_annotate_obj=block, _text='This is block level result')
-                    elif level == 'sentence':
+                    if level == "block":
+                        _annotate(
+                            _annotate_obj=block, _text=self.call_ollama_llm(block.text)
+                        )
+                    elif level == "sentence":
                         for sentence in block.sentences:
-                            _annotate(_annotate_obj=sentence, _text='This is sentence level result')
-                    elif level == 'text':
+                            _annotate(
+                                _annotate_obj=sentence,
+                                _text="This is sentence level result",
+                            )
+                    elif level == "text":
                         for text in block.texts:
-                            _annotate(_annotate_obj=text, _text='This is sentence level result')
+                            _annotate(
+                                _annotate_obj=text,
+                                _text="This is text level result",
+                            )
 
         return document
 
@@ -148,15 +173,18 @@ class OllamaLLMAnnotator(BaseAnnotator):
         parser.add_argument(
             "--ollama_llm_annotator_name", type=str, default="ollama_llm"
         )
+
         parser.add_argument(
             "--ollama_llm_text_level",
             type=str,
             choices=["page", "sentence", "block"],
-            default="page",
+            default="block",
         )
+
         parser.add_argument(
-            "--ollama_llm_max_len",
-            type=int,
-            default=2048,
-            help="Maximum input length for LLM",
+            "--ollama_llm_target_layouts",
+            type=str,
+            nargs="+",
+            default=["text", "list", "cell"],
+            choices=LAYOUT_NAMES,
         )
