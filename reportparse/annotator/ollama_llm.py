@@ -7,8 +7,9 @@ from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
+from reportparse.annotator.store_pages import ChromaDBHandler
 
-
+chroma_db = ChromaDBHandler()
 @BaseAnnotator.register("ollama_llm")
 class OllamaLLMAnnotator(BaseAnnotator):
 
@@ -137,11 +138,17 @@ class OllamaLLMAnnotator(BaseAnnotator):
 
         for page in document.pages:
             if level == "page":
-                # print('--------PAGE-----------')
-                # print(page.text)
-                # print('--------PAGE2-----------')
+
+                # Get page number
+                page_number = page.num
+                # Get text from page
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
+
+                # Store page in ChromaDB
+                chroma_db.store_page(doc_name=document.name, page_number=page_number, text=text)
+
                 # print(text)
+
                 _annotate(_annotate_obj=page, _text=self.call_ollama_llm(text))
             else:
                 for block in page.blocks + page.table_blocks:
@@ -178,7 +185,7 @@ class OllamaLLMAnnotator(BaseAnnotator):
             "--ollama_llm_text_level",
             type=str,
             choices=["page", "sentence", "block"],
-            default="block",
+            default="page",
         )
 
         parser.add_argument(
