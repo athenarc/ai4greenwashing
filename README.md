@@ -26,7 +26,19 @@ pip install pip==23.3.1 setuptools==59.5.0 cython==3.0.6 wheel==0.42.0
 pip install "deepdoctection[pt]==0.26" --no-deps
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
+pip install langchain-ollama chromadb langchain-chroma
+pip install tqdm
+pip install langchain-groq
 ```
+If something is broken you might need to do:
+
+```bash
+pip install "deepdoctection[pt]==0.26" --no-deps
+pip install langchain-ollama chromadb langchain-chroma
+pip install tqdm
+pip install langchain-groq
+```
+a second time.
 
 Additionally, for the llm API to work, you need to create your own private keys [here](https://console.groq.com/keys), and add them to the .env file that you must create in accordance with the .env.example file.
 
@@ -36,6 +48,7 @@ For running locally, install ollama from https://ollama.com/ and then do
 
 ```
 ollama pull llama3.2
+ollama pull mxbai-embed-large
 ```
 
 This will have worse results due to using a smaller model, but does not need an API. Also, for Linux machines you should use:

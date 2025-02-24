@@ -146,4 +146,6 @@ ENV/
 ._.DS_Store
 
 #ignore the chroma_db database 
-./reportparse/database_data/chroma_db
+reportparse/database_data/chroma_db
+reportparse/database_data
+reportparse/asset/example_input
