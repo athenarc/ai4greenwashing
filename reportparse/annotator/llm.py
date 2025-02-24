@@ -5,7 +5,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 import argparse
 import ollama
 from langchain_groq import ChatGroq
-from reportparse.annotator.rag_database import chroma_db
+# from reportparse.annotator.rag_database import chroma_db
 from dotenv import load_dotenv
 
 @BaseAnnotator.register("llm")
@@ -13,7 +13,7 @@ class LLMAnnotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
-       self.db = chroma_db()
+       # self.db = chroma_db()
        return
     
     def call_llm(self, text): 
@@ -203,7 +203,7 @@ class LLMAnnotator(BaseAnnotator):
             if level == 'page':
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
                 #store text in chromadb
-                self.db.store_text_in_chromadb(text)
+                # self.db.store_text_in_chromadb(text)
             else: break
         for page in document.pages:
             if level == 'page':
