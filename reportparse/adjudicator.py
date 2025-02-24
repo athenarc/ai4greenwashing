@@ -25,16 +25,44 @@ df = document.to_dataframe(level='page')
 print(df)
 
 
-def retrieve_context(page_text, k=3):
+def retrieve_context(page_text, page_num, k=3):
     """Retrieve relevant context from ChromaDB using similarity search."""
     try:
-        results = collection.query(query_texts=[page_text], n_results=k)
+        # results = collection.query(query_texts=[page_text], n_results=k)
+        results = collection.query(
+            query_texts=[page_text],
+            n_results=k,
+            where={"page_number": {"$ne": page_num}},  # Exclude current page
+        )
         return "\n\n".join(results["documents"][0]) if results and results["documents"] else ""
     except Exception as e:
         logger.error(f"Error retrieving context from ChromaDB: {e}")
         return ""
 
-def verify_claim_with_context(claim, justification, context):
+# def verify_claim_with_context(claim, justification, context):
+#     """Use an LLM to verify if the claim is actually greenwashing based on document context."""
+#     prompt = f"""
+#     A report page flagged a potential greenwashing claim:
+
+#     **Claim:** {claim}
+#     **Justification:** {justification}
+
+#     Below is additional context from the rest of the document:
+
+#     {context}
+
+#     Based on the full document context, is this claim actual greenwashing, or does the report substantiate it? Provide a reasoned response.
+#     """
+
+#     try:
+#         response = ollama.chat(model="llama3.2", messages=[{"role": "user", "content": prompt}])
+#         return response["message"]["content"]
+#     except Exception as e:
+#         logger.error(f"Error calling Ollama LLM: {e}")
+#         return "Error: Could not generate a response."
+
+
+def verify_claim_with_context(claim, justification, page_text, context):
     """Use an LLM to verify if the claim is actually greenwashing based on document context."""
     prompt = f"""
     A report page flagged a potential greenwashing claim:
@@ -42,20 +70,16 @@ def verify_claim_with_context(claim, justification, context):
     **Claim:** {claim}
     **Justification:** {justification}
 
-    Below is additional context from the rest of the document:
+    Below is the full text of the page where the claim was found:
+
+    {page_text}
+
+    Additionally, below is relevant context from other pages in the document:
 
     {context}
 
     Based on the full document context, is this claim actual greenwashing, or does the report substantiate it? Provide a reasoned response.
     """
-
-    try:
-        response = ollama.chat(model="llama3.2", messages=[{"role": "user", "content": prompt}])
-        return response["message"]["content"]
-    except Exception as e:
-        logger.error(f"Error calling Ollama LLM: {e}")
-        return "Error: Could not generate a response."
-
 
 
 results = []
@@ -71,9 +95,9 @@ for idx, row in df.iterrows():
 
         claim, justification = parts[0].strip(), parts[1].strip()
 
-        context = retrieve_context(row["page_text"])
+        context = retrieve_context(row["page_text"], idx)
 
-        verdict = verify_claim_with_context(claim, justification, context)
+        verdict = verify_claim_with_context(claim, justification, row["page_text"], context)
 
         results.append({"page": idx, "claim": claim, "verdict": verdict})
 
