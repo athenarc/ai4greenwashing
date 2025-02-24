@@ -12,6 +12,7 @@ class ChromaDBHandler:
     def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db"):
         self.client = chromadb.PersistentClient(path=db_path)
 
+        # TODO: find out why this doesn't work
         # self.embedding_model = OllamaEmbeddingFunction(
         #     url="http://localhost:11434",
         #     model_name="mxbai-embed-large",
@@ -34,14 +35,13 @@ class ChromaDBHandler:
 
 
     def retrieve_relevant_pages(self, query: str, top_k: int = 3):
-        """Retrieve the most relevant pages based on the query."""
-        results = self.collection.query(query_texts=[query], n_results=top_k)
-
-        if not results or "documents" not in results or not results["documents"]:
-            return "No relevant pages found."
+        results = self.collection.query(
+            query_texts=[query],
+            n_results=top_k  
+        )
 
         retrieved_pages = []
         for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
             retrieved_pages.append(f"Page {meta['page_number']} (Doc {meta['doc_name']}):\n{doc}\n")
 
-        return "\n".join(retrieved_pages)
+        return "\n".join(retrieved_pages)  
