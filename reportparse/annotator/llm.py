@@ -28,7 +28,7 @@ class LLMAnnotator(BaseAnnotator):
                 groq_api_key=os.getenv("GROQ_API_KEY"),
             )
         else:
-            self.llm = ChatOllama(model="llama3.2", temperature=0)
+            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
     def call_llm(self, text, max_len=2048):

@@ -75,7 +75,7 @@ def verify_claim_with_context(claim, justification, page_text, context, use_groq
             )
             return response.json().get("choices", [{}])[0].get("message", {}).get("content", "Error: No response from Groq LLM")
         else:
-            response = ollama.chat(model="llama3.2", messages=[{"role": "user", "content": prompt}])
+            response = ollama.chat(model=os.getenv("OLLAMA_MODEL"), messages=[{"role": "user", "content": prompt}])
             return response["message"]["content"]
     except Exception as e:
         logger.error(f"Error calling LLM: {e}")
