@@ -27,14 +27,6 @@ class LLMAnnotator(BaseAnnotator):
                 max_retries=1,
                 groq_api_key=os.getenv("GROQ_API_KEY"),
             )
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_2"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY"),
-            )
         else:
             self.llm = ChatOllama(model="llama3.2", temperature=0)
         return
