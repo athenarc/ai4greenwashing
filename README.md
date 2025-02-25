@@ -2,7 +2,7 @@
 
 Project for employing AI techniques for detecting and justifying greenwashing claims.
 
-## How to install and run:
+## Installation:
 
 after cloning the repository, it is recommended that you create a virtual enviroment
 
@@ -40,9 +40,9 @@ pip install langchain-groq
 ```
 a second time.
 
-Additionally, for the llm API to work, you need to create your own private keys [here](https://console.groq.com/keys), and add them to the .env file that you must create in accordance with the .env.example file.
+Additionally, for the llm API to work, you need to create your own private API key [here](https://console.groq.com/keys), and add it to the .env file that you must create in accordance with the .env.example file.
 
-Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted to the .env file can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
+Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
 
 For running locally, install ollama from https://ollama.com/ and then do
 
@@ -64,3 +64,36 @@ systemctl start/stop ollama.service
 ```
 
 otherwise the process will keep restarting even if killed.
+
+## Running:
+
+Run either:
+```bash
+python -m reportparse.main \
+  -i ./reportparse/asset/example.pdf \
+  -o ./results \
+  --input_type "pdf" \
+  --overwrite_strategy "no" \
+  --reader "pymupdf" \
+  --annotators "llm"
+```
+or to use layout analysis: 
+
+```bash
+python -m reportparse.main \
+  -i ./reportparse/asset/example.pdf \
+  -o ./results \
+  --input_type "pdf" \
+  --overwrite_strategy "no" \
+  --reader "deepdoctection" \
+  --annotators "llm"
+  ```
+
+You can use ollama_llm instead of llm to run locally.
+This will store all pages in a chromadb and afterwards annotate each page.
+
+Then run:
+```bash
+python -m reportparse.adjudicator
+```
+for final verdicts.
