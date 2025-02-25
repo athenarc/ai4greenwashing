@@ -160,10 +160,10 @@ class LLMAnnotator(BaseAnnotator):
                 # Get text from page
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
 
-                # chroma_db.store_page(doc_name=document.name, page_number=page_number, text=text)
+                chroma_db.store_page(doc_name=document.name, page_number=page_number, text=text)
                 # print(len(text))
-                if page_number < 20 and page_number % 2 == 0:
-                    _annotate(_annotate_obj=page, _text=self.call_llm(text))
+                # if page_number < 20 and page_number % 2 == 0:
+                _annotate(_annotate_obj=page, _text=self.call_llm(text))
             else:
                 for block in page.blocks + page.table_blocks:
                     if (
