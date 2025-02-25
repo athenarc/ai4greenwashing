@@ -18,7 +18,7 @@ class LLMAnnotator(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
-        if os.getenv("USE_GROQ_API") == "true":
+        if os.getenv("USE_GROQ_API") == "True":
             self.llm = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
@@ -162,7 +162,7 @@ class LLMAnnotator(BaseAnnotator):
 
                 # chroma_db.store_page(doc_name=document.name, page_number=page_number, text=text)
                 # print(len(text))
-                if page_number < 27 and page_number % 2 == 0:
+                if page_number < 20 and page_number % 2 == 0:
                     _annotate(_annotate_obj=page, _text=self.call_llm(text))
             else:
                 for block in page.blocks + page.table_blocks:
