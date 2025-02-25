@@ -25,8 +25,8 @@ else:
     use_groq = False
 print(use_groq)
 
-use_justification = False
-use_chunks = False
+# use_justification = False
+# use_chunks = False
 
 # parser.add_argument("--use_justification", action="store_true", help="Use justification of LLM claim")
 # args = parser.parse_args()
@@ -85,7 +85,7 @@ def retrieve_context(claim, page_num, db, k=3, use_chunks=False):
 
 
 
-def verify_claim_with_context(claim, justification, page_text, context, use_groq=use_groq, use_justification=use_justification):
+def verify_claim_with_context(claim, justification, page_text, context, use_groq=use_groq, use_justification=False):
     """Use an LLM (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
     if use_justification:
         prompt = f"""
@@ -156,13 +156,11 @@ def verify_claim_with_context(claim, justification, page_text, context, use_groq
 results = []
 flag = "llm"
 db_handler = ChromaDBHandler()
-
 for use_chunks in [False, True]:
     for use_justification in [False, True]:
         for idx, row in df.iterrows():
             if flag not in row or pd.isna(row[flag]):
                 continue  
-            
             row[flag] = re.sub(r"No greenwashing claims found\s*$", "", row[flag])
             claim_pattern = r"Potential greenwashing claim:\s*(.*?)\s*Justification:\s*(.*?)(?=\nPotential greenwashing claim:|\Z)"
 
@@ -174,9 +172,10 @@ for use_chunks in [False, True]:
 
                 context = retrieve_context(claim, idx, db_handler, k=6, use_chunks=use_chunks)
 
-                verdict = verify_claim_with_context(claim, justification, row["page_text"], context, use_groq=use_groq)
+                verdict = verify_claim_with_context(claim, justification, row["page_text"], context, use_groq=use_groq, use_justification=use_justification)
 
                 results.append({"page": idx, "claim": claim, "verdict": verdict})
+                break
 
 
         filename = f"verified_{model_name}_use_justification_{use_justification}_use_chunks_{use_chunks}.json"
