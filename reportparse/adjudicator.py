@@ -8,17 +8,23 @@ import chromadb
 import requests
 from reportparse.structure.document import Document
 import re
+from reportparse.annotator.store_pages import ChromaDBHandler
+from langchain_groq import ChatGroq
 
 logger = getLogger(__name__)
 
-parser = argparse.ArgumentParser(description="Verify greenwashing claims using LLMs")
-parser.add_argument("--use_groq", action="store_true", help="Use Groq LLM instead of Ollama")
-args = parser.parse_args()
-if args.use_groq and os.getenv("USE_GROQ_API") == "True":
+# parser = argparse.ArgumentParser(description="Verify greenwashing claims using LLMs")
+# parser.add_argument("--use_groq", action="store_true", help="Use Groq LLM instead of Ollama")
+# args = parser.parse_args()
+# if args.use_groq and os.getenv("USE_GROQ_API") == "True":
+
+print(os.getenv("USE_GROQ_API"))
+if os.getenv("USE_GROQ_API") == "True":
     use_groq = True
 else:
     use_groq = False
-    
+print(use_groq)
+
 use_justification = False
 use_chunks = False
 
@@ -39,9 +45,9 @@ use_chunks = False
 #     use_chunks = False
 
 model_name = os.getenv("OLLAMA_MODEL") if not use_groq else os.getenv("GROQ_LLM_MODEL_1")
+print(model_name)
 
-
-CHROMA_DB_PATH = "reportparse/database_data/chroma_db_2s"
+CHROMA_DB_PATH = "reportparse/database_data/chroma_db_2"
 
 try:
     client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
@@ -57,21 +63,25 @@ df = document.to_dataframe(level='page')
 print(df)
 
 
-def retrieve_context(claim, page_num, db, k=3, use_chunks=use_chunks):
-    """Retrieve relevant context from ChromaDB based on claim similarity."""
+def retrieve_context(claim, page_num, db, k=3, use_chunks=False):
     try:
-        relevant_texts = db.retrieve_relevant_pages(claim, top_k=k, use_chunks=use_chunks)
+        collection = db.chunk_collection if use_chunks else db.page_collection
+        results = collection.query(query_texts=[claim], n_results=k)  # Perform the query
 
-        # Remove current page from context
+        relevant_texts = "\n".join([result[0] for result in results["documents"]])  # Access the documents properly
+
+        # Remove the current page from the context
         filtered_texts = "\n".join(
             line for line in relevant_texts.split("\n") if f"Page {page_num} " not in line
         )
 
-        return filtered_texts if filtered_texts.strip() else ""
+        return filtered_texts.strip() if filtered_texts.strip() else ""
 
     except Exception as e:
         logger.error(f"Error retrieving context from ChromaDB: {e}")
         return ""
+
+
 
 
 
@@ -113,29 +123,39 @@ def verify_claim_with_context(claim, justification, page_text, context, use_groq
 
     try:
         if use_groq:
-            model_name=os.getenv("GROQ_LLM_MODEL_1")
-            response = requests.post(
-                "https://api.groq.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {os.getenv('GROQ_API_KEY_1')}", "Content-Type": "application/json"},
-                json={"model": "mixtral-8x7b-32768", "messages": [{"role": "user", "content": prompt}]}
-            )
-            return response.json().get("choices", [{}])[0].get("message", {}).get("content", "Error: No response from Groq LLM")
+            try:
+                # Initialize the ChatGroq object with the appropriate parameters
+                llm = ChatGroq(
+                    model=os.getenv("GROQ_LLM_MODEL_1"),
+                    temperature=0,          
+                    max_tokens=None,        
+                    timeout=None,           
+                    max_retries=1,          
+                    groq_api_key=os.getenv("GROQ_API_KEY"), 
+                )
+                
+                response = llm.invoke(prompt)
+
+                # Return the response content from Groq
+                return response.content
+            
+            except Exception as e:
+                logger.error(f"Error calling Groq API: {e}")
+                return "Error: Could not generate a response from Groq."
+
         else:
-            model_name=os.getenv("OLLAMA_MODEL")
-            response = ollama.chat(model=os.getenv("OLLAMA_MODEL"), messages=[{"role": "user", "content": prompt}])
+            print("here")
+            response = ollama.chat(model=model_name, messages=[{"role": "user", "content": prompt}])
             return response["message"]["content"]
     except Exception as e:
         logger.error(f"Error calling LLM: {e}")
         return "Error: Could not generate a response."
 
 
-results = []
-if use_groq:
-    flag = "llm"
-else:
-    flag = "ollama_llm"
-print(flag)
 
+results = []
+flag = "llm"
+db_handler = ChromaDBHandler()
 
 for use_chunks in [False, True]:
     for use_justification in [False, True]:
@@ -152,9 +172,9 @@ for use_chunks in [False, True]:
                 claim = claim.strip()
                 justification = justification.strip()
 
-                context = retrieve_context(claim, idx)
+                context = retrieve_context(claim, idx, db_handler, k=6, use_chunks=use_chunks)
 
-                verdict = verify_claim_with_context(claim, justification, row["page_text"], context, use_groq=False)
+                verdict = verify_claim_with_context(claim, justification, row["page_text"], context, use_groq=use_groq)
 
                 results.append({"page": idx, "claim": claim, "verdict": verdict})
 

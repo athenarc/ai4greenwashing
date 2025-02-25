@@ -8,7 +8,7 @@ from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 repo_root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
 class ChromaDBHandler:
-    def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_d_2"):
+    def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db_2"):
         self.client = chromadb.PersistentClient(path=db_path)
 
         self.page_collection = self.client.get_or_create_collection(name="parsed_pages")
@@ -73,7 +73,7 @@ class ChromaDBHandler:
         results = collection.query(query_texts=[query], n_results=top_k)
 
         retrieved_texts = []
-        for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+        for doc, meta in zip(results["documents"], results["metadatas"]):
             retrieved_texts.append(f"Page {meta['page_number']} (Doc {meta['doc_name']}):\n{doc}\n")
 
         return "\n".join(retrieved_texts)
