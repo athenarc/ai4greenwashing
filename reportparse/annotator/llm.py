@@ -27,8 +27,11 @@ class LLMAnnotator(BaseAnnotator):
                 max_retries=1,
                 groq_api_key=os.getenv("GROQ_API_KEY"),
             )
+            print(f"Using Groq model: {os.getenv('GROQ_LLM_MODEL_1')} as annotator.")
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            # print model used
+            print(f"Using Ollama model: {os.getenv('OLLAMA_MODEL')} as annotator.")
         return
 
     def call_llm(self, text, max_len=2048):
@@ -40,19 +43,18 @@ class LLMAnnotator(BaseAnnotator):
         messages = [
             (
                 "system",
-                f"""You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
-         Your answer should follow the following format: 
+                f"""You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. If no greenwashing claims are found, return this message:
+                "No greenwashing claims found"
+        DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT. Your answer should follow the following format repeated for one or more claims found, else "No greenwashing claims found": 
 
-         Potential greenwashing claim: [the claim]
-         Justification: [short justification]
+        <Start of format>
 
-         Another potential greenwashing claim: [another claim]
-         Justification for the second claim: [another justification]
-         
-         If no greenwashing claims are found, return this message:
-         "No greenwashing claims found"
+        Potential greenwashing claim: [the claim]
+        Justification: [short justification]
+        
+        ...
 
-         DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
+        <End of format>
          """,
             ),
             ("human", text),
@@ -78,30 +80,34 @@ class LLMAnnotator(BaseAnnotator):
 
         map_template = PromptTemplate.from_template(
             """
-            You are a fact-checker specializing in greenwashing. Fact-check the given text and find any greenwashing claims.
-            Your answer should follow this format:
-            
-            Potential greenwashing claim: [the claim]
-            Justification: [short justification]
-            
-            If no greenwashing claims are found, return:
+            You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. If no greenwashing claims are found, return this message:
             "No greenwashing claims found"
-            
-            DO NOT MAKE ANY COMMENTARY. JUST PROVIDE THE MENTIONED FORMAT.
-            Text to be examined: {docs}
+        DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT. Your answer should follow the following format repeated for one or more claims found, else "No greenwashing claims found": 
+        <Start of format>
+
+        Potential greenwashing claim: [the claim]
+        Justification: [short justification]
+        
+        ...
+
+        <End of format>
+        Text to be examined: {docs}
         """
         )
 
         reduce_template = PromptTemplate.from_template(
             """
-            Synthesize the following results into a single conclusion. Follow this format:
-            
-            If no greenwashing claims are found, return:
+            Synthesize the following results into a single conclusion. If no greenwashing claims are found in any of the results, return:
             "No greenwashing claims found"
-            Otherwise:
+            DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT. Your answer should follow the following format repeated for one or more claims found. Only if no greenwashing claims are found in any of the results, return "No greenwashing claims found": 
+            <Start of format>
+
             Potential greenwashing claim: [the claim]
             Justification: [short justification]
             
+            ...
+
+            <End of format>
             The results are listed below: {docs}
         """
         )
@@ -112,7 +118,6 @@ class LLMAnnotator(BaseAnnotator):
         results = []
         for chunk in chunks:
             results.append(map_chain.invoke({"docs": chunk}).content)
-            time.sleep(3)
 
         combined_results = "\n".join(results)
         final_summary = reduce_chain.invoke({"docs": combined_results})
@@ -155,14 +160,10 @@ class LLMAnnotator(BaseAnnotator):
                 # Get text from page
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
 
-                # Store page in ChromaDB
-                chroma_db.store_page(
-                    doc_name=document.name, page_number=page_number, text=text
-                )
-
-                # print(text)
-
-                _annotate(_annotate_obj=page, _text=self.call_llm(text))
+                # chroma_db.store_page(doc_name=document.name, page_number=page_number, text=text)
+                # print(len(text))
+                if page_number < 27 and page_number % 2 == 0:
+                    _annotate(_annotate_obj=page, _text=self.call_llm(text))
             else:
                 for block in page.blocks + page.table_blocks:
                     if (
