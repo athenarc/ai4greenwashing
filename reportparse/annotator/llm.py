@@ -6,7 +6,7 @@ import argparse
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
-from reportparse.annotator.store_pages import ChromaDBHandler
+from reportparse.db_rag.db import ChromaDBHandler
 import os
 import time
 
@@ -19,14 +19,24 @@ class LLMAnnotator(BaseAnnotator):
     def __init__(self):
         load_dotenv()
         if os.getenv("USE_GROQ_API") == "True":
-            self.llm = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_1"),
+            self.llm = ChatGroq( 
+                model=os.getenv("GROQ_LLM_MODEL_1"), 
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY"),
+                groq_api_key=os.getenv("GROQ_API_KEY_1"),
             )
+
+            self.llm_2 = ChatGroq(
+                model=os.getenv("GROQ_LLM_MODEL_2"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                groq_api_key=os.getenv("GROQ_API_KEY_2"),
+            )
+
             print(f"Using Groq model: {os.getenv('GROQ_LLM_MODEL_1')} as annotator.")
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)

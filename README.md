@@ -88,12 +88,3 @@ python -m reportparse.main \
   --reader "deepdoctection" \
   --annotators "llm"
   ```
-
-You can use ollama_llm instead of llm to run locally.
-This will store all pages in a chromadb and afterwards annotate each page.
-
-Then run:
-```bash
-python -m reportparse.adjudicator
-```
-for final verdicts.
