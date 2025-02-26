@@ -35,6 +35,6 @@ class pipeline:
         return result
     
 
-pip = pipeline('Toyota factory is harming the enviroment', 3)
-result = pip.retrieve_knowledge()
-print(print("\n".join(result.astype(str))) )
+# pip = pipeline('Toyota factory is harming the enviroment', 3)
+# result = pip.retrieve_knowledge()
+# print(print("\n".join(result.astype(str))) )
