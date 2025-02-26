@@ -3,12 +3,8 @@ from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 import argparse
-from langchain_groq import ChatGroq
-from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
-from reportparse.annotator.store_pages import ChromaDBHandler
-import os
-import time
+from reportparse.db_rag.db import ChromaDBHandler
 
 chroma_db = ChromaDBHandler()
 

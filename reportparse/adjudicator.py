@@ -8,7 +8,7 @@ import chromadb
 import requests
 from reportparse.structure.document import Document
 import re
-from reportparse.annotator.store_pages import ChromaDBHandler
+from reportparse.db_rag.db import ChromaDBHandler
 from langchain_groq import ChatGroq
 
 logger = getLogger(__name__)

@@ -33,10 +33,7 @@ pip install langchain-groq
 If something is broken you might need to do:
 
 ```bash
-pip install "deepdoctection[pt]==0.26" --no-deps
-pip install langchain-ollama chromadb langchain-chroma
-pip install tqdm
-pip install langchain-groq
+pip install "deepdoctection[pt]==0.26" --no-deps tqdm langchain-ollama chromadb langchain-groq langchain-chroma
 ```
 a second time.
 
