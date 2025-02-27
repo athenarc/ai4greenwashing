@@ -160,7 +160,11 @@ class LLMAnnotator(BaseAnnotator):
     #todo: add info truncation if text is too big for llm to handle.
     def web_rag(self, claim, web_sources):
         pip = pipeline(claim, web_sources)
-        result, url_list = pip.retrieve_knowledge()
+        try:
+            result, url_list = pip.retrieve_knowledge()
+        except Exception as e:
+            print(e)
+            return None, []
         try:
             info = "\n".join(result.astype(str))
             if info: 
