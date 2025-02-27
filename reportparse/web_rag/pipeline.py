@@ -32,7 +32,7 @@ class pipeline:
                 print('Could not find relevant sources.')
                 return None
         
-        return result
+        return result, self.harvested_urls
     
 
 # pip = pipeline('Toyota factory is harming the enviroment', 3)

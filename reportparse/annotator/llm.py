@@ -5,6 +5,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.web_rag.pipeline import pipeline
 import argparse
 import re
+import json
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
@@ -159,7 +160,7 @@ class LLMAnnotator(BaseAnnotator):
     #todo: add info truncation if text is too big for llm to handle.
     def web_rag(self, claim, web_sources):
         pip = pipeline(claim, web_sources)
-        result = pip.retrieve_knowledge()
+        result, url_list = pip.retrieve_knowledge()
         try:
             info = "\n".join(result.astype(str))
             if info: 
@@ -192,12 +193,12 @@ class LLMAnnotator(BaseAnnotator):
                 try:
                     print('Invoking with the first llm...')
                     ai_msg = self.llm.invoke(messages)
-                    return ai_msg.content
+                    return ai_msg.content, url_list
                 except Exception as e:
                     try:
                         print('Invoking with the second llm...')
                         ai_msg = self.llm_2.invoke(messages)
-                        return ai_msg.content
+                        return ai_msg.content, url_list
                     except Exception as e:
                         print(e)
                         return 'No web content found'
@@ -217,15 +218,16 @@ class LLMAnnotator(BaseAnnotator):
         target_layouts = args.llm_target_layouts if args is not None else list(target_layouts)
         web_rag = args.web_rag if args is not None else 'no'
 
-        def _annotate(_annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, score_value):
-            _annotate_obj.add_annotation(
+        def _annotate(_annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata):
+                _annotate_obj.add_annotation(
                 annotation=Annotation(
                     parent_object=_annotate_obj,
                     annotator=annotator_name,
                     value= _text,
-                    meta={'score': score_value}
+                    meta=json.loads(metadata)
                 )
             )
+
         for page in document.pages:
             if level == 'page':
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
@@ -233,7 +235,7 @@ class LLMAnnotator(BaseAnnotator):
                 result = str(result)
                 _annotate(_annotate_obj=page, _text=result, annotator_name=
                           args.llm_annotator_name if args is not None else annotator_name,
-                          score_value='Simple greenwashing detection')
+                          metadata=json.dumps({"info": "Simple greenwashing detection"}))
 
 
                 if web_rag =='yes':
@@ -242,10 +244,14 @@ class LLMAnnotator(BaseAnnotator):
                     claims = [c.strip() for c in claims]
                     for c in claims:
 
-                        web_rag_result = self.web_rag(c, web_sources=1)
+                        web_rag_result, url_list = self.web_rag(c, web_sources=1)
+                        claim_dict = {
+                        "claim": c,
+                        "urls": url_list
+                        }
+                        json_output = json.dumps(claim_dict)
 
-                        _annotate(_annotate_obj=page, _text=web_rag_result, annotator_name='web_rag_result',
-                                  score_value=f'Claim: {c}')
+                        _annotate(_annotate_obj=page, _text=web_rag_result, annotator_name='web_rag_result', metadata=json_output)
 
 
 
