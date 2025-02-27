@@ -305,8 +305,7 @@ class LLMAnnotator(BaseAnnotator):
         parser.add_argument(
             '--web_rag',
             type=str,
-            default='no',
-            
+            default='yes'
         )
 
 

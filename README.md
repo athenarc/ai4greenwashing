@@ -45,9 +45,7 @@ python -m reportparse.main \
   --input_type "pdf" \
   --overwrite_strategy "no" \
   --reader "pymupdf" \
-  --annotators "llm" "web_rag" \
-  --use_chroma
-  --web_rag "yes"
+  --annotators "chroma" "web_rag" \
 ```
 
 

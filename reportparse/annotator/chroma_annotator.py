@@ -17,7 +17,7 @@ chroma_db = ChromaDBHandler()
 model_name = os.getenv("GROQ_LLM_MODEL_1") if os.getenv("USE_GROQ_API") == "True" else os.getenv("OLLAMA_MODEL")
 
 
-@BaseAnnotator.register("llm")
+@BaseAnnotator.register("chroma")
 class LLMAnnotator(BaseAnnotator):
 
     def __init__(self):
@@ -250,12 +250,12 @@ class LLMAnnotator(BaseAnnotator):
         args=None,
         level="block",
         target_layouts=("text", "list", "cell"),
-        annotator_name="llm-test",
+        annotator_name="chroma",
     ) -> Document:
-        annotator_name = args.llm_annotator_name if args is not None else annotator_name
-        level = args.llm_text_level if args is not None else level
+        annotator_name = args.chroma_annotator_name if args is not None else annotator_name
+        level = args.chroma_text_level if args is not None else level
         target_layouts = (
-            args.llm_target_layouts if args is not None else list(target_layouts)
+            args.chroma_target_layouts if args is not None else list(target_layouts)
         )
         use_chroma = args.use_chroma if args is not None else False
         use_chunks = args.use_chunks if args is not None else False
@@ -302,7 +302,7 @@ class LLMAnnotator(BaseAnnotator):
                     _annotate_obj=page,
                     _text=result,
                     annotator_name=(
-                        args.llm_annotator_name if args is not None else annotator_name
+                        args.chroma_annotator_name if args is not None else annotator_name
                     ),
                     score_value="Simple greenwashing detection",
                 )
@@ -351,18 +351,18 @@ class LLMAnnotator(BaseAnnotator):
 
     def add_argument(self, parser: argparse.ArgumentParser):
 
-        parser.add_argument("--llm_annotator_name", type=str, default="llm")
+        parser.add_argument("--chroma_annotator_name", type=str, default="chroma")
 
         # todo: add page level block
         parser.add_argument(
-            "--llm_text_level",
+            "--chroma_text_level",
             type=str,
             choices=["page", "sentence", "block"],
             default="page",
         )
 
         parser.add_argument(
-            "--llm_target_layouts",
+            "--chroma_target_layouts",
             type=str,
             nargs="+",
             default=["text", "list", "cell"],
