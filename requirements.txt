@@ -148,7 +148,7 @@ tensorboard==2.18.0
 tensorboard-data-server==0.7.2
 termcolor==2.0.1
 thinc==8.2.5
-timm==0.6.12
+timm
 tokenizers==0.13.3
 tomli==2.2.1
 toolz==1.0.0
@@ -177,3 +177,5 @@ detectron2 @ git+https://github.com/facebookresearch/detectron2.git@ff53992b1985
 duckduckgo_search
 bs4
 stanza
+chromadb
+langchain_ollama
