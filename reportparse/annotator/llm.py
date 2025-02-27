@@ -17,18 +17,18 @@ chroma_db = ChromaDBHandler()
 model_name = os.getenv("GROQ_LLM_MODEL_1") if os.getenv("USE_GROQ_API") == "True" else os.getenv("OLLAMA_MODEL")
 
 
-@BaseAnnotator.register("llm_test")
-class llm_testAnnotator(BaseAnnotator):
+@BaseAnnotator.register("llm")
+class LLMAnnotator(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
         return
 
-    def call_llm_test(self, text):
+    def call_llm(self, text):
 
         time.sleep(5)
         if os.getenv("USE_GROQ_API") == "True":
-            self.llm_test = ChatGroq(
+            self.llm = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
@@ -37,7 +37,7 @@ class llm_testAnnotator(BaseAnnotator):
                 groq_api_key=os.getenv("GROQ_API_KEY_1"),
             )
 
-            self.llm_test_2 = ChatGroq(
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_2"),
                 temperature=0,
                 max_tokens=None,
@@ -46,8 +46,8 @@ class llm_testAnnotator(BaseAnnotator):
                 groq_api_key=os.getenv("GROQ_API_KEY_2"),
             )
         else:
-            self.llm_test = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-            self.llm_test_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
 
         messages = [
             (
@@ -71,30 +71,30 @@ class llm_testAnnotator(BaseAnnotator):
         ]
 
         try:
-            print("Invoking with the first llm_test...")
+            print("Invoking with the first llm...")
             if len(text.split()) >= 2000:
-                ai_msg = self.reduce_llm_test_input(text, self.llm_test)
+                ai_msg = self.reduce_llm_input(text, self.llm)
                 return ai_msg
             else:
-                ai_msg = self.llm_test.invoke(messages)
+                ai_msg = self.llm.invoke(messages)
                 return ai_msg.content
         except Exception as e:
             print(e)
             try:
-                print("Invoking with the second llm_test...")
+                print("Invoking with the second llm...")
                 if len(text.split()) >= 1900:
-                    ai_msg = self.reduce_llm_test_input(text, self.llm_test_2)
+                    ai_msg = self.reduce_llm_input(text, self.llm_2)
                     return ai_msg
                 else:
-                    ai_msg = self.llm_test_2.invoke(messages)
+                    ai_msg = self.llm_2.invoke(messages)
                     return ai_msg.content
             except Exception as e:
-                print("llm_test invokation failed. Returning none...")
+                print("llm invokation failed. Returning none...")
                 print(e)
                 return None
 
-    # method to reduce llm_test input if it is too large.
-    def reduce_llm_test_input(self, text, llm_test):
+    # method to reduce llm input if it is too large.
+    def reduce_llm_input(self, text, llm):
         import time
 
         print("Invoking map reduce function to split text")
@@ -144,8 +144,8 @@ class llm_testAnnotator(BaseAnnotator):
                             State the claim like a statement.
                            The result are listed below: {docs}"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
-        map_chain = map_prompt | llm_test  # Chain map prompt with llm_test
-        reduce_chain = reduce_prompt | llm_test  # Chain reduce prompt with llm_test
+        map_chain = map_prompt | llm  # Chain map prompt with llm
+        reduce_chain = reduce_prompt | llm  # Chain reduce prompt with llm
         result_1 = map_chain.invoke({"docs": chunk_1})
         time.sleep(5)
         result_2 = map_chain.invoke({"docs": chunk_2})
@@ -191,7 +191,7 @@ class llm_testAnnotator(BaseAnnotator):
                 return ""
 
         def verify_claim_with_context(claim, text, context):
-            """Use an llm_test (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
+            """Use an llm (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
             messages=[
             (
                     "system",
@@ -226,17 +226,17 @@ class llm_testAnnotator(BaseAnnotator):
                 ("human", f"{text}"),
             ]
             try:
-                print("Calling llm_test to verify claim with context")
+                print("Calling llm to verify claim with context")
                 try:
-                    ai_msg = self.llm_test.invoke(messages)
+                    ai_msg = self.llm.invoke(messages)
                     return ai_msg.content
                     
                 except Exception as e:
                     logger.error(f"Error calling the API: {e}")
-                    return "Error: Could not generate a response from the llm_test."
+                    return "Error: Could not generate a response from the llm."
                     
             except Exception as e:
-                logger.error(f"Error calling llm_test: {e}")
+                logger.error(f"Error calling llm: {e}")
                 return "Error: Could not generate a response."
 
         context = retrieve_context(claim=claim, page_number=page_number, db=chroma_db, k=k, use_chunks=use_chunks)
@@ -250,12 +250,12 @@ class llm_testAnnotator(BaseAnnotator):
         args=None,
         level="block",
         target_layouts=("text", "list", "cell"),
-        annotator_name="llm_test-test",
+        annotator_name="llm-test",
     ) -> Document:
-        annotator_name = args.llm_test_annotator_name if args is not None else annotator_name
-        level = args.llm_test_text_level if args is not None else level
+        annotator_name = args.llm_annotator_name if args is not None else annotator_name
+        level = args.llm_text_level if args is not None else level
         target_layouts = (
-            args.llm_test_target_layouts if args is not None else list(target_layouts)
+            args.llm_target_layouts if args is not None else list(target_layouts)
         )
         use_chroma = args.use_chroma if args is not None else False
         use_chunks = args.use_chunks if args is not None else False
@@ -293,21 +293,21 @@ class llm_testAnnotator(BaseAnnotator):
         
         for page in document.pages:
             if level == "page":
-                print("Calling first llm_test to annotate")
+                print("Calling first llm to annotate")
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                result = self.call_llm_test(text)
+                result = self.call_llm(text)
                 result = str(result)
-                print("First llm_test result: ", result)
+                print("First llm result: ", result)
                 _annotate(
                     _annotate_obj=page,
                     _text=result,
                     annotator_name=(
-                        args.llm_test_annotator_name if args is not None else annotator_name
+                        args.llm_annotator_name if args is not None else annotator_name
                     ),
                     score_value="Simple greenwashing detection",
                 )
                 if use_chroma:
-                    print("Calling second llm_test to annotate")
+                    print("Calling second llm to annotate")
                     page_number = page.num
                     claims = re.findall(
                         r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result
@@ -315,7 +315,7 @@ class llm_testAnnotator(BaseAnnotator):
                     claims = [c.strip() for c in claims]
                     for c in claims:
                         chroma_result = self.call_chroma(c, text, page_number, chroma_db, k=6, use_chunks=use_chunks)
-                        print("Second llm_test result: ", chroma_result)
+                        print("Second llm result: ", chroma_result)
                         _annotate(
                             _annotate_obj=page,
                             _text=chroma_result,
@@ -351,18 +351,18 @@ class llm_testAnnotator(BaseAnnotator):
 
     def add_argument(self, parser: argparse.ArgumentParser):
 
-        parser.add_argument("--llm_test_annotator_name", type=str, default="llm_test")
+        parser.add_argument("--llm_annotator_name", type=str, default="llm")
 
         # todo: add page level block
         parser.add_argument(
-            "--llm_test_text_level",
+            "--llm_text_level",
             type=str,
             choices=["page", "sentence", "block"],
             default="page",
         )
 
         parser.add_argument(
-            "--llm_test_target_layouts",
+            "--llm_target_layouts",
             type=str,
             nargs="+",
             default=["text", "list", "cell"],
