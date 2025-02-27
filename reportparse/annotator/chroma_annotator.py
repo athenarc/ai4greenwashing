@@ -13,21 +13,18 @@ from langchain_ollama import ChatOllama
 
 logger = getLogger(__name__)
 
-chroma_db = ChromaDBHandler()
-model_name = os.getenv("GROQ_LLM_MODEL_1") if os.getenv("USE_GROQ_API") == "True" else os.getenv("OLLAMA_MODEL")
-
-
 @BaseAnnotator.register("chroma")
 class LLMAnnotator(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
+        self.chroma_db = ChromaDBHandler()
         return
 
     def call_llm(self, text):
 
         time.sleep(5)
-        if os.getenv("USE_GROQ_API") == "True":
+        if os.getenv("USE_GROQ_API") == "True" and False:
             self.llm = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
@@ -71,12 +68,16 @@ class LLMAnnotator(BaseAnnotator):
         ]
 
         try:
-            print("Invoking with the first llm...")
+            print("Invoking the first llm...")
             if len(text.split()) >= 2000:
+                print("hi1")
                 ai_msg = self.reduce_llm_input(text, self.llm)
+                print("AI message 1: ", ai_msg)
                 return ai_msg
             else:
+                print("hi2")
                 ai_msg = self.llm.invoke(messages)
+                print("AI message 1: ", ai_msg.content)
                 return ai_msg.content
         except Exception as e:
             print(e)
@@ -147,11 +148,11 @@ class LLMAnnotator(BaseAnnotator):
         map_chain = map_prompt | llm  # Chain map prompt with llm
         reduce_chain = reduce_prompt | llm  # Chain reduce prompt with llm
         result_1 = map_chain.invoke({"docs": chunk_1})
-        time.sleep(5)
+        #time.sleep(5)
         result_2 = map_chain.invoke({"docs": chunk_2})
-        time.sleep(5)
+        #time.sleep(5)
         result_3 = map_chain.invoke({"docs": chunk_3})
-        time.sleep(5)
+        #time.sleep(5)
         result_1_text = (
             result_1.content if hasattr(result_1, "content") else str(result_1)
         )
@@ -172,23 +173,37 @@ class LLMAnnotator(BaseAnnotator):
 
 
     def call_chroma(self, claim, text, page_number, chroma_db, k=6, use_chunks=False):
-        def retrieve_context(claim, page_number, db, k=6, use_chunks=False):
+        def retrieve_context(claim, page_number, db, k=6, use_chunks=False, threshold=0.5):
             try:
-                print("Retrieving context from ChromaDB")
+                logger.info("Retrieving context from ChromaDB")
                 collection = db.chunk_collection if use_chunks else db.page_collection
-                results = collection.query(query_texts=[claim], n_results=k)
 
-                relevant_texts = "\n".join([result[0] for result in results["documents"]])
-
-                filtered_texts = "\n".join(
-                    line for line in relevant_texts.split("\n") if f"Page {page_number} " not in line
+                results = collection.query(
+                    query_texts=[claim],
+                    n_results=k,
+                    where={"page_number": {"$ne": page_number}},  # Exclude the current page
                 )
+                if results is None:
+                    return "", []
+                relevant_texts = []
+                retrieved_pages = []
+                
+                for i, (doc, score) in enumerate(zip(results["documents"], results["distances"])):
+                    if score[0] > threshold:  # Apply threshold filter
+                        continue
 
-                return filtered_texts.strip() if filtered_texts.strip() else ""
+                    metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
+                    page_num = metadata.get("page_number", "Unknown")
+
+                    retrieved_pages.append(page_num)
+                    relevant_texts.append(f"Page {page_num}: {doc[0]}")
+
+                return "\n".join(relevant_texts).strip(), retrieved_pages
 
             except Exception as e:
                 logger.error(f"Error retrieving context from ChromaDB: {e}")
-                return ""
+                return "", []
+
 
         def verify_claim_with_context(claim, text, context):
             """Use an llm (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
@@ -226,20 +241,16 @@ class LLMAnnotator(BaseAnnotator):
                 ("human", f"{text}"),
             ]
             try:
-                print("Calling llm to verify claim with context")
-                try:
-                    ai_msg = self.llm.invoke(messages)
-                    return ai_msg.content
-                    
-                except Exception as e:
-                    logger.error(f"Error calling the API: {e}")
-                    return "Error: Could not generate a response from the llm."
-                    
+                logger.info("Calling LLM to verify claim with context")
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
             except Exception as e:
-                logger.error(f"Error calling llm: {e}")
+                logger.error(f"Error calling LLM: {e}")
                 return "Error: Could not generate a response."
 
-        context = retrieve_context(claim=claim, page_number=page_number, db=chroma_db, k=k, use_chunks=use_chunks)
+        context, retrieved_pages = retrieve_context(claim, page_number, chroma_db, k, use_chunks)
+        print("Retrieved pages: ", retrieved_pages)
         result = verify_claim_with_context(claim=claim, text=text, context=context)
         return result
 
@@ -259,6 +270,7 @@ class LLMAnnotator(BaseAnnotator):
         )
         use_chroma = args.use_chroma if args is not None else False
         use_chunks = args.use_chunks if args is not None else False
+        print("Model name: ", os.getenv("GROQ_LLM_MODEL_1") if os.getenv("USE_GROQ_API") == "True" else os.getenv("OLLAMA_MODEL"))
 
         # Manual overrides to debug easily
         # use_chunks = False
@@ -286,7 +298,7 @@ class LLMAnnotator(BaseAnnotator):
                     text = page.get_text_by_target_layouts(
                         target_layouts=target_layouts
                     )
-                    chroma_db.store_page(
+                    self.chroma_db.store_page(
                         doc_name=document.name, page_number=page_number, text=text
                     )
             print("Finished storing in Chroma")
@@ -314,7 +326,7 @@ class LLMAnnotator(BaseAnnotator):
                     )
                     claims = [c.strip() for c in claims]
                     for c in claims:
-                        chroma_result = self.call_chroma(c, text, page_number, chroma_db, k=6, use_chunks=use_chunks)
+                        chroma_result = self.call_chroma(c, text, page_number, self.chroma_db, k=6, use_chunks=use_chunks)
                         print("Second llm result: ", chroma_result)
                         _annotate(
                             _annotate_obj=page,
