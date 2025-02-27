@@ -282,7 +282,7 @@ class LLMAnnotator(BaseAnnotator):
         parser.add_argument(
             '--web_rag_annotator_name',
             type=str,
-            default='llm'
+            default='web_rag'
         )
 
         #todo: add page level block
@@ -290,7 +290,7 @@ class LLMAnnotator(BaseAnnotator):
             '--web_rag_text_level',
             type=str,
             choices=['page', 'sentence', 'block'],
-            default='sentence'
+            default='page'
         )
 
         parser.add_argument(
