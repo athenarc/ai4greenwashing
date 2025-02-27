@@ -26,43 +26,13 @@ pip install pip==23.3.1 setuptools==59.5.0 cython==3.0.6 wheel==0.42.0
 pip install "deepdoctection[pt]==0.26" --no-deps
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
-pip install langchain-ollama chromadb langchain-chroma
-pip install tqdm
-pip install langchain-groq
+pip install langchain-ollama chromadb langchain-groq
+pip install sentence-transformers
 ```
-
-If something is broken you might need to do:
-
-```bash
-pip install "deepdoctection[pt]==0.26" --no-deps tqdm langchain-ollama chromadb langchain-groq langchain-chroma
-```
-
-a second time.
 
 Additionally, for the llm API to work, you need to create your own private API key [here](https://console.groq.com/keys), and add it to the .env file that you must create in accordance with the .env.example file.
 
 Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
-
-For running locally, install ollama from https://ollama.com/ and then do
-
-```
-ollama pull llama3.2
-ollama pull mxbai-embed-large
-```
-
-This will have worse results due to using a smaller model, but does not need an API. Also, for Linux machines you should use:
-
-```
-systemctl disable ollama.service
-```
-
-so that it does not start on boot, and start/stop ollama using:
-
-```
-systemctl start/stop ollama.service
-```
-
-otherwise the process will keep restarting even if killed.
 
 ## Running:
 
@@ -89,3 +59,24 @@ python -m reportparse.main \
   --reader "deepdoctection" \
   --annotators "llm"
 ```
+
+For running locally, install ollama from https://ollama.com/ and then do
+
+```
+ollama pull llama3.2
+ollama pull mxbai-embed-large
+```
+
+This will have worse results due to using a smaller model, but does not need an API. Also, for Linux machines you should use:
+
+```
+systemctl disable ollama.service
+```
+
+so that it does not start on boot, and start/stop ollama using:
+
+```
+systemctl start/stop ollama.service
+```
+
+otherwise the process will keep restarting even if killed.
