@@ -328,13 +328,20 @@ class LLMAnnotator(BaseAnnotator):
             print("Finished storing in Chroma")
 
         for page in document.pages:
-            if level == 'page':
+            if level == "page":
+                print("Calling first llm to annotate")
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
                 result = self.call_llm(text)
                 result = str(result)
-                _annotate(_annotate_obj=page, _text=result, annotator_name=
-                          args.llm_annotator_name if args is not None else annotator_name,
-                          metadata=json.dumps({"info": "Simple greenwashing detection"}))
+                print("First llm result: ", result)
+                _annotate(
+                    _annotate_obj=page,
+                    _text=result,
+                    annotator_name=(
+                        args.llm_annotator_name if args is not None else annotator_name
+                    ),
+                    score_value="Simple greenwashing detection",
+                )
 
 
                 if web_rag =='yes':
