@@ -36,7 +36,7 @@ Your private .env file must also include two large language models that are inst
 
 ## Running:
 
-Run either:
+Run:
 
 ```bash
 python -m reportparse.main \
@@ -45,20 +45,11 @@ python -m reportparse.main \
   --input_type "pdf" \
   --overwrite_strategy "no" \
   --reader "pymupdf" \
-  --annotators "llm"
+  --annotators "llm" "web_rag" \
+  --use_chroma
+  --web_rag "yes"
 ```
 
-or to use layout analysis:
-
-```bash
-python -m reportparse.main \
-  -i ./reportparse/asset/example.pdf \
-  -o ./results \
-  --input_type "pdf" \
-  --overwrite_strategy "no" \
-  --reader "deepdoctection" \
-  --annotators "llm"
-```
 
 For running locally, install ollama from https://ollama.com/ and then do
 
