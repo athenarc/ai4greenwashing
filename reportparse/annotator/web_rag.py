@@ -5,24 +5,18 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.web_rag.pipeline import pipeline
 import argparse
 import re
+import os 
 import json
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 @BaseAnnotator.register("web_rag")
-class LLMAnnotator(BaseAnnotator):
+class WEB_RAG_Annotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
-       return
-    
-    def call_llm(self, text): 
-        import os 
-        import time
-        
-        time.sleep(5)
-
-        self.llm = ChatGroq( 
+       
+       self.llm = ChatGroq( 
             model=os.getenv("GROQ_LLM_MODEL_1"), 
             temperature=0,
             max_tokens=None,
@@ -31,7 +25,7 @@ class LLMAnnotator(BaseAnnotator):
             groq_api_key=os.getenv("GROQ_API_KEY_1"),
         )
 
-        self.web_rag_2 = ChatGroq(
+       self.llm_2 = ChatGroq(
             model=os.getenv("GROQ_LLM_MODEL_2"),
             temperature=0,
             max_tokens=None,
@@ -39,6 +33,13 @@ class LLMAnnotator(BaseAnnotator):
             max_retries=1,
             groq_api_key=os.getenv("GROQ_API_KEY_2"),
         )
+       
+    
+    def call_llm(self, text): 
+        
+        import time
+        
+        time.sleep(5)
 
 
         messages = [
@@ -77,10 +78,10 @@ class LLMAnnotator(BaseAnnotator):
             try:
                 print('Invoking with the second llm...')
                 if len(text.split()) >= 1900:
-                    ai_msg = self.reduce_web_rag_input(text, self.web_rag_2)
+                    ai_msg = self.reduce_web_rag_input(text, self.llm_2)
                     return ai_msg
                 else:
-                    ai_msg = self.web_rag_2.invoke(messages)
+                    ai_msg = self.llm_2.invoke(messages)
                     return ai_msg.content
             except Exception as e:
                 print('LLM invokation failed. Returning none...')
@@ -157,6 +158,17 @@ class LLMAnnotator(BaseAnnotator):
         result = final_summary.content if hasattr(final_summary, 'content') else str(final_summary)
         return result
     
+
+    #function to extract label value from llm
+    def extract_label(self, text):
+        match = re.search(r'Result of the statement:(.*?)Justification:', text, re.DOTALL)
+        return match.group(1).strip() if match else ""
+    
+    def extract_justification(self, text):
+        match = re.search(r'Justification:\s*(.*)', text, re.DOTALL)
+        return match.group(1).strip() if match else ""
+
+    
     #todo: add info truncation if text is too big for llm to handle.
     def web_rag(self, claim, web_sources):
         pip = pipeline(claim, web_sources)
@@ -201,7 +213,7 @@ class LLMAnnotator(BaseAnnotator):
                 except Exception as e:
                     try:
                         print('Invoking with the second llm...')
-                        ai_msg = self.web_rag_2.invoke(messages)
+                        ai_msg = self.llm_2.invoke(messages)
                         return ai_msg.content, url_list
                     except Exception as e:
                         print(e)
@@ -251,7 +263,9 @@ class LLMAnnotator(BaseAnnotator):
                         web_rag_result, url_list = self.web_rag(c, web_sources=1)
                         claim_dict = {
                         "claim": c,
-                        "urls": url_list
+                        "urls": url_list,
+                        "Label": self.extract_label(web_rag_result),
+                        "Justification": self.extract_justification(web_rag_result)
                         }
                         json_output = json.dumps(claim_dict)
 
