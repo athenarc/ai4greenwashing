@@ -30,11 +30,13 @@ pip install langchain-ollama chromadb langchain-chroma
 pip install tqdm
 pip install langchain-groq
 ```
+
 If something is broken you might need to do:
 
 ```bash
 pip install "deepdoctection[pt]==0.26" --no-deps tqdm langchain-ollama chromadb langchain-groq langchain-chroma
 ```
+
 a second time.
 
 Additionally, for the llm API to work, you need to create your own private API key [here](https://console.groq.com/keys), and add it to the .env file that you must create in accordance with the .env.example file.
@@ -65,6 +67,7 @@ otherwise the process will keep restarting even if killed.
 ## Running:
 
 Run either:
+
 ```bash
 python -m reportparse.main \
   -i ./reportparse/asset/example.pdf \
@@ -74,7 +77,8 @@ python -m reportparse.main \
   --reader "pymupdf" \
   --annotators "llm"
 ```
-or to use layout analysis: 
+
+or to use layout analysis:
 
 ```bash
 python -m reportparse.main \
@@ -84,4 +88,4 @@ python -m reportparse.main \
   --overwrite_strategy "no" \
   --reader "deepdoctection" \
   --annotators "llm"
-  ```
+```
