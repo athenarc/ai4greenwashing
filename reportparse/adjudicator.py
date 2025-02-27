@@ -85,7 +85,7 @@ def retrieve_context(claim, page_num, db, k=3, use_chunks=False):
 
 
 
-def verify_claim_with_context(claim, justification, page_text, context, use_groq=use_groq, use_justification=False):
+def verify_claim_with_context(claim, justification, page_text, context, use_groq=False, use_justification=False):
     """Use an LLM (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
     if use_justification:
         prompt = f"""
