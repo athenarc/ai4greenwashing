@@ -7,11 +7,7 @@ from logging import getLogger
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.web_rag.pipeline import pipeline
 from reportparse.db_rag.db import ChromaDBHandler
-import argparse
-import re
-import json
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 
@@ -70,7 +66,6 @@ class LLMAnnotator(BaseAnnotator):
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
          State the claim like a statement.
          """,
-                
             ),
             ("human", f"{text}"),
         ]
@@ -132,7 +127,7 @@ class LLMAnnotator(BaseAnnotator):
          State the claim like a statement.
         Text to be examined: {docs}"""
         map_prompt = PromptTemplate.from_template(map_template)
-       # Define the reduce template
+        # Define the reduce template
         reduce_template = """Synthesize the following results, into a single conlcusion. Please follow the format that is given to you.
                             Find at least one greenwashing claim in the text.
                             If greenwashing claims were found, follow the format below:
@@ -149,75 +144,32 @@ class LLMAnnotator(BaseAnnotator):
                             State the claim like a statement.
                            The result are listed below: {docs}"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
-        map_chain = map_prompt | llm  # Chain map prompt with LLM
-        reduce_chain = reduce_prompt | llm  # Chain reduce prompt with LLM
+        map_chain = map_prompt | llm  # Chain map prompt with llm
+        reduce_chain = reduce_prompt | llm  # Chain reduce prompt with llm
         result_1 = map_chain.invoke({"docs": chunk_1})
         time.sleep(5)
         result_2 = map_chain.invoke({"docs": chunk_2})
         time.sleep(5)
         result_3 = map_chain.invoke({"docs": chunk_3})
         time.sleep(5)
-        result_1_text = result_1.content if hasattr(result_1, 'content') else str(result_1)
-        result_2_text = result_2.content if hasattr(result_2, 'content') else str(result_2)
-        result_3_text = result_3.content if hasattr(result_3, 'content') else str(result_3)
+        result_1_text = (
+            result_1.content if hasattr(result_1, "content") else str(result_1)
+        )
+        result_2_text = (
+            result_2.content if hasattr(result_2, "content") else str(result_2)
+        )
+        result_3_text = (
+            result_3.content if hasattr(result_3, "content") else str(result_3)
+        )
         combined_results = "\n".join([result_1_text, result_2_text, result_3_text])
         final_summary = reduce_chain.invoke({"docs": combined_results})
-        result = final_summary.content if hasattr(final_summary, 'content') else str(final_summary)
+        result = (
+            final_summary.content
+            if hasattr(final_summary, "content")
+            else str(final_summary)
+        )
         return result
-    
-    #todo: add info truncation if text is too big for llm to handle.
-    def web_rag(self, claim, web_sources):
-        pip = pipeline(claim, web_sources)
-        try:
-            result, url_list = pip.retrieve_knowledge()
-        except Exception as e:
-            print(e)
-            return None, []
-        try:
-            info = "\n".join(result.astype(str))
-            if info: 
-                messages = [
-                        (
-                            "system",
-                        f'''You have at your disposal information '[Information]' and a statement: '[User Input]' whose accuracy must be evaluated. 
-                            Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
 
-                            Before you decide:
-
-                            1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
-                            2. Compare the statement with the information you have, evaluating each element of the statement separately.
-                            3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
-
-                            Result: Provide a clear answer by choosing one of the following labels:
-
-                            - TRUE: If the statement is fully confirmed by the information and evidence you have.
-                            - FALSE: If the statement is clearly disproved by the information and evidence you have.
-                            - PARTIALLY TRUE: If the statement contains some correct elements, but not entirely accurate.
-                            - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
-
-                            Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
-
-                            Statement: '[User Input]'
-                            Result of the statement:
-                            Justification:'''),
-                        ("human", f'''External info '{info}'
-                         Statement: '{claim}' "'''),]
-                try:
-                    print('Invoking with the first llm...')
-                    ai_msg = self.llm.invoke(messages)
-                    return ai_msg.content, url_list
-                except Exception as e:
-                    try:
-                        print('Invoking with the second llm...')
-                        ai_msg = self.llm_2.invoke(messages)
-                        return ai_msg.content, url_list
-                    except Exception as e:
-                        print(e)
-                        return 'No web content found'
-            else: return 'No content was found from the web'
-        except Exception as e:
-            print(e)
-            return 'No content was found from the web'
 
     def call_chroma(self, claim, text, page_number, chroma_db, k=6, use_chunks=False):
         def retrieve_context(claim, page_number, db, k=6, use_chunks=False):
@@ -291,6 +243,7 @@ class LLMAnnotator(BaseAnnotator):
         result = verify_claim_with_context(claim=claim, text=text, context=context)
         return result
 
+    
     def annotate(
         self,
         document: Document,
@@ -301,19 +254,30 @@ class LLMAnnotator(BaseAnnotator):
     ) -> Document:
         annotator_name = args.llm_annotator_name if args is not None else annotator_name
         level = args.llm_text_level if args is not None else level
-        target_layouts = args.llm_target_layouts if args is not None else list(target_layouts)
-        web_rag = args.web_rag if args is not None else 'no'
+        target_layouts = (
+            args.llm_target_layouts if args is not None else list(target_layouts)
+        )
         use_chroma = args.use_chroma if args is not None else False
         use_chunks = args.use_chunks if args is not None else False
-        def _annotate(_annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata):
-                _annotate_obj.add_annotation(
+
+        # Manual overrides to debug easily
+        # use_chunks = False
+        use_chroma= True
+        def _annotate(
+            _annotate_obj: AnnotatableLevel,
+            _text: str,
+            annotator_name: str,
+            score_value,
+        ):
+            _annotate_obj.add_annotation(
                 annotation=Annotation(
                     parent_object=_annotate_obj,
                     annotator=annotator_name,
-                    value= _text,
-                    meta=json.loads(metadata)
+                    value=_text,
+                    meta={"score": score_value},
                 )
             )
+
         if use_chroma:
             print("Starting storing in Chroma")
             for page in document.pages:
@@ -326,7 +290,7 @@ class LLMAnnotator(BaseAnnotator):
                         doc_name=document.name, page_number=page_number, text=text
                     )
             print("Finished storing in Chroma")
-
+        
         for page in document.pages:
             if level == "page":
                 print("Calling first llm to annotate")
@@ -342,23 +306,6 @@ class LLMAnnotator(BaseAnnotator):
                     ),
                     score_value="Simple greenwashing detection",
                 )
-
-
-                if web_rag =='yes':
-                    
-                    claims = re.findall(r'(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)', result)
-                    claims = [c.strip() for c in claims]
-                    for c in claims:
-
-                        web_rag_result, url_list = self.web_rag(c, web_sources=1)
-                        claim_dict = {
-                        "claim": c,
-                        "urls": url_list
-                        }
-                        json_output = json.dumps(claim_dict)
-
-                        _annotate(_annotate_obj=page, _text=web_rag_result, annotator_name='web_rag_result', metadata=json_output)
-
                 if use_chroma:
                     print("Calling second llm to annotate")
                     page_number = page.num
@@ -375,7 +322,7 @@ class LLMAnnotator(BaseAnnotator):
                             annotator_name="chroma_result",
                             score_value=f"Claim: {c}",
                         )
-
+                    
             else:
                 for block in page.blocks + page.table_blocks:
                     if (
@@ -417,15 +364,9 @@ class LLMAnnotator(BaseAnnotator):
         parser.add_argument(
             "--llm_target_layouts",
             type=str,
-            choices=['page', 'sentence', 'block'],
-            default='sentence'
-        )
-
-        parser.add_argument(
-            '--web_rag',
-            type=str,
-            default='no',
-            
+            nargs="+",
+            default=["text", "list", "cell"],
+            choices=LAYOUT_NAMES,
         )
 
         parser.add_argument(

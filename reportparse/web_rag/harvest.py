@@ -16,7 +16,6 @@ import logging
 import warnings
 logging.getLogger("stanza").setLevel(logging.ERROR)
 warnings.filterwarnings("ignore", category=FutureWarning)
-from sentence_transformers import SentenceTransformer, util
 
 
 
