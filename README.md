@@ -39,15 +39,11 @@ Your private .env file must also include two large language models that are inst
 Run:
 
 ```bash
-python -m reportparse.main \
-  -i ./reportparse/asset/example.pdf \
-  -o ./results \
-  --input_type "pdf" \
-  --overwrite_strategy "no" \
-  --reader "pymupdf" \
-  --annotators "chroma" "web_rag" \
+python -m reportparse.main   -i reportparse/asset/example.pdf   -o ./results   --input_type "pdf"   --overwrite_strategy "all" --max_pages 10  --reader "pymupdf"   --annotators "llm_agg" --pages_to_gw 1
 ```
 
+The above command runs the web_rag and chroma_db implementations, to parse the esg-report for greenwashing, from page 1 to a maximum page number defined by the `--pages_to_gw` parameter. The `--max_pages` defines the total number of pages that the chroma_db will store on its database. In our case, `--max_pages 10` means that the chroma db will store the first 10 pages of the esg-report. You can check the results of the implementation on the
+`.results/esg-report.pdf.json` file. For more information on how the above bash command works, please refer to this [README.md file](https://github.com/climate-nlp/reportparse/blob/dev/README.md)
 
 For running locally, install ollama from https://ollama.com/ and then do
 
