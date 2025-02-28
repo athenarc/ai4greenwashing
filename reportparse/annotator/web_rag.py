@@ -161,12 +161,20 @@ class WEB_RAG_Annotator(BaseAnnotator):
 
     #function to extract label value from llm
     def extract_label(self, text):
-        match = re.search(r'Result of the statement:(.*?)Justification:', text, re.DOTALL)
-        return match.group(1).strip() if match else ""
+        try:
+            match = re.search(r'Result of the statement:(.*?)Justification:', text, re.DOTALL)
+            return match.group(1).strip() if match else ""
+        except Exception as e:
+            print(f"Error during label extraction: {e}")
+            return None
     
     def extract_justification(self, text):
-        match = re.search(r'Justification:\s*(.*)', text, re.DOTALL)
-        return match.group(1).strip() if match else ""
+        try:
+            match = re.search(r'Justification:\s*(.*)', text, re.DOTALL)
+            return match.group(1).strip() if match else ""
+        except Exception as e:
+            print(f"Error during justification extraction: {e}")
+            return None
 
     
     #todo: add info truncation if text is too big for llm to handle.
