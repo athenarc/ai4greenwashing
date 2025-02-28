@@ -217,11 +217,11 @@ class WEB_RAG_Annotator(BaseAnnotator):
                         return ai_msg.content, url_list
                     except Exception as e:
                         print(e)
-                        return 'No web content found'
-            else: return 'No content was found from the web'
+                        return 'No web content found', []
+            else: return 'No content was found from the web', []
         except Exception as e:
             print(e)
-            return 'No content was found from the web'
+            return 'No content was found from the web', []
 
 
     def annotate(

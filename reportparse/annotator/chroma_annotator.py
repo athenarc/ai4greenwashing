@@ -24,7 +24,7 @@ class LLMAnnotator(BaseAnnotator):
     def call_llm(self, text):
 
         time.sleep(5)
-        if os.getenv("USE_GROQ_API") == "True" and False:
+        if os.getenv("USE_GROQ_API") == "True":
             self.llm = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
