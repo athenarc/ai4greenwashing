@@ -160,6 +160,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
     
 
     #function to extract label value from llm
+    # TODO: fix for no links
     def extract_label(self, text):
         try:
             match = re.search(r'Result of the statement:(.*?)Justification:', text, re.DOTALL)
@@ -184,7 +185,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
             result, url_list = pip.retrieve_knowledge()
         except Exception as e:
             print(e)
-            return None, []
+            return 'No content was found from the web', []
         try:
             info = "\n".join(result.astype(str))
             if info: 
@@ -225,7 +226,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
                         return ai_msg.content, url_list
                     except Exception as e:
                         print(e)
-                        return 'No web content found', []
+                        return 'LLM invocation failed', []
             else: return 'No content was found from the web', []
         except Exception as e:
             print(e)

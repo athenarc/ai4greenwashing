@@ -93,7 +93,7 @@ class LLMAggregator(BaseAnnotator):
                 claims = [c.strip() for c in claims]
                 for c in claims:
                     # add aggregation with chroma db
-                    chroma_result = self.chroma.call_chroma(
+                    chroma_result, retrieved_pages = self.chroma.call_chroma(
                         c,
                         text,
                         page_number,
@@ -107,7 +107,7 @@ class LLMAggregator(BaseAnnotator):
                         _annotate_obj=page,
                         _text=chroma_result,
                         annotator_name="chroma_result",
-                        metadata=json.dumps({"Claim": c}),
+                        metadata=json.dumps({"Claim": c, "retrieved_pages": retrieved_pages}),
                     )
 
                     # add web_rag aggregation

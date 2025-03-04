@@ -255,7 +255,7 @@ class LLMAnnotator(BaseAnnotator):
         context, retrieved_pages = retrieve_context(claim, page_number, chroma_db, k, use_chunks)
         print("Retrieved pages: ", retrieved_pages)
         result = verify_claim_with_context(claim=claim, text=text, context=context)
-        return result
+        return result, retrieved_pages
 
     
     def annotate(
