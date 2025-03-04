@@ -30,7 +30,7 @@ class pipeline:
                 self.harvested_urls = df.nlargest(self.n, 'body_similarity')['url'].to_list()
             except Exception as e:
                 print('Could not find relevant sources.')
-                return None
+                return None, []
         
         return result, self.harvested_urls
     

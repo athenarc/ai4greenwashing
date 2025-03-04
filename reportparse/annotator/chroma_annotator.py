@@ -58,7 +58,8 @@ class LLMAnnotator(BaseAnnotator):
          Another potential greenwashing claim: [another claim]
          Justification: [another justification]
          
-         Find at least one greenwashing claim in the text.
+         If no greenwashing claims are found, return this message:
+         "No greenwashing claims found"
 
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
          State the claim like a statement.
@@ -122,7 +123,8 @@ class LLMAnnotator(BaseAnnotator):
          Third potential greenwashing claim: [another claim]
          Justification: [another justification]
          
-         Find at least one greenwashing claim in the text.
+         If no greenwashing claims are found, return this message:
+         "No greenwashing claims found"
          
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
          State the claim like a statement.
@@ -130,7 +132,8 @@ class LLMAnnotator(BaseAnnotator):
         map_prompt = PromptTemplate.from_template(map_template)
         # Define the reduce template
         reduce_template = """Synthesize the following results, into a single conlcusion. Please follow the format that is given to you.
-                            Find at least one greenwashing claim in the text.
+                            If no greenwashing claims are found, return this message:
+                            "No greenwashing claims found"
                             If greenwashing claims were found, follow the format below:
                             Potential greenwashing claim: [the claim]
                             Justification: [short justification]
