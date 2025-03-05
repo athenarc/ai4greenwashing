@@ -10,8 +10,10 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.db_rag.db import ChromaDBHandler
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+import json
 
 logger = getLogger(__name__)
+
 
 @BaseAnnotator.register("chroma")
 class LLMAnnotator(BaseAnnotator):
@@ -151,11 +153,11 @@ class LLMAnnotator(BaseAnnotator):
         map_chain = map_prompt | llm  # Chain map prompt with llm
         reduce_chain = reduce_prompt | llm  # Chain reduce prompt with llm
         result_1 = map_chain.invoke({"docs": chunk_1})
-        #time.sleep(5)
+        # time.sleep(5)
         result_2 = map_chain.invoke({"docs": chunk_2})
-        #time.sleep(5)
+        # time.sleep(5)
         result_3 = map_chain.invoke({"docs": chunk_3})
-        #time.sleep(5)
+        # time.sleep(5)
         result_1_text = (
             result_1.content if hasattr(result_1, "content") else str(result_1)
         )
@@ -174,9 +176,10 @@ class LLMAnnotator(BaseAnnotator):
         )
         return result
 
-
     def call_chroma(self, claim, text, page_number, chroma_db, k=6, use_chunks=False):
-        def retrieve_context(claim, page_number, db, k=6, use_chunks=False, threshold=0.5):
+        def retrieve_context(
+            claim, page_number, db, k=6, use_chunks=False, threshold=0.7
+        ):
             try:
                 logger.info("Retrieving context from ChromaDB")
                 collection = db.chunk_collection if use_chunks else db.page_collection
@@ -184,20 +187,30 @@ class LLMAnnotator(BaseAnnotator):
                 results = collection.query(
                     query_texts=[claim],
                     n_results=k,
-                    where={"page_number": {"$ne": page_number}},  # Exclude the current page
+                    where={
+                        "page_number": {"$ne": page_number}
+                    },  # Exclude the current page
                 )
                 if results is None:
                     return "", []
                 relevant_texts = []
                 retrieved_pages = []
-                
-                for i, (doc, score) in enumerate(zip(results["documents"], results["distances"])):
+
+                for i, (doc, score) in enumerate(
+                    zip(results["documents"], results["distances"])
+                ):
                     if score[0] > threshold:  # Apply threshold filter
                         continue
 
-                    metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
+                    metadata = (
+                        results["metadatas"][i][0] if results["metadatas"][i] else {}
+                    )
                     page_num = metadata.get("page_number", "Unknown")
-
+                    # print("Page number: ", page_num)
+                    # print("Doc: ", doc)
+                    # print("Score: ", score)
+                    # print("Metadata: ", metadata)
+                    # print(doc[0])
                     retrieved_pages.append(page_num)
                     relevant_texts.append(f"Page {page_num}: {doc[0]}")
 
@@ -207,41 +220,42 @@ class LLMAnnotator(BaseAnnotator):
                 logger.error(f"Error retrieving context from ChromaDB: {e}")
                 return "", []
 
-
         def verify_claim_with_context(claim, text, context):
             """Use an llm (Ollama or Groq) to verify if the claim is actually greenwashing based on document context."""
-            messages=[
-            (
+            messages = [
+                (
                     "system",
-                f"""You have at your disposal a **potential greenwashing claim** and information from a report. Your task is to evaluate whether the claim is **TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE** based on the provided context.
+                    f"""You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from the rest of the report, whose accuracy must be evaluated. 
+                            Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
 
-                ### **Before making a decision:**
-                1. **Analyze the claim** carefully to understand its main points.
-                2. **Compare the claim** against the full text of the page where it was flagged and any relevant context from other pages.
-                3. **Use only the given information**, avoiding external assumptions or unsupported reasoning.
+                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
 
-                ### **Your response should follow this format:**
+                Before you decide:
 
-                **Claim:** {claim}
+                1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
+                2. Compare the statement with the information from the rest of the report, evaluating each element of the statement separately.
+                3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
 
-                **Page Text:**
-                {text}
+                Result: Provide a clear answer by choosing one of the following labels:
 
-                **Additional Context from Other Pages:**
-                {context}
+                - TRUE: If the statement is fully confirmed by the information and evidence in the rest of the report.
+                - FALSE: If the statement is clearly disproved by the information and evidence in the rest of the report.
+                - PARTIALLY TRUE: If the statement contains some correct elements but is not entirely accurate.
+                - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
 
-                **Evaluation:**
-                Choose one of the following labels:
-                - **TRUE**: If the claim is fully supported by the report.
-                - **FALSE**: If the claim is clearly disproved by the report.
-                - **PARTIALLY TRUE**: If the claim has some correct aspects but is not entirely accurate.
-                - **PARTIALLY FALSE**: If the claim includes correct elements but also contains misleading or incorrect information.
+                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
 
-                **Justification:**
-                Provide a clear, concise explanation of why the claim was classified this way, referring explicitly to the provided report text and additional context. Avoid unnecessary details and keep your reasoning precise.
-                """,
+                Statement: '[User Input]'
+                            Result of the statement:
+                            Justification:""",
                 ),
-                ("human", f"{text}"),
+                (
+                    "human",
+                    f""" Statement: {claim}
+                 Relevant page text {text}
+                 Context: {context}
+                 """,
+                ),
             ]
             try:
                 logger.info("Calling LLM to verify claim with context")
@@ -252,12 +266,31 @@ class LLMAnnotator(BaseAnnotator):
                 logger.error(f"Error calling LLM: {e}")
                 return "Error: Could not generate a response."
 
-        context, retrieved_pages = retrieve_context(claim, page_number, chroma_db, k, use_chunks)
+        context, retrieved_pages = retrieve_context(
+            claim, page_number, chroma_db, k, use_chunks
+        )
         print("Retrieved pages: ", retrieved_pages)
         result = verify_claim_with_context(claim=claim, text=text, context=context)
         return result, retrieved_pages
 
-    
+    def extract_label(self, text):
+        try:
+            match = re.search(
+                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
+            )
+            return match.group(1).strip() if match else ""
+        except Exception as e:
+            print(f"Error during label extraction: {e}")
+            return None
+
+    def extract_justification(self, text):
+        try:
+            match = re.search(r"Justification:\s*(.*)", text, re.DOTALL)
+            return match.group(1).strip() if match else ""
+        except Exception as e:
+            print(f"Error during justification extraction: {e}")
+            return None
+
     def annotate(
         self,
         document: Document,
@@ -266,30 +299,37 @@ class LLMAnnotator(BaseAnnotator):
         target_layouts=("text", "list", "cell"),
         annotator_name="chroma",
     ) -> Document:
-        annotator_name = args.chroma_annotator_name if args is not None else annotator_name
+        annotator_name = (
+            args.chroma_annotator_name if args is not None else annotator_name
+        )
         level = args.chroma_text_level if args is not None else level
         target_layouts = (
             args.chroma_target_layouts if args is not None else list(target_layouts)
         )
         use_chroma = args.use_chroma if args is not None else False
         use_chunks = args.use_chunks if args is not None else False
-        print("Model name: ", os.getenv("GROQ_LLM_MODEL_1") if os.getenv("USE_GROQ_API") == "True" else os.getenv("OLLAMA_MODEL"))
+        print(
+            "Model name: ",
+            (
+                os.getenv("GROQ_LLM_MODEL_1")
+                if os.getenv("USE_GROQ_API") == "True"
+                else os.getenv("OLLAMA_MODEL")
+            ),
+        )
 
         # Manual overrides to debug easily
         # use_chunks = False
-        use_chroma= True
+        use_chroma = True
+
         def _annotate(
-            _annotate_obj: AnnotatableLevel,
-            _text: str,
-            annotator_name: str,
-            score_value,
+            _annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata
         ):
             _annotate_obj.add_annotation(
                 annotation=Annotation(
                     parent_object=_annotate_obj,
                     annotator=annotator_name,
                     value=_text,
-                    meta={"score": score_value},
+                    meta=json.loads(metadata),
                 )
             )
 
@@ -305,7 +345,7 @@ class LLMAnnotator(BaseAnnotator):
                         doc_name=document.name, page_number=page_number, text=text
                     )
             print("Finished storing in Chroma")
-        
+
         for page in document.pages:
             if level == "page":
                 print("Calling first llm to annotate")
@@ -316,10 +356,8 @@ class LLMAnnotator(BaseAnnotator):
                 _annotate(
                     _annotate_obj=page,
                     _text=result,
-                    annotator_name=(
-                        args.chroma_annotator_name if args is not None else annotator_name
-                    ),
-                    score_value="Simple greenwashing detection",
+                    annotator_name="llm_result",
+                    metadata=json.dumps({"info": "Simple greenwashing detection"}),
                 )
                 if use_chroma:
                     print("Calling second llm to annotate")
@@ -329,15 +367,29 @@ class LLMAnnotator(BaseAnnotator):
                     )
                     claims = [c.strip() for c in claims]
                     for c in claims:
-                        chroma_result = self.call_chroma(c, text, page_number, self.chroma_db, k=6, use_chunks=use_chunks)
+                        chroma_result, retrieved_pages = self.call_chroma(
+                            c,
+                            text,
+                            page_number,
+                            self.chroma_db,
+                            k=6,
+                            use_chunks=use_chunks,
+                        )
                         print("Second llm result: ", chroma_result)
+                        claim_dict = {
+                            "claim": c,
+                            "retrieved_pages": retrieved_pages,
+                            "Label": self.extract_label(chroma_result),
+                            "Justification": self.extract_justification(chroma_result),
+                        }
+                        json_output = json.dumps(claim_dict)
                         _annotate(
                             _annotate_obj=page,
                             _text=chroma_result,
                             annotator_name="chroma_result",
-                            score_value=f"Claim: {c}",
+                            metadata=json_output,
                         )
-                    
+
             else:
                 for block in page.blocks + page.table_blocks:
                     if (
@@ -385,13 +437,9 @@ class LLMAnnotator(BaseAnnotator):
         )
 
         parser.add_argument(
-            "--use_chroma",
-            action="store_true",
-            help="Enable ChromaDB usage"
+            "--use_chroma", action="store_true", help="Enable ChromaDB usage"
         )
 
         parser.add_argument(
-            "--use_chunks",
-            action="store_true",
-            help="Use chunks instead of pages"
+            "--use_chunks", action="store_true", help="Use chunks instead of pages"
         )

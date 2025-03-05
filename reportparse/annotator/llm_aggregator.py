@@ -80,11 +80,7 @@ class LLMAggregator(BaseAnnotator):
                 _annotate(
                     _annotate_obj=page,
                     _text=result,
-                    annotator_name=(
-                        args.web_rag_annotator_name
-                        if args is not None
-                        else annotator_name
-                    ),
+                    annotator_name="First pass",
                     metadata=json.dumps({"info": "Simple greenwashing detection"}),
                 )
 
@@ -103,11 +99,20 @@ class LLMAggregator(BaseAnnotator):
                     )
                     print("Second llm result: ", chroma_result)
                     # annotate for chroma
+                    claim_dict = {
+                        "claim": c,
+                        "retrieved_pages": retrieved_pages,
+                        "Label": self.chroma.extract_label(chroma_result),
+                        "Justification": self.chroma.extract_justification(
+                            chroma_result
+                        ),
+                    }
+                    json_output = json.dumps(claim_dict)
                     _annotate(
                         _annotate_obj=page,
                         _text=chroma_result,
                         annotator_name="chroma_result",
-                        metadata=json.dumps({"Claim": c, "retrieved_pages": retrieved_pages}),
+                        metadata=json_output,
                     )
 
                     # add web_rag aggregation
