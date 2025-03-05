@@ -178,7 +178,7 @@ class LLMAnnotator(BaseAnnotator):
 
     def call_chroma(self, claim, document_name, text, page_number, chroma_db, k=6, use_chunks=False):
         def retrieve_context(
-            claim, document_name, page_number, db, k=6, use_chunks=False, threshold=0.7
+            claim, document_name, page_number, db, k=6, use_chunks=False, distance=0.7
         ):
             try:
                 logger.info("Retrieving context from ChromaDB")
@@ -201,7 +201,8 @@ class LLMAnnotator(BaseAnnotator):
                 for i, (doc, score) in enumerate(
                     zip(results["documents"], results["distances"])
                 ):
-                    if score[0] > threshold:  # Apply threshold filter
+                    print("distance: ", score[0])
+                    if score[0] > distance:  # Apply distance filter
                         continue
 
                     metadata = (

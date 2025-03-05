@@ -11,9 +11,16 @@ class ChromaDBHandler:
     def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db"):
         self.client = chromadb.PersistentClient(path=db_path)
 
-        self.page_collection = self.client.get_or_create_collection(name="parsed_pages")
-        self.chunk_collection = self.client.get_or_create_collection(name="chunked_pages")
+        self.page_collection = self.client.get_or_create_collection(
+            name="parsed_pages",
+            metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
+        )
 
+        self.chunk_collection = self.client.get_or_create_collection(
+            name="chunked_pages",
+            metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
+        )
+        
     def chunk_text(self, text, min_chunk_size=200, max_chunk_size=500, num_chunks=3, overlap_ratio=0.25):
         """
         Dynamically chunks text:
