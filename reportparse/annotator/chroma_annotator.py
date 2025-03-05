@@ -178,7 +178,7 @@ class LLMAnnotator(BaseAnnotator):
 
     def call_chroma(self, claim, document_name, text, page_number, chroma_db, k=6, use_chunks=False):
         def retrieve_context(
-            claim, document_name, page_number, db, k=6, use_chunks=False, distance=0.7
+            claim, document_name, page_number, db, k=6, use_chunks=False, distance=0.6
         ):
             try:
                 logger.info("Retrieving context from ChromaDB")
