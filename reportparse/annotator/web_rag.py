@@ -183,6 +183,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
         pip = pipeline(claim, web_sources)
         try:
             result, url_list = pip.retrieve_knowledge()
+            if result is None:
+                print('Result is None')
+                return 'No content was found from the web', []
         except Exception as e:
             print(e)
             return 'No content was found from the web', []
