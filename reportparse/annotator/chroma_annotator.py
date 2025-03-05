@@ -176,9 +176,9 @@ class LLMAnnotator(BaseAnnotator):
         )
         return result
 
-    def call_chroma(self, claim, text, page_number, chroma_db, k=6, use_chunks=False):
+    def call_chroma(self, claim, document_name, text, page_number, chroma_db, k=6, use_chunks=False):
         def retrieve_context(
-            claim, page_number, db, k=6, use_chunks=False, threshold=0.7
+            claim, document_name, page_number, db, k=6, use_chunks=False, threshold=0.7
         ):
             try:
                 logger.info("Retrieving context from ChromaDB")
@@ -188,7 +188,8 @@ class LLMAnnotator(BaseAnnotator):
                     query_texts=[claim],
                     n_results=k,
                     where={
-                        "page_number": {"$ne": page_number}
+                        "page_number": {"$ne": page_number},
+                        "doc_name": {"$eq": document_name}
                     },  # Exclude the current page
                 )
                 if results is None:
@@ -267,7 +268,7 @@ class LLMAnnotator(BaseAnnotator):
                 return "Error: Could not generate a response."
 
         context, retrieved_pages = retrieve_context(
-            claim, page_number, chroma_db, k, use_chunks
+            claim, document_name, page_number, chroma_db, k, use_chunks
         )
         print("Retrieved pages: ", retrieved_pages)
         result = verify_claim_with_context(claim=claim, text=text, context=context)
@@ -369,6 +370,7 @@ class LLMAnnotator(BaseAnnotator):
                     for c in claims:
                         chroma_result, retrieved_pages = self.call_chroma(
                             c,
+                            document.name,
                             text,
                             page_number,
                             self.chroma_db,

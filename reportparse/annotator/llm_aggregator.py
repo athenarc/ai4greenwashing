@@ -165,6 +165,7 @@ class LLMAggregator(BaseAnnotator):
                     # add aggregation with chroma db
                     chroma_result, retrieved_pages = self.chroma.call_chroma(
                         c,
+                        document.name,
                         text,
                         page_number,
                         self.chroma.chroma_db,
