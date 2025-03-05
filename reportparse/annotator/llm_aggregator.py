@@ -72,11 +72,8 @@ class LLMAggregator(BaseAnnotator):
                 Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
                 
                 Statement: '[User Input]'  
-                Final Aggregated Verdict:  
-                [Your final decision based on the provided evidence]  
-                Justification:  
-                [Your reasoning, synthesizing the database and web results while maintaining precision and conciseness.]  
-                """,
+                Result of the statement:  
+                Justification:""",
             ),
             (
                 "human",
