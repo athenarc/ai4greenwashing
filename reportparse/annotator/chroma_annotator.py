@@ -184,11 +184,11 @@ class LLMAnnotator(BaseAnnotator):
                 logger.info("Retrieving context from ChromaDB")
                 collection = db.chunk_collection if use_chunks else db.page_collection
 
+                # only keep docs where the doc_name is the same as the document_name and exclude the current page
                 results = collection.query(
                     query_texts=[claim],
                     n_results=k,
-                    where={
-                        "page_number": {"$ne": page_number},
+                    where={"$and": [{"doc_name": document_name}, {"page_number": {"$ne": page_number}}]
                     },  # Exclude the current page
                 )
                 if results is None:
@@ -196,15 +196,12 @@ class LLMAnnotator(BaseAnnotator):
                 relevant_texts = []
                 retrieved_pages = []
 
-                ## only keep docs where the doc_name is the same as the document_name
-                # TODO: check if it can be added in the where clause above. problem might be chromadb versions
                 for i, (doc, score) in enumerate(
                     zip(results["documents"], results["distances"])
                 ):
                     print("distance: ", score[0])
                     if score[0] > distance:  # Apply distance filter
                         continue
-
                     metadata = (
                         results["metadatas"][i][0] if results["metadatas"][i] else {}
                     )
