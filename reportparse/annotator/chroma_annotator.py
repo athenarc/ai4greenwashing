@@ -189,7 +189,6 @@ class LLMAnnotator(BaseAnnotator):
                     n_results=k,
                     where={
                         "page_number": {"$ne": page_number},
-                        "doc_name": {"$eq": document_name}
                     },  # Exclude the current page
                 )
                 if results is None:
@@ -197,6 +196,8 @@ class LLMAnnotator(BaseAnnotator):
                 relevant_texts = []
                 retrieved_pages = []
 
+                ## only keep docs where the doc_name is the same as the document_name
+                # TODO: check if it can be added in the where clause above. problem might be chromadb versions
                 for i, (doc, score) in enumerate(
                     zip(results["documents"], results["distances"])
                 ):
@@ -207,11 +208,6 @@ class LLMAnnotator(BaseAnnotator):
                         results["metadatas"][i][0] if results["metadatas"][i] else {}
                     )
                     page_num = metadata.get("page_number", "Unknown")
-                    # print("Page number: ", page_num)
-                    # print("Doc: ", doc)
-                    # print("Score: ", score)
-                    # print("Metadata: ", metadata)
-                    # print(doc[0])
                     retrieved_pages.append(page_num)
                     relevant_texts.append(f"Page {page_num}: {doc[0]}")
 
