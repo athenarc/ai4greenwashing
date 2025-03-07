@@ -16,7 +16,7 @@ import logging
 import warnings
 logging.getLogger("stanza").setLevel(logging.ERROR)
 warnings.filterwarnings("ignore", category=FutureWarning)
-
+import torch
 
 
 
@@ -44,14 +44,9 @@ class Harvester:
         return cleaned_text
     
     def get_relevant_sentences(self, claim, body, threshold):
-
         doc = nlp(body)
-
         # Extract sentences
         body_sentences = [sentence.text for sentence in doc.sentences]
-    
-        a = claim
-        b = pd.DataFrame(body_sentences)
         
         # Compute embeddings
         claim_emb = single_text_embedding(claim)
@@ -64,7 +59,8 @@ class Harvester:
         relevant_segments = [
         segment for score, segment in zip(cosine_scores, body_sentences) if score >= threshold
         ]
-
+        del claim_emb, body_sen_emb, cosine_scores  # Free tensor memory
+        torch.cuda.empty_cache()  # Free unused GPU memory
         
         return " ".join(relevant_segments)
     
@@ -206,6 +202,7 @@ class Harvester:
 
             if(len(df)>=self.max_sources):
                 break
-
+        # Free memory
+        torch.cuda.empty_cache()
         return df
             
