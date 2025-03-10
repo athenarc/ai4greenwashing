@@ -184,7 +184,7 @@ class Harvester:
                 print('skipping procedure....')
                 continue
             
-            if(len(body)>300000):
+            if(len(body.split())>100000):
                 print('Web page is too long')
                 print('skipping procedure....')
                 continue
