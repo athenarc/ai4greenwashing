@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from logging import getLogger
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 logger = getLogger(__name__)
 
@@ -21,22 +22,23 @@ class LLMAggregator(BaseAnnotator):
         self.web = WEB_RAG_Annotator()
         self.chroma = LLMAnnotator()
         if os.getenv("USE_GROQ_API") == "True":
-            self.llm = ChatGroq(
+
+            self.llm = ChatGoogleGenerativeAI(
+                model=os.getenv("GEMINI_MODEL"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                google_api_key=os.getenv("GEMINI_API_KEY")
+            )
+
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
                 groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
-
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_2"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_2"),
             )
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
@@ -85,9 +87,15 @@ class LLMAggregator(BaseAnnotator):
         ]
         try:
             logger.info("Calling LLM to verify claim with context")
-            ai_msg = self.llm.invoke(messages)
-            print("AI message: ", ai_msg.content)
-            return ai_msg.content
+            try:
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+            except Exception as e:
+                print(f'Invokation error: {e}. Invoking with the second llm....')
+                ai_msg = self.llm_2.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
         except Exception as e:
             logger.error(f"Error calling LLM: {e}")
             return "Error: Could not generate a response."
@@ -191,6 +199,7 @@ class LLMAggregator(BaseAnnotator):
                     )
 
                     # add web_rag aggregation
+                    print(f'SEARCHING FOR CLAIM {c}')
                     web_rag_result, url_list = self.web.web_rag(c, web_sources=1)
                     claim_dict_webrag = {
                         "claim": c,

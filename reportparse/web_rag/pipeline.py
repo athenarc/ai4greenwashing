@@ -15,7 +15,7 @@ class pipeline:
     def retrieve_knowledge(self):
 
         #scan the web for urls containing knowledge
-        url_list = google_search(self.query, self.n + 2)
+        url_list = google_search(self.query, self.n+2)
         if url_list is None:
             print('Could not find any results regarding the claim. Please try again or choose a different statement')
             return None

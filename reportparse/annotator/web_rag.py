@@ -8,44 +8,67 @@ import re
 import os 
 import json
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+import time
 
 @BaseAnnotator.register("web_rag")
 class WEB_RAG_Annotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
+  
        
-       self.llm = ChatGroq( 
-            model=os.getenv("GROQ_LLM_MODEL_1"), 
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            groq_api_key=os.getenv("GROQ_API_KEY_1"),
-        )
+       self.llm = ChatGoogleGenerativeAI(
+                model=os.getenv("GEMINI_MODEL"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                google_api_key=os.getenv("GEMINI_API_KEY")
+            )
 
        self.llm_2 = ChatGroq(
-            model=os.getenv("GROQ_LLM_MODEL_2"),
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            groq_api_key=os.getenv("GROQ_API_KEY_2"),
-        )
+                model=os.getenv("GROQ_LLM_MODEL_1"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                groq_api_key=os.getenv("GROQ_API_KEY_1"),
+            )
        
     
-    def call_llm(self, text): 
-        
-        import time
-        
-        time.sleep(5)
+    def call_llm(self, text):
 
+        time.sleep(5)
+        if os.getenv("USE_GROQ_API") == "True":
+
+    
+            self.llm = ChatGoogleGenerativeAI(
+                model=os.getenv("GEMINI_MODEL"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                google_api_key=os.getenv("GEMINI_API_KEY")
+            )
+
+            self.llm_2 = ChatGroq(
+                model=os.getenv("GROQ_LLM_MODEL_1"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                groq_api_key=os.getenv("GROQ_API_KEY_1"),
+            )
+        else:
+            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
 
         messages = [
             (
                 "system",
-                f'''You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
+                f"""You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
          Your answer should follow the following format: 
 
          Potential greenwashing claim: [the claim]
@@ -58,39 +81,32 @@ class WEB_RAG_Annotator(BaseAnnotator):
          "No greenwashing claims found"
 
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a statement.
-         ''',
-                
+         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
+         """,
             ),
             ("human", f"{text}"),
         ]
 
         try:
-            print('Invoking with the first llm...')
-            if len(text.split()) >= 2000:
-                ai_msg = self.reduce_web_rag_input(text, self.llm)
-                return ai_msg
-            else:
-                ai_msg = self.llm.invoke(messages)
-                return ai_msg.content
+            print("Invoking the first llm...")
+            ai_msg = self.llm.invoke(messages)
+            return ai_msg.content
         except Exception as e:
             print(e)
             try:
-                print('Invoking with the second llm...')
+                print("Invoking with the second llm...")
                 if len(text.split()) >= 1900:
-                    ai_msg = self.reduce_web_rag_input(text, self.llm_2)
+                    ai_msg = self.reduce_llm_input(text, self.llm_2)
                     return ai_msg
                 else:
                     ai_msg = self.llm_2.invoke(messages)
                     return ai_msg.content
             except Exception as e:
-                print('LLM invokation failed. Returning none...')
+                print("llm invokation failed. Returning none...")
                 print(e)
                 return None
-
         
-        
-    #method to reduce llm input if it is too large.
+    # #method to reduce llm input if it is too large.
     def reduce_web_rag_input(self, text, llm):
         import time
         print('Invoking map reduce function to split text')
@@ -121,7 +137,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
          If no greenwashing claims are found, return nothing.
          
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a statement.
+         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
         Text to be examined: {docs}"""
         map_prompt = PromptTemplate.from_template(map_template)
        # Define the reduce template
@@ -139,7 +155,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
                             Justification: [another justification]
 
                             Do not make any commentary and don't create any titles. Just provide what you are told.
-                            State the claim like a statement.
+                            State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
                            The result are listed below: {docs}"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
         map_chain = map_prompt | llm  # Chain map prompt with LLM
@@ -272,7 +288,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
                     claims = [c.strip() for c in claims]
                     for c in claims:
 
-                        web_rag_result, url_list = self.web_rag(c, web_sources=1)
+                        web_rag_result, url_list = self.web_rag(c, web_sources=3)
+                        print(f'SEARCHING FOR CLAIM: {c}')
                         claim_dict = {
                         "claim": c,
                         "urls": url_list,

@@ -173,9 +173,10 @@ class Harvester:
                 continue
             title = self.get_title(html)
             if title is None or len(title) <=3:
-                print('No title found')
-                print('skipping procedure....')
-                continue
+                title = 'No title found'
+                # print('No title found')
+                # print('skipping procedure....')
+                # continue
             body, body_dot = self.get_body(html, claim=self.claim)
 
             if((body is None or len(body.split())<50)):

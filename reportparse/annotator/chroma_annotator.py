@@ -10,6 +10,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.db_rag.db import ChromaDBHandler
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 import json
 
 logger = getLogger(__name__)
@@ -27,22 +28,24 @@ class LLMAnnotator(BaseAnnotator):
 
         time.sleep(5)
         if os.getenv("USE_GROQ_API") == "True":
-            self.llm = ChatGroq(
+
+    
+            self.llm = ChatGoogleGenerativeAI(
+                model=os.getenv("GEMINI_MODEL"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                google_api_key=os.getenv("GEMINI_API_KEY")
+            )
+
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
                 groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
-
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_2"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_2"),
             )
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
@@ -64,24 +67,16 @@ class LLMAnnotator(BaseAnnotator):
          "No greenwashing claims found"
 
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a statement.
+         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
          """,
             ),
             ("human", f"{text}"),
         ]
 
         try:
-            print("Invoking the first llm...")
-            if len(text.split()) >= 2000:
-                print("hi1")
-                ai_msg = self.reduce_llm_input(text, self.llm)
-                print("AI message 1: ", ai_msg)
-                return ai_msg
-            else:
-                print("hi2")
-                ai_msg = self.llm.invoke(messages)
-                print("AI message 1: ", ai_msg.content)
-                return ai_msg.content
+            ai_msg = self.llm.invoke(messages)
+            print("AI message 1: ", ai_msg.content)
+            return ai_msg.content
         except Exception as e:
             print(e)
             try:
@@ -129,7 +124,7 @@ class LLMAnnotator(BaseAnnotator):
          "No greenwashing claims found"
          
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a statement.
+         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
         Text to be examined: {docs}"""
         map_prompt = PromptTemplate.from_template(map_template)
         # Define the reduce template
@@ -147,7 +142,7 @@ class LLMAnnotator(BaseAnnotator):
                             Justification: [another justification]
 
                             Do not make any commentary and don't create any titles. Just provide what you are told.
-                            State the claim like a statement.
+                            State the claim like a search. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
                            The result are listed below: {docs}"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
         map_chain = map_prompt | llm  # Chain map prompt with llm
