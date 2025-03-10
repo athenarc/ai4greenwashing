@@ -11,6 +11,7 @@ from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import time
+from langchain_ollama import ChatOllama
 
 @BaseAnnotator.register("web_rag")
 class WEB_RAG_Annotator(BaseAnnotator):
