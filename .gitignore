@@ -149,3 +149,6 @@ ENV/
 reportparse/database_data/chroma_db
 reportparse/database_data
 reportparse/asset/example_input
+
+reqs.txt
+reportparse/asset/

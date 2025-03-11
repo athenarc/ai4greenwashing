@@ -71,3 +71,15 @@ total_commit_non_spec = ((climate_df["climate_commitment"] == "yes") & (climate_
 overall_cti = total_commit_non_spec / total_commit if total_commit > 0 else 0
 
 print(f"Overall Cheap Talk Index (CTI): {overall_cti:.4f}")
+
+cti_results = {
+    "page_cti_scores": cti_df.set_index("page_id")["CTI"].to_dict(),
+    "overall_cti": overall_cti
+}
+
+output_path = "./cli_results/example_cti_scrores.json"
+
+with open(output_path, "w") as f:
+    json.dump(cti_results, f, indent=4)
+
+print(f"CTI scores saved to {output_path}")
