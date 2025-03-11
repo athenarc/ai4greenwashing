@@ -95,86 +95,12 @@ class WEB_RAG_Annotator(BaseAnnotator):
         except Exception as e:
             print(e)
             try:
-                print("Invoking with the second llm...")
-                if len(text.split()) >= 1900:
-                    ai_msg = self.reduce_llm_input(text, self.llm_2)
-                    return ai_msg
-                else:
                     ai_msg = self.llm_2.invoke(messages)
                     return ai_msg.content
             except Exception as e:
                 print("llm invokation failed. Returning none...")
                 print(e)
                 return None
-        
-    # #method to reduce llm input if it is too large.
-    def reduce_web_rag_input(self, text, llm):
-        import time
-        print('Invoking map reduce function to split text')
-        from langchain.prompts import PromptTemplate
-        from langchain.chains.summarize import load_summarize_chain
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
-        
-
-        #Dynamically split the text into three parts
-        chunk_size = len(text) // 3  
-        chunk_1 = text[:chunk_size]
-        chunk_2 = text[chunk_size:2*chunk_size]
-        chunk_3 = text[2*chunk_size:]  
-
-        # Define the map template
-        map_template = """You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
-         Your answer should follow the following format: 
-
-         Potential greenwashing claim: [the claim]
-         Justification: [short justification]
-
-         Second potential greenwashing claim: [another claim]
-         Justification: [another justification]
-
-         Third potential greenwashing claim: [another claim]
-         Justification: [another justification]
-         
-         If no greenwashing claims are found, return nothing.
-         
-         DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
-        Text to be examined: {docs}"""
-        map_prompt = PromptTemplate.from_template(map_template)
-       # Define the reduce template
-        reduce_template = """Synthesize the following results, into a single conlcusion. Please follow the format that is given to you.
-                            If no greenwashing claims are found, return this message:
-                            "No greenwashing claims found"
-                            If greenwashing claims were found, follow the format below:
-                            Potential greenwashing claim: [the claim]
-                            Justification: [short justification]
-
-                            Second potential greenwashing claim: [another claim]
-                            Justification: [another justification]
-
-                            Third potential greenwashing claim: [another claim]
-                            Justification: [another justification]
-
-                            Do not make any commentary and don't create any titles. Just provide what you are told.
-                            State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
-                           The result are listed below: {docs}"""
-        reduce_prompt = PromptTemplate.from_template(reduce_template)
-        map_chain = map_prompt | llm  # Chain map prompt with LLM
-        reduce_chain = reduce_prompt | llm  # Chain reduce prompt with LLM
-        result_1 = map_chain.invoke({"docs": chunk_1})
-        time.sleep(5)
-        result_2 = map_chain.invoke({"docs": chunk_2})
-        time.sleep(5)
-        result_3 = map_chain.invoke({"docs": chunk_3})
-        time.sleep(5)
-        result_1_text = result_1.content if hasattr(result_1, 'content') else str(result_1)
-        result_2_text = result_2.content if hasattr(result_2, 'content') else str(result_2)
-        result_3_text = result_3.content if hasattr(result_3, 'content') else str(result_3)
-        combined_results = "\n".join([result_1_text, result_2_text, result_3_text])
-        final_summary = reduce_chain.invoke({"docs": combined_results})
-        result = final_summary.content if hasattr(final_summary, 'content') else str(final_summary)
-        return result
-    
 
     #function to extract label value from llm
     # TODO: fix for no links
@@ -351,5 +277,3 @@ class WEB_RAG_Annotator(BaseAnnotator):
             type=str,
             default='yes'
         )
-
-
