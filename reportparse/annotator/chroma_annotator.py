@@ -316,3 +316,4 @@ class LLMAnnotator(BaseAnnotator):
         parser.add_argument(
             "--use_chunks", action="store_true", help="Use chunks instead of pages"
         )
+        

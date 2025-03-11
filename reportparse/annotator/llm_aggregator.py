@@ -5,6 +5,7 @@ from reportparse.annotator.web_rag import WEB_RAG_Annotator
 from reportparse.annotator.chroma_annotator import LLMAnnotator
 import argparse
 import re
+from pymongo import MongoClient
 import json
 from dotenv import load_dotenv
 from logging import getLogger
@@ -21,6 +22,9 @@ class LLMAggregator(BaseAnnotator):
         load_dotenv()
         self.web = WEB_RAG_Annotator()
         self.chroma = LLMAnnotator()
+        self.mongo_client = MongoClient("mongodb://localhost:27017/")
+        self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
+        self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm = ChatGoogleGenerativeAI(
@@ -116,7 +120,7 @@ class LLMAggregator(BaseAnnotator):
         target_layouts = (
             args.web_rag_target_layouts if args is not None else list(target_layouts)
         )
-        gw_pages = args.pages_to_gw if args is not None else None
+        gw_pages = args.pages_to_gw if args is not None else 1
         use_chunks = args.use_chunks if args is not None else False
 
         def _annotate(
@@ -149,6 +153,22 @@ class LLMAggregator(BaseAnnotator):
         gw_index = 0
         print(f"Checking the first {gw_pages} pages for greenwashing")
         for page in document.pages:
+            pdf_name = document.name
+            page_number = page.num
+
+            # check if doc exists
+            existing_doc = self.mongo_collection.find_one({"name": pdf_name})
+
+            if existing_doc:
+                # Get the stored page with the same number
+                existing_page = next((p for p in existing_doc["pages"] if p["num"] == page_number), None)
+
+                if existing_page and "annotations" in existing_page and existing_page["annotations"]:
+                    print(f"Skipping page {page_number} of {pdf_name} (already annotated).")
+                    gw_index += 1
+                    continue  # Skip pages that already have annotations
+            # If the page has no existing annotations or doesn't exist, process it
+            print(f"Processing page {page_number} of {pdf_name} (annotations missing).")
 
             if gw_index >= gw_pages:
                 break
@@ -232,6 +252,7 @@ class LLMAggregator(BaseAnnotator):
                                 "Justification": self.web.extract_justification(
                                     aggregator_result
                                 ),
+                                "Marked page": page_number,
                             }
                         ),
                     )
