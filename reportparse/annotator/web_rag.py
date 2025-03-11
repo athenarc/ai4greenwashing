@@ -3,6 +3,7 @@ from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.web_rag.pipeline import pipeline
+from reportparse.llm_prompts import FIRST_PASS_PROMPT, WEB_RAG_PROMPT
 import argparse
 import re
 import os 
@@ -18,8 +19,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
-       self.first_pass_prompt = os.getenv('FIRST_PASS_PROMPT')
-       self.web_rag_prompt = os.getenv('WEB_RAG_PROMPT')
+       self.first_pass_prompt = FIRST_PASS_PROMPT
+       self.web_rag_prompt = WEB_RAG_PROMPT
        
        self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),

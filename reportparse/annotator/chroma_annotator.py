@@ -8,9 +8,11 @@ from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.db_rag.db import ChromaDBHandler
+from reportparse.llm_prompts import FIRST_PASS_PROMPT, CHROMA_PROMPT
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 import json
 
 logger = getLogger(__name__)
@@ -22,8 +24,8 @@ class LLMAnnotator(BaseAnnotator):
     def __init__(self):
         load_dotenv()
         self.chroma_db = ChromaDBHandler()
-        self.first_pass_prompt = os.getenv('FIRST_PASS_PROMPT')
-        self.chroma_prompt = os.getenv('CHROMA_PROMPT')
+        self.first_pass_prompt = FIRST_PASS_PROMPT
+        self.chroma_prompt = CHROMA_PROMPT
         return
 
     def call_llm(self, text):
