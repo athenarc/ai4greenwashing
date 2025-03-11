@@ -3,7 +3,8 @@ import re
 from duckduckgo_search import DDGS
 from urllib.parse import urlparse
 
-doc_extensions = ["doc", "docx", 'php', 'pdf', 'txt', 'theFile', 'file', 'xls']
+#doc_extensions = ["doc", "docx", 'php', 'pdf', 'txt', 'theFile', 'file', 'xls']
+doc_extensions = []
 pattern = r'[./=]([a-zA-Z0-9]+)$'
 
 def google_search(query, web_sources, retries=5, backoff_time=2):
@@ -26,7 +27,7 @@ def google_search(query, web_sources, retries=5, backoff_time=2):
                 match = re.search(pattern, dict['href'][-6:])
                 if match:
                     file_extension = match.group(1)
-                    print(file_extension)
+                    
                 else:
                     file_extension = None
 

@@ -18,7 +18,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
-  
+       self.first_pass_prompt = os.getenv('FIRST_PASS_PROMPT')
+       self.web_rag_prompt = os.getenv('WEB_RAG_PROMPT')
        
        self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
@@ -69,23 +70,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
         messages = [
             (
                 "system",
-                f"""You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
-         Your answer should follow the following format: 
-
-         Potential greenwashing claim: [the claim]
-         Justification: [short justification]
-
-         Another potential greenwashing claim: [another claim]
-         Justification: [another justification]
-         
-         If no greenwashing claims are found, return this message:
-         "No greenwashing claims found"
-
-         DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.
-         """,
+                self.first_pass_prompt,
             ),
-            ("human", f"{text}"),
+            ("human", text),
         ]
 
         try:
@@ -138,27 +125,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
                 messages = [
                         (
                             "system",
-                        f'''You have at your disposal information '[Information]' and a statement: '[User Input]' whose accuracy must be evaluated. 
-                            Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
-
-                            Before you decide:
-
-                            1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
-                            2. Compare the statement with the information you have, evaluating each element of the statement separately.
-                            3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
-
-                            Result: Provide a clear answer by choosing one of the following labels:
-
-                            - TRUE: If the statement is fully confirmed by the information and evidence you have.
-                            - FALSE: If the statement is clearly disproved by the information and evidence you have.
-                            - PARTIALLY TRUE: If the statement contains some correct elements, but not entirely accurate.
-                            - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
-
-                            Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
-
-                            Statement: '[User Input]'
-                            Result of the statement:
-                            Justification:'''),
+                        self.web_rag_prompt
+                        ),
                         ("human", f'''External info '{info}'
                          Statement: '{claim}' "'''),]
                 try:
