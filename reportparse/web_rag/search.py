@@ -3,8 +3,8 @@ import re
 from duckduckgo_search import DDGS
 from urllib.parse import urlparse
 
-#doc_extensions = ["doc", "docx", 'php', 'pdf', 'txt', 'theFile', 'file', 'xls']
-doc_extensions = []
+doc_extensions = ["doc", "docx", 'php', 'pdf', 'txt', 'theFile', 'file', 'xls']
+
 pattern = r'[./=]([a-zA-Z0-9]+)$'
 
 def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
@@ -20,7 +20,7 @@ def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
             results = DDGS().text(
                 keywords=search_query,
                 safesearch='off',
-                max_results=web_sources,
+                max_results=5,
             )
 
             for dict in results:
