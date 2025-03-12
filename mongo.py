@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from reportparse.reader.base import BaseReader
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
+import pandas as pd
 
 # TODO CHECK ARG LOGIC AND REMOVE MOST OF THESE
 parser = argparse.ArgumentParser(description="Annotate PDF with custom settings.")
@@ -18,13 +19,13 @@ parser.add_argument(
     help="Path to save the annotated document.",
 )
 parser.add_argument(
+    "--max_pages", type=int, default=120, help="Maximum number of pages to process."
+)
+parser.add_argument(
     "--pages_to_gw",
     type=int,
     default=120,
     help="Number of pages to process for greenwashing analysis.",
-)
-parser.add_argument(
-    "--max_pages", type=int, default=120, help="Maximum number of pages to process."
 )
 parser.add_argument(
     "--web_rag_annotator_name",
@@ -76,56 +77,28 @@ llm_agg = BaseAnnotator.by_name("llm_agg")()
 
 document = llm_agg.annotate(document=document, args=args)
 
-# document = BaseAnnotator.by_name("climate")().annotate(document=document)
-# document = BaseAnnotator.by_name("climate_commitment")().annotate(document=document)
-# document = BaseAnnotator.by_name("climate_sentiment")().annotate(document=document)
-# document = BaseAnnotator.by_name("climate_specificity")().annotate(document=document)
-
-
 if not os.path.exists("./results"):
     os.makedirs("./results")
 
-# create json
 document.save("./results/example.pdf.json")
 
-df = document.to_dataframe(level="block")
 df_2 = document.to_dataframe(level="page")
-
-# print(df)
-
-# # eda
-# print(df.describe())
-# print(df.info())
-# print(df.head())
-# print(df.tail())
-# print(df.columns)
-# print(df.index)
-
-# # eda for df_2
-# print(df_2.describe())
-# print(df_2.info())
-# print(df_2.head())
-# print(df_2.tail())
-# print(df_2.columns)
-# print(df_2.index)
 
 with open("./results/example.pdf.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 print("Connecting to MongoDB...")
 client = MongoClient("mongodb://localhost:27017/")
-db = client["pdf_annotations"]  # Database name
-collection = db["annotations"]  # Collection name
+db = client["pdf_annotations"]
+collection = db["annotations"]
 print("Connected to MongoDB.")
 
 pdf_id = data["name"]
 new_pages = data["pages"]
 
-# Check if the document already exists in the database
 existing_doc = collection.find_one({"name": pdf_id})
 
 if existing_doc:
-    # Extract existing page numbers
     existing_pages = {page["num"] for page in existing_doc["pages"]}
 
     # **Filter new pages that are not in the database AND have annotations**
@@ -160,3 +133,80 @@ if result:
     print(f"Final document contains {len(result['pages'])} annotated pages.")
 else:
     print("Document was not inserted.")
+
+
+reader = BaseReader.by_name("pymupdf")()
+
+input_path = "./reportparse/asset/example.pdf"
+document = reader.read(input_path=input_path)
+
+
+document = BaseAnnotator.by_name("climate")().annotate(document=document)
+document = BaseAnnotator.by_name("climate_commitment")().annotate(document=document)
+document = BaseAnnotator.by_name("climate_specificity")().annotate(document=document)
+
+
+if not os.path.exists("./cli_results"):
+    os.makedirs("./cli_results")
+
+# create json
+document.save("./cli_results/example.pdf.json")
+
+df = document.to_dataframe(level="block")
+
+print(df)
+
+# # eda
+print(df.describe())
+print()
+
+print(df.info())
+print()
+
+print(df.head())
+print()
+
+print(df.tail())
+print()
+
+print(df.columns)
+print()
+
+print(df.index)
+print()
+
+climate_df = df[df["climate"] == "yes"]
+
+cti_df = climate_df.groupby("page_id").apply(
+    lambda x: pd.Series({
+        "commit_total": (x["climate_commitment"] == "yes").sum(),
+        "commit_non_spec": ((x["climate_commitment"] == "yes") & (x["climate_specificity"] == "non")).sum()
+    })
+)
+
+# Calculate CTI
+cti_df["CTI"] = cti_df["commit_non_spec"] / cti_df["commit_total"]
+cti_df["CTI"].fillna(0, inplace=True)
+
+cti_df.reset_index(inplace=True)
+
+print(cti_df)
+
+# for the whole document
+total_commit = (climate_df["climate_commitment"] == "yes").sum()
+total_commit_non_spec = ((climate_df["climate_commitment"] == "yes") & (climate_df["climate_specificity"] == "non")).sum()
+overall_cti = total_commit_non_spec / total_commit if total_commit > 0 else 0
+
+print(f"Overall Cheap Talk Index (CTI): {overall_cti:.4f}")
+
+cti_results = {
+    "page_cti_scores": cti_df.set_index("page_id")["CTI"].to_dict(),
+    "overall_cti": overall_cti
+}
+
+output_path = "./cli_results/example_cti_scrores.json"
+
+with open(output_path, "w") as f:
+    json.dump(cti_results, f, indent=4)
+
+print(f"CTI scores saved to {output_path}")

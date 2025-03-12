@@ -6,23 +6,28 @@ from pymongo import MongoClient
 from reportparse.reader.base import BaseReader
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
+import matplotlib.pyplot as plt
+import seaborn as sns
+import argparse
+
+parser = argparse.ArgumentParser(description="Process and analyze climate-related text from a PDF.")
+parser.add_argument("--input", type=str, default="./reportparse/asset/example.pdf", help="Path to input PDF file.")
+parser.add_argument("--output", type=str, default="./cli_results", help="Directory to save output files.")
+
+args = parser.parse_args()
+os.makedirs(args.output, exist_ok=True)
+
 
 reader = BaseReader.by_name("pymupdf")()
 
-input_path = "./reportparse/asset/example.pdf"
-document = reader.read(input_path=input_path)
-
+document = reader.read(input_path=args.input)
 
 document = BaseAnnotator.by_name("climate")().annotate(document=document)
 document = BaseAnnotator.by_name("climate_commitment")().annotate(document=document)
 document = BaseAnnotator.by_name("climate_specificity")().annotate(document=document)
 
-
-if not os.path.exists("./cli_results"):
-    os.makedirs("./cli_results")
-
-# create json
-document.save("./cli_results/example.pdf.json")
+json_output_path = os.path.join(args.output, os.path.basename(args.input) + ".json")
+document.save(json_output_path)
 
 df = document.to_dataframe(level="block")
 df_2 = document.to_dataframe(level="page")
@@ -76,10 +81,32 @@ cti_results = {
     "page_cti_scores": cti_df.set_index("page_id")["CTI"].to_dict(),
     "overall_cti": overall_cti
 }
-
-output_path = "./cli_results/example_cti_scrores.json"
+input_base = os.path.basename(args.input)
+output_path = f"./cli_results/{input_base}_cti_scrores.json"
 
 with open(output_path, "w") as f:
     json.dump(cti_results, f, indent=4)
 
 print(f"CTI scores saved to {output_path}")
+
+
+page_ids = list(cti_results["page_cti_scores"].keys())
+page_scores = list(cti_results["page_cti_scores"].values())
+
+plt.figure(figsize=(12, 6))
+
+sns.barplot(x=page_ids, y=page_scores, palette="Blues_r")
+
+plt.axhline(y=overall_cti, color='red', linestyle='--', label=f'Overall CTI: {overall_cti:.4f}')
+
+plt.xlabel("Page ID")
+plt.ylabel("CTI Score")
+plt.title("Cheap Talk Index (CTI) per Page")
+plt.xticks(rotation=90)  
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# save plot in the same dir
+plt.savefig(f"./cli_results/{input_base}_cti_plot.png")
