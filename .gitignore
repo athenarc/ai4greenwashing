@@ -152,4 +152,5 @@ reqs.txt
 backup/
 
 reqs.txt
-reportparse/asset/
+reportparse/asset/example_input/
+reportparse/asset/example_output/
