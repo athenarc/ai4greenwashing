@@ -3,6 +3,7 @@ from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.web_rag.pipeline import pipeline
+from reportparse.llm_prompts import FIRST_PASS_PROMPT, WEB_RAG_PROMPT
 import argparse
 import re
 import os 
@@ -18,8 +19,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
     
     def __init__(self):
        load_dotenv()
-       self.first_pass_prompt = os.getenv('FIRST_PASS_PROMPT')
-       self.web_rag_prompt = os.getenv('WEB_RAG_PROMPT')
+       self.first_pass_prompt = FIRST_PASS_PROMPT
+       self.web_rag_prompt = WEB_RAG_PROMPT
+       
        
        self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
@@ -78,6 +80,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
         try:
             print("Invoking the first llm...")
             ai_msg = self.llm.invoke(messages)
+            
             return ai_msg.content
         except Exception as e:
             print(e)
@@ -109,8 +112,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
 
     
     #todo: add info truncation if text is too big for llm to handle.
-    def web_rag(self, claim, web_sources):
-        pip = pipeline(claim, web_sources)
+    def web_rag(self, claim, web_sources, company_name):
+        pip = pipeline(claim, web_sources, company_name)
         try:
             result, url_list = pip.retrieve_knowledge()
             if result is None:
@@ -180,16 +183,18 @@ class WEB_RAG_Annotator(BaseAnnotator):
                 if web_rag =='yes':
                     
                     claims = re.findall(r'(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)', result)
+                    company_name = re.findall(r'(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)', result)
                     claims = [c.strip() for c in claims]
                     for c in claims:
 
-                        web_rag_result, url_list = self.web_rag(c, web_sources=3)
+                        web_rag_result, url_list = self.web_rag(c, 1, company_name)
                         print(f'SEARCHING FOR CLAIM: {c}')
                         claim_dict = {
                         "claim": c,
                         "urls": url_list,
                         "Label": self.extract_label(web_rag_result),
                         "Justification": self.extract_justification(web_rag_result)
+                        
                         }
                         json_output = json.dumps(claim_dict)
 
