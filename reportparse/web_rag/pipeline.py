@@ -6,16 +6,17 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class pipeline:
 
-    def __init__(self, query, n):
+    def __init__(self, query, n, metadata):
         self.query = query
         self.n = n
         self.harvested_urls= None
+        self.meta = metadata
 
     #based on a claim, implement a searcher and a harvester 
     def retrieve_knowledge(self):
 
         #scan the web for urls containing knowledge
-        url_list = google_search(self.query, self.n+2)
+        url_list = google_search(self.query, self.n+2, self.meta)
         if url_list is None:
             print('Could not find any results regarding the claim. Please try again or choose a different statement')
             return None

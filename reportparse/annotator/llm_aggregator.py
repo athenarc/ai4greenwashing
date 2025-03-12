@@ -144,6 +144,7 @@ class LLMAggregator(BaseAnnotator):
 
                 page_number = page.num
                 claims = re.findall(r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result)
+                company_name = re.findall(r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result)
                 claims = [c.strip() for c in claims]
                 for c in claims:
                     # add aggregation with chroma db
@@ -176,7 +177,7 @@ class LLMAggregator(BaseAnnotator):
 
                     # add web_rag aggregation
                     print(f'SEARCHING FOR CLAIM {c}')
-                    web_rag_result, url_list = self.web.web_rag(c, web_sources=1)
+                    web_rag_result, url_list = self.web.web_rag(c, 1, company_name)
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,

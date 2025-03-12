@@ -1,6 +1,7 @@
 FIRST_PASS_PROMPT='''You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
          Your answer should follow the following format: 
-
+        
+         Company Name: [the name of the company that the esg report belongs to]
          Potential greenwashing claim: [the claim]
          Justification: [short justification]
 
@@ -11,7 +12,7 @@ FIRST_PASS_PROMPT='''You are a fact-checker, that specializes in greenwashing. F
          "No greenwashing claims found"
 
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         State the claim like a search query. The query should be brief, precise, and focus on the core topics or keywords mentioned in the text. Avoid unnecessary words or long phrases, and aim for a search-friendly format.'''
+         '''
 WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a statement: '[User Input]' whose accuracy must be evaluated. 
                             Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
 

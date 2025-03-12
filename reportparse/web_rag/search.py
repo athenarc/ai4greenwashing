@@ -7,12 +7,13 @@ from urllib.parse import urlparse
 doc_extensions = []
 pattern = r'[./=]([a-zA-Z0-9]+)$'
 
-def google_search(query, web_sources, retries=5, backoff_time=2):
-
+def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
+    
     urls = []
     sites_source = []  
     # Removed exclude_terms and inurl_filters logic
-    search_query = query  # Use the query directly without filtering terms
+    search_query = f"{query+' '+str(metadata[0])}"
+    print(f"SEARCH QUERY: {search_query}")
 
     for attempt in range(retries):
         try:
