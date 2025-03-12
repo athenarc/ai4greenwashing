@@ -23,13 +23,10 @@ class LLMAggregator(BaseAnnotator):
         load_dotenv()
         self.web = WEB_RAG_Annotator()
         self.chroma = LLMAnnotator()
-<<<<<<< HEAD
         self.mongo_client = MongoClient("mongodb://localhost:27017/")
         self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
-=======
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
->>>>>>> a8512f0cf7d2010f18cdca723b4562efd6f84662
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm = ChatGoogleGenerativeAI(
