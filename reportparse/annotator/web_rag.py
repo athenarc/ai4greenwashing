@@ -250,5 +250,3 @@ class WEB_RAG_Annotator(BaseAnnotator):
             type=str,
             default='yes'
         )
-
-

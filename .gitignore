@@ -148,7 +148,8 @@ ENV/
 #ignore the chroma_db database 
 reportparse/database_data/chroma_db
 reportparse/database_data
-reportparse/asset/example_input
-reportparse/asset/example_output
 reqs.txt
 backup/
+
+reqs.txt
+reportparse/asset/

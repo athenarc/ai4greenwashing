@@ -178,3 +178,4 @@ detectron2 @ git+https://github.com/facebookresearch/detectron2.git@ff53992b1985
 duckduckgo_search
 bs4
 stanza
+pymongo[srv]
