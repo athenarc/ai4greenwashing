@@ -61,16 +61,16 @@ parser.add_argument(
     default=["text", "list", "cell"],
     choices=LAYOUT_NAMES,
 )
-parser.add_argument("--use_chroma",action="store_true", help="Enable ChromaDB usage")
+parser.add_argument("--use_chroma", action="store_true", help="Enable ChromaDB usage")
 parser.add_argument(
     "--use_chunks", action="store_true", help="Use chunks instead of pages"
 )
 args = parser.parse_args()
 
-
 reader = BaseReader.by_name("pymupdf")()
 
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
+output_path = args.output_path if args.output_path else "./results/example.pdf.json"
 document = reader.read(input_path=input_path)
 
 llm_agg = BaseAnnotator.by_name("llm_agg")()
@@ -80,11 +80,11 @@ document = llm_agg.annotate(document=document, args=args)
 if not os.path.exists("./results"):
     os.makedirs("./results")
 
-document.save("./results/example.pdf.json")
+document.save(output_path)
 
 df = document.to_dataframe(level="page")
 
-with open("./results/example.pdf.json", "r", encoding="utf-8") as file:
+with open(output_path, "r", encoding="utf-8") as file:
     data = json.load(file)
 
 print("Connecting to MongoDB...")
@@ -105,7 +105,9 @@ if existing_doc:
     new_pages_to_insert = [
         page
         for page in new_pages
-        if page["num"] not in existing_pages and "annotations" in page and page["annotations"]
+        if page["num"] not in existing_pages
+        and "annotations" in page
+        and page["annotations"]
     ]
 
     if new_pages_to_insert:
@@ -113,17 +115,23 @@ if existing_doc:
         collection.update_one(
             {"name": pdf_id}, {"$push": {"pages": {"$each": new_pages_to_insert}}}
         )
-        print(f"Inserted {len(new_pages_to_insert)} new pages with annotations into {pdf_id}.")
+        print(
+            f"Inserted {len(new_pages_to_insert)} new pages with annotations into {pdf_id}."
+        )
     else:
         print(f"No new annotated pages to insert for {pdf_id}.")
 else:
     # If the document doesn't exist, insert only pages that have annotations
-    annotated_pages = [page for page in new_pages if "annotations" in page and page["annotations"]]
+    annotated_pages = [
+        page for page in new_pages if "annotations" in page and page["annotations"]
+    ]
 
     if annotated_pages:
         data["pages"] = annotated_pages
         collection.insert_one(data)
-        print(f"Inserted new document with {len(annotated_pages)} annotated pages from {pdf_id}.")
+        print(
+            f"Inserted new document with {len(annotated_pages)} annotated pages from {pdf_id}."
+        )
     else:
         print(f"No annotated pages found. Document {pdf_id} was not inserted.")
 
@@ -135,3 +143,26 @@ else:
     print("Document was not inserted.")
 
 print(df)
+
+
+
+print(df)
+
+# # eda
+print(df.describe())
+print()
+
+print(df.info())
+print()
+
+print(df.head())
+print()
+
+print(df.tail())
+print()
+
+print(df.columns)
+print()
+
+print(df.index)
+print()

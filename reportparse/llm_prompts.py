@@ -60,7 +60,7 @@ CHROMA_PROMPT='''You have at your disposal information a statement: '[User Input
 LLM_AGGREGATOR_PROMPT='''You have at your disposal two independent verdicts regarding the accuracy of a given statement: '[User Input]'.  
 
                 - The first verdict (Database Verdict) is derived from an LLM that has access to a structured database containing the entire document from which the statement was extracted.  
-                - The second verdict (Web Verdict) is derived from an LLM that retrieves and analyzes information from the web to assess the claim.  
+                - The second verdict (Web Verdict) is derived from an LLM that retrieves and analyzes information from the web to assess the claim. If no content was found from the web, the Web Verdict will contain 'No content was found from the web'. Proceed with the analysis using only the Database Verdict.
 
                 Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
 
