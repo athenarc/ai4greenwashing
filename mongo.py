@@ -71,11 +71,21 @@ reader = BaseReader.by_name("pymupdf")()
 
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
 output_path = args.output_path if args.output_path else "./results/example.pdf.json"
-document = reader.read(input_path=input_path)
+document = reader.read(input_path=input_path, max_pages=args.max_pages)
 
 llm_agg = BaseAnnotator.by_name("llm_agg")()
+climate_annotator = BaseAnnotator.by_name("climate")()
+climate_commitment_annotator = BaseAnnotator.by_name("climate_commitment")()
+climate_specificity_annotator = BaseAnnotator.by_name("climate_specificity")()
+climate_sentiment_annotator = BaseAnnotator.by_name("climate_sentiment")()
 
 document = llm_agg.annotate(document=document, args=args)
+
+document = climate_annotator.annotate(document=document)
+document = climate_commitment_annotator.annotate(document=document)
+document = climate_specificity_annotator.annotate(document=document)
+document = climate_sentiment_annotator.annotate(document=document)
+
 
 if not os.path.exists("./results"):
     os.makedirs("./results")
@@ -141,10 +151,6 @@ if result:
     print(f"Final document contains {len(result['pages'])} annotated pages.")
 else:
     print("Document was not inserted.")
-
-print(df)
-
-
 
 print(df)
 
