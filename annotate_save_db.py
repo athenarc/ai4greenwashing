@@ -67,12 +67,17 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-reader = BaseReader.by_name("pymupdf")()
-
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
 output_path = args.output_path if args.output_path else "./results/example.pdf.json"
+
+################### MAIN ###################
+
+# reader and args
+reader = BaseReader.by_name("pymupdf")()
+
 document = reader.read(input_path=input_path, max_pages=args.max_pages)
 
+# annotators
 llm_agg = BaseAnnotator.by_name("llm_agg")()
 climate_annotator = BaseAnnotator.by_name("climate")()
 climate_commitment_annotator = BaseAnnotator.by_name("climate_commitment")()
@@ -80,7 +85,6 @@ climate_specificity_annotator = BaseAnnotator.by_name("climate_specificity")()
 climate_sentiment_annotator = BaseAnnotator.by_name("climate_sentiment")()
 
 document = llm_agg.annotate(document=document, args=args)
-
 document = climate_annotator.annotate(document=document)
 document = climate_commitment_annotator.annotate(document=document)
 document = climate_specificity_annotator.annotate(document=document)
@@ -91,8 +95,6 @@ if not os.path.exists("./results"):
     os.makedirs("./results")
 
 document.save(output_path)
-
-df = document.to_dataframe(level="page")
 
 with open(output_path, "r", encoding="utf-8") as file:
     data = json.load(file)
@@ -152,23 +154,7 @@ if result:
 else:
     print("Document was not inserted.")
 
-print(df)
-
-# # eda
-print(df.describe())
-print()
-
-print(df.info())
-print()
-
-print(df.head())
-print()
-
-print(df.tail())
-print()
+df = document.to_dataframe_ext(level="page")
 
 print(df.columns)
-print()
-
-print(df.index)
 print()

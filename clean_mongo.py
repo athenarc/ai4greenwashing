@@ -8,5 +8,8 @@ collection = db["annotations"]  # Collection name
 print("Connected to MongoDB.")
 
 # Drop the collectio
-collection.drop()
-print("Collection dropped.")
+try :
+    collection.drop()
+    print("Collection dropped.")
+except:
+    print("Collection not found.")
