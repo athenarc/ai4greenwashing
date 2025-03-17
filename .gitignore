@@ -154,3 +154,6 @@ backup/
 reqs.txt
 reportparse/asset/example_input/
 reportparse/asset/example_output/
+reportparse/asset/example_inputs/
+reportparse/asset/example_outputs/
+cli_results/
