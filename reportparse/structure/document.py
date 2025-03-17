@@ -708,3 +708,121 @@ class Document:
                     records.append(d)
         df = pd.DataFrame(records)
         return df
+
+    def to_dataframe_ext(self, level: str) -> pd.DataFrame:
+        if level not in ['page', 'block', 'sentence', 'table', 'figure']:
+            raise ValueError(
+                f'The specified level ({level}) is invalid. It must be either page, block, table, figure, or sentence.'
+            )
+
+        records = []
+        for page in self.pages:
+            if level == 'page':
+                d = {
+                    'page_id': page.id,
+                    'page_num': page.num,
+                    'page_width': page.width,
+                    'page_height': page.height,
+                    'page_text': page.text,
+                }
+                for annot in page.annotations:
+                    d[annot.annotator] = annot.value
+                    # if 'score' in annot.meta:
+                    #     d[annot.annotator + '-score'] = annot.meta['score']
+                    for key, value in annot.meta.items():
+                        if isinstance(value, list):  # Handling lists (e.g., cti metrics)
+                            d[f"meta_{annot.annotator}_{key}"] = [
+                                (item['label'], item['score']) for item in value if isinstance(item, dict)
+                            ]
+                        else:
+                            d[f"meta_{annot.annotator}_{key}"] = value  # Store other metadata directly
+                records.append(d)
+            elif level == 'block':
+                for block in page.blocks + page.table_blocks:
+                    d = {
+                        'page_id': page.id,
+                        'block_id': block.id,
+                        'block_layout_type': block.layout_type,
+                        'block_bbox': block.bbox,
+                        'block_text': block.text,
+                    }
+                    for annot in page.annotations:
+                        d[annot.annotator] = annot.value
+                        # if 'score' in annot.meta:
+                        #     d[annot.annotator + '-score'] = annot.meta['score']
+                        for key, value in annot.meta.items():
+                            if isinstance(value, list):  # Handling lists (e.g., cti metrics)
+                                d[f"meta_{annot.annotator}_{key}"] = [
+                                    (item['label'], item['score']) for item in value if isinstance(item, dict)
+                                ]
+                            else:
+                                d[f"meta_{annot.annotator}_{key}"] = value  # Store other metadata directly
+                    records.append(d)
+            elif level == 'sentence':
+                for block in page.blocks:
+                    for sentence in block.sentences:
+                        d = {
+                            'page_id': page.id,
+                            'block_id': block.id,
+                            'sentence_id': sentence.id,
+                            'sentence_bbox': sentence.bbox,
+                            'sentence_span': sentence.span,
+                            'sentence_text': sentence.text,
+                        }
+                        for annot in page.annotations:
+                            d[annot.annotator] = annot.value
+                            # if 'score' in annot.meta:
+                            #     d[annot.annotator + '-score'] = annot.meta['score']
+                            for key, value in annot.meta.items():
+                                if isinstance(value, list):  # Handling lists (e.g., cti metrics)
+                                    d[f"meta_{annot.annotator}_{key}"] = [
+                                        (item['label'], item['score']) for item in value if isinstance(item, dict)
+                                    ]
+                                else:
+                                    d[f"meta_{annot.annotator}_{key}"] = value  # Store other metadata directly
+                        records.append(d)
+            elif level == 'table':
+                for table in page.tables:
+                    d = {
+                        'page_id': page.id,
+                        'table_id': table.id,
+                        'table_bbox': table.bbox,
+                        'table_html': table.html,
+                        'table_text': table.text,
+                        'table_block_ids': [b.id for b in table.blocks],
+                    }
+                    for annot in page.annotations:
+                        d[annot.annotator] = annot.value
+                        # if 'score' in annot.meta:
+                        #     d[annot.annotator + '-score'] = annot.meta['score']
+                        for key, value in annot.meta.items():
+                            if isinstance(value, list):  # Handling lists (e.g., cti metrics)
+                                d[f"meta_{annot.annotator}_{key}"] = [
+                                    (item['label'], item['score']) for item in value if isinstance(item, dict)
+                                ]
+                            else:
+                                d[f"meta_{annot.annotator}_{key}"] = value  # Store other metadata directly
+                    records.append(d)
+            elif level == 'figure':
+                for figure in page.figures:
+                    d = {
+                        'page_id': page.id,
+                        'figure_id': figure.id,
+                        'figure_bbox': figure.bbox,
+                        'figure_text': figure.text,
+                    }
+                    for annot in page.annotations:
+                        d[annot.annotator] = annot.value
+                        # if 'score' in annot.meta:
+                        #     d[annot.annotator + '-score'] = annot.meta['score']
+                        for key, value in annot.meta.items():
+                            if isinstance(value, list):  # Handling lists (e.g., cti metrics)
+                                d[f"meta_{annot.annotator}_{key}"] = [
+                                    (item['label'], item['score']) for item in value if isinstance(item, dict)
+                                ]
+                            else:
+                                d[f"meta_{annot.annotator}_{key}"] = value  # Store other metadata directly
+                    records.append(d)
+        df = pd.DataFrame(records)
+        return df
+

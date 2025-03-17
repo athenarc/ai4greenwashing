@@ -2,10 +2,10 @@ import os
 import json
 import argparse
 import pandas as pd
-from pymongo import MongoClient
 from reportparse.reader.base import BaseReader
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
+from reportparse.document import Document
 import matplotlib.pyplot as plt
 import seaborn as sns
 import argparse
@@ -18,17 +18,17 @@ args = parser.parse_args()
 os.makedirs(args.output, exist_ok=True)
 
 
-reader = BaseReader.by_name("pymupdf")()
+# reader = BaseReader.by_name("pymupdf")()
 
-document = reader.read(input_path=args.input)
+# document = reader.read(input_path=args.input)
 
-document = BaseAnnotator.by_name("climate")().annotate(document=document)
-document = BaseAnnotator.by_name("climate_commitment")().annotate(document=document)
-document = BaseAnnotator.by_name("climate_specificity")().annotate(document=document)
+# document = BaseAnnotator.by_name("climate")().annotate(document=document)
+# document = BaseAnnotator.by_name("climate_commitment")().annotate(document=document)
+# document = BaseAnnotator.by_name("climate_specificity")().annotate(document=document)
 
 json_output_path = os.path.join(args.output, os.path.basename(args.input) + ".json")
-document.save(json_output_path)
-
+# document.save(json_output_path)
+document = Document.from_json(json_output_path)
 df = document.to_dataframe(level="block")
 df_2 = document.to_dataframe(level="page")
 

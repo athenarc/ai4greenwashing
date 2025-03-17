@@ -4,6 +4,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.annotator.web_rag import WEB_RAG_Annotator
 from reportparse.annotator.chroma_annotator import LLMAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
+from reportparse.climate_cti import cti_classification
 from reportparse.llm_evaluation import llm_evaluation
 import argparse
 import re
@@ -135,6 +136,8 @@ class LLMAggregator(BaseAnnotator):
         gw_index = 0
         print(f"Checking the first {gw_pages} pages for greenwashing")
         for page in document.pages:
+            if gw_index >= gw_pages:
+                break
             pdf_name = document.name
             page_number = page.num
 
@@ -152,8 +155,7 @@ class LLMAggregator(BaseAnnotator):
             # If the page has no existing annotations or doesn't exist, process it
             print(f"Processing page {page_number} of {pdf_name} (annotations missing).")
 
-            if gw_index >= gw_pages:
-                break
+
             if level == "page":
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
                 # call the first llm from chroma, that finds all potential greenwashing claims
@@ -164,7 +166,7 @@ class LLMAggregator(BaseAnnotator):
                 _annotate(
                     _annotate_obj=page,
                     _text=result,
-                    annotator_name="First pass",
+                    annotator_name="first_pass",
                     metadata=json.dumps({"info": "Simple greenwashing detection"}),
                 )
 
@@ -172,6 +174,7 @@ class LLMAggregator(BaseAnnotator):
                 claims = re.findall(r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result)
                 company_name = re.findall(r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result)
                 claims = [c.strip() for c in claims]
+                claim_index=0
                 for c in claims:
                     # add aggregation with chroma db
                     chroma_result, retrieved_pages, context = self.chroma.call_chroma(
@@ -193,8 +196,8 @@ class LLMAggregator(BaseAnnotator):
                     claim_dict_chroma = {
                         "claim": c,
                         "retrieved_pages": retrieved_pages,
-                        "Label": self.chroma.extract_label(chroma_result),
-                        "Justification": self.chroma.extract_justification(
+                        "label": self.chroma.extract_label(chroma_result),
+                        "justification": self.chroma.extract_justification(
                             chroma_result
                         ),
                         "context": context,
@@ -207,7 +210,7 @@ class LLMAggregator(BaseAnnotator):
                     _annotate(
                         _annotate_obj=page,
                         _text=chroma_result,
-                        annotator_name="chroma_result",
+                        annotator_name=f"chroma_result_claim_{claim_index}",
                         metadata=json_output,
                     )
 
@@ -228,8 +231,8 @@ class LLMAggregator(BaseAnnotator):
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,
-                        "Label": self.web.extract_label(web_rag_result),
-                        "Justification": self.web.extract_justification(web_rag_result),
+                        "label": self.web.extract_label(web_rag_result),
+                        "justification": self.web.extract_justification(web_rag_result),
                         "web_info": web_info,
                         "faith_eval": faith_eval,
                         "groundedness_eval": groundedness_eval,
@@ -242,31 +245,35 @@ class LLMAggregator(BaseAnnotator):
                     _annotate(
                         _annotate_obj=page,
                         _text=web_rag_result,
-                        annotator_name="web_rag_result",
+                        annotator_name=f"web_rag_result_claim_{claim_index}",
                         metadata=json_output,
                     )
 
+                    cti_results = cti_classification(c)
                     aggregator_result = self.call_aggregator(c, chroma_result, web_rag_result)
                     print("Aggregator result: ", aggregator_result)
                     _annotate(
                         _annotate_obj=page,
                         _text=aggregator_result,
-                        annotator_name="aggregator_result",
+                        annotator_name=f"aggregator_result_claim_{claim_index}",
                         metadata=json.dumps(
                             {
                                 "claim": c,
                                 "chroma_result": chroma_result,
                                 "web_rag_result": web_rag_result,
-                                "Label": self.web.extract_label(aggregator_result),
-                                "Justification": self.web.extract_justification(
+                                "label": self.web.extract_label(aggregator_result),
+                                "justification": self.web.extract_justification(
                                     aggregator_result
                                 ),
-                                "Marked page": page_number,
+                                "cti metrics_detection": cti_results["detection"],
+                                "cti metrics_commitment": cti_results["commitment"],
+                                "cti metrics_sentiment": cti_results["sentiment"],
+                                "cti metrics_specificity": cti_results["specificity"],
                             }
                         ),
                     )
+                    claim_index += 1
                 gw_index += 1
-
             else:
                 return "Page extraction failed"
 
