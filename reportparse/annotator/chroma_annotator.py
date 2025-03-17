@@ -145,7 +145,7 @@ class LLMAnnotator(BaseAnnotator):
         )
         print("Retrieved pages: ", retrieved_pages)
         result = verify_claim_with_context(claim=claim, text=text, context=context)
-        return result, retrieved_pages
+        return result, retrieved_pages, context
 
     def extract_label(self, text):
         try:
@@ -241,7 +241,7 @@ class LLMAnnotator(BaseAnnotator):
                     )
                     claims = [c.strip() for c in claims]
                     for c in claims:
-                        chroma_result, retrieved_pages = self.call_chroma(
+                        chroma_result, retrieved_pages, context = self.call_chroma(
                             c,
                             document.name,
                             text,
@@ -256,6 +256,7 @@ class LLMAnnotator(BaseAnnotator):
                             "retrieved_pages": retrieved_pages,
                             "Label": self.extract_label(chroma_result),
                             "Justification": self.extract_justification(chroma_result),
+                            "context": context,
                         }
                         json_output = json.dumps(claim_dict)
                         _annotate(

@@ -1,0 +1,3754 @@
+{
+    "name": "example.pdf",
+    "pages": [
+        {
+            "num": 0,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "3486032152550786355",
+                    "bbox": [
+                        141.7324981689453,
+                        68.15635681152344,
+                        4192.9130859375,
+                        1174.449951171875
+                    ],
+                    "text": "049 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Decarbonized Society Contributing to a Decarbonized Society Through the Decarbonization Business Contributing to a Decarbonized Society at Business Sites (Factories and Offices) Climate-related Financial Information Disclosure (Based on TCFD Recommendations)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3486032152550786355_sent_0",
+                            "bbox": [
+                                141.7324981689453,
+                                68.15635681152344,
+                                4192.9130859375,
+                                1174.449951171875
+                            ],
+                            "span": [
+                                0,
+                                466
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7189751008032384514",
+                    "bbox": [
+                        141.7324981689453,
+                        299.5753173828125,
+                        2012.865234375,
+                        1363.77197265625
+                    ],
+                    "text": "Achieving a Resource-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Risk Management Structure Hitachi identifies, evaluates, and manages climate change- related risks by business unit and Group company to deter- mine environmental impacts and other factors.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7189751008032384514_sent_0",
+                            "bbox": [
+                                141.7324981689453,
+                                299.5753173828125,
+                                2012.865234375,
+                                1363.77197265625
+                            ],
+                            "span": [
+                                0,
+                                290
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-820638419281377295",
+                    "bbox": [
+                        1110.2362060546875,
+                        574.18701171875,
+                        2062.130615234375,
+                        886.7742919921875
+                    ],
+                    "text": "The results are tabulated by the Sustainability Promotion Division of Hitachi, Ltd., and those risks and opportunities perceived as being particularly important for the Group as a whole are deliberated and decided by the Senior Executive Committee and, if neces- sary, by the Board of Directors as well.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-820638419281377295_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                574.18701171875,
+                                2062.130615234375,
+                                886.7742919921875
+                            ],
+                            "span": [
+                                0,
+                                303
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "8645076454548966475",
+                    "bbox": [
+                        2173.228271484375,
+                        299.5753173828125,
+                        3104.156005859375,
+                        616.0140991210938
+                    ],
+                    "text": "Metrics and Target Targets Hitachi defines medium- to long-term metrics and targets in the Hitachi Environmental Innovation 2050 long-term environ- mental targets.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "8645076454548966475_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                299.5753173828125,
+                                3104.156005859375,
+                                616.0140991210938
+                            ],
+                            "span": [
+                                0,
+                                163
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5382958863330422028",
+                    "bbox": [
+                        2173.228271484375,
+                        574.18701171875,
+                        3047.098388671875,
+                        724.3181762695312
+                    ],
+                    "text": "We also establish and manage short-term metrics and targets in detail every three years through the Environmental Action Plan.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5382958863330422028_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                574.18701171875,
+                                3047.098388671875,
+                                724.3181762695312
+                            ],
+                            "span": [
+                                0,
+                                126
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2341305050450680089",
+                    "bbox": [
+                        2173.22314453125,
+                        736.6431274414062,
+                        3104.64892578125,
+                        886.8619995117188
+                    ],
+                    "text": "Metrics for climate change mitigation and adaptation use total CO2 emissions and the reduction rate in CO2 emissions per unit.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2341305050450680089_sent_0",
+                            "bbox": [
+                                2173.22314453125,
+                                736.6431274414062,
+                                3104.64892578125,
+                                886.8619995117188
+                            ],
+                            "span": [
+                                0,
+                                126
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1217178498094916448",
+                    "bbox": [
+                        2173.227294921875,
+                        845.0349731445312,
+                        3116.40771484375,
+                        1049.332763671875
+                    ],
+                    "text": "Total CO2 emissions from the use of sold products in Scope 3, which account for most of our emissions given the nature of Hitachi’s business, fluctuate greatly due to changes in sales volumes and our business portfolio.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1217178498094916448_sent_0",
+                            "bbox": [
+                                2173.227294921875,
+                                845.0349731445312,
+                                3116.40771484375,
+                                1049.332763671875
+                            ],
+                            "span": [
+                                0,
+                                219
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "4232640015179050559",
+                    "bbox": [
+                        2173.227294921875,
+                        1007.5056762695312,
+                        3111.306640625,
+                        1157.6368408203125
+                    ],
+                    "text": "This has the disadvantage of making it difficult to see the results of energy saving and efficiency improvements.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "4232640015179050559_sent_0",
+                            "bbox": [
+                                2173.227294921875,
+                                1007.5056762695312,
+                                3111.306640625,
+                                1157.6368408203125
+                            ],
+                            "span": [
+                                0,
+                                113
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "5958019808482910599",
+                    "bbox": [
+                        2173.227294921875,
+                        1115.8096923828125,
+                        3092.0400390625,
+                        1320.2099609375
+                    ],
+                    "text": "Therefore, we have established CO2 emissions per unit as a metric for providing customers and society with products and services that offer equivalent value while emitting less CO2.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "5958019808482910599_sent_0",
+                            "bbox": [
+                                2173.227294921875,
+                                1115.8096923828125,
+                                3092.0400390625,
+                                1320.2099609375
+                            ],
+                            "span": [
+                                0,
+                                181
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1358580370737642379",
+                    "bbox": [
+                        2173.223388671875,
+                        1278.3828125,
+                        3109.28369140625,
+                        1428.51416015625
+                    ],
+                    "text": "We also set and manage a metric for avoided emissions that contribute to the realization of a decarbonized society as a whole.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1358580370737642379_sent_0",
+                            "bbox": [
+                                2173.223388671875,
+                                1278.3828125,
+                                3109.28369140625,
+                                1428.51416015625
+                            ],
+                            "span": [
+                                0,
+                                126
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6245123077717009614",
+                    "bbox": [
+                        2173.22021484375,
+                        1440.839111328125,
+                        3119.99169921875,
+                        1699.3619384765625
+                    ],
+                    "text": "We continue to reduce CO2 emissions generated at our own business sites (factories and offices) by utilizing the Hitachi Internal Carbon Pricing (HICP) system, which provides incentives for capital investments that contribute to CO2 reductions.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6245123077717009614_sent_0",
+                            "bbox": [
+                                2173.22021484375,
+                                1440.839111328125,
+                                3119.99169921875,
+                                1699.3619384765625
+                            ],
+                            "span": [
+                                0,
+                                244
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-3419116477729067885",
+                    "bbox": [
+                        2173.22021484375,
+                        1657.534912109375,
+                        3070.39404296875,
+                        1753.5433349609375
+                    ],
+                    "text": "The carbon price for HICP is set at 14,000 yen per ton-CO2.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-3419116477729067885_sent_0",
+                            "bbox": [
+                                2173.22021484375,
+                                1657.534912109375,
+                                3070.39404296875,
+                                1753.5433349609375
+                            ],
+                            "span": [
+                                0,
+                                59
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3676416017182955318",
+                    "bbox": [
+                        2173.228271484375,
+                        1765.8681640625,
+                        3116.230224609375,
+                        2024.3037109375
+                    ],
+                    "text": "In addition, in April 2021, Hitachi, Ltd. introduced evalua- tions that take environmental value into account in the execu- tive compensation system with a view to accelerating the creation of environmental value toward achievement of long- term environmental targets.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3676416017182955318_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1765.8681640625,
+                                3116.230224609375,
+                                2024.3037109375
+                            ],
+                            "span": [
+                                0,
+                                268
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "783409130898817307",
+                    "bbox": [
+                        3298.8193359375,
+                        447.70880126953125,
+                        3369.490478515625,
+                        482.1546325683594
+                    ],
+                    "text": "P.013",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "783409130898817307_sent_0",
+                            "bbox": [
+                                3298.8193359375,
+                                447.70880126953125,
+                                3369.490478515625,
+                                482.1546325683594
+                            ],
+                            "span": [
+                                0,
+                                5
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1596566853348880361",
+                    "bbox": [
+                        3298.8193359375,
+                        447.70880126953125,
+                        4140.0146484375,
+                        618.2850341796875
+                    ],
+                    "text": "Reflecting Sustainability Targets in Executive Compensation Evaluation P.027 “Environmental Vision” and “Hitachi Environmental Innovation 2050”",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1596566853348880361_sent_0",
+                            "bbox": [
+                                3298.8193359375,
+                                447.70880126953125,
+                                4140.0146484375,
+                                618.2850341796875
+                            ],
+                            "span": [
+                                0,
+                                143
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8598445475958353041",
+                    "bbox": [
+                        3298.8193359375,
+                        644.9529418945312,
+                        4093.406494140625,
+                        998.8954467773438
+                    ],
+                    "text": "P.030 Environmental Action Plan P.035 Achieving a Decarbonized Society P.036 Expanding the Decarbonization Business P.039 Contributing to a Decarbonized Society at Business Sites (Factories and Offices) P.061 Calculating GHG Emissions Throughout the Value Chain (Fiscal 2022)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8598445475958353041_sent_0",
+                            "bbox": [
+                                3298.8193359375,
+                                644.9529418945312,
+                                4093.406494140625,
+                                998.8954467773438
+                            ],
+                            "span": [
+                                0,
+                                275
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1374329583919595510",
+                    "bbox": [
+                        1209.057373046875,
+                        75.50657653808594,
+                        3481.986328125,
+                        117.4753189086914
+                    ],
+                    "text": "Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1374329583919595510_sent_0",
+                            "bbox": [
+                                1209.057373046875,
+                                75.50657653808594,
+                                3481.986328125,
+                                117.4753189086914
+                            ],
+                            "span": [
+                                0,
+                                83
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": [
+                {
+                    "annotator": "first_pass",
+                    "value": "Company Name: Hitachi\nPotential greenwashing claim: Achieving a Decarbonized Society\nJustification: Broad, aspirational statement lacking specific, verifiable actions beyond mentioning internal carbon pricing and executive compensation adjustments.\n\nAnother potential greenwashing claim: CO2 emissions per unit as a metric\nJustification: Acknowledges the metric's volatility due to sales volume and portfolio changes, potentially masking genuine progress in energy efficiency.\n\nAnother potential greenwashing claim: Hitachi Internal Carbon Pricing (HICP) system\nJustification: While internal carbon pricing can be a positive step, a price of 14,000 yen per ton-CO2 might not be sufficiently high to drive significant behavioral changes and could be a performative measure.",
+                    "meta": {
+                        "info": "Simple greenwashing detection"
+                    }
+                },
+                {
+                    "annotator": "chroma_result_claim_0",
+                    "value": "Statement: Achieving a Decarbonized Society\nResult of the statement: TRUE\nJustification: The provided text explicitly states \"Achieving a Decarbonized Society\" as a key focus area and outlines various strategies and metrics Hitachi is employing to contribute to it, including internal carbon pricing, executive compensation linked to environmental value, and specific targets for CO2 emissions reduction.",
+                    "meta": {
+                        "claim": "Achieving a Decarbonized Society",
+                        "retrieved_pages": [],
+                        "label": "TRUE",
+                        "justification": "The provided text explicitly states \"Achieving a Decarbonized Society\" as a key focus area and outlines various strategies and metrics Hitachi is employing to contribute to it, including internal carbon pricing, executive compensation linked to environmental value, and specific targets for CO2 emissions reduction."
+                    }
+                },
+                {
+                    "annotator": "web_rag_result_claim_0",
+                    "value": "Statement: 'Achieving a Decarbonized Society' \"\nResult of the statement: TRUE\nJustification:The provided text discusses Hitachi's efforts and strategies towards \"Achieving a Decarbonized Society\". It is mentioned multiple times as a key goal and focus of their environmental strategy.",
+                    "meta": {
+                        "claim": "Achieving a Decarbonized Society",
+                        "urls": [
+                            "https://www.hitachi.com/sustainability/report/environmental/decarbonization.html"
+                        ],
+                        "label": "TRUE",
+                        "justification": "The provided text discusses Hitachi's efforts and strategies towards \"Achieving a Decarbonized Society\". It is mentioned multiple times as a key goal and focus of their environmental strategy."
+                    }
+                },
+                {
+                    "annotator": "aggregator_result_claim_0",
+                    "value": "Statement: Achieving a Decarbonized Society\nResult of the statement: TRUE\nJustification: Both the Database Verdict and the Web Verdict confirm that \"Achieving a Decarbonized Society\" is a key focus area, with the provided text detailing Hitachi's strategies and targets related to it. Since both sources independently corroborate the statement, it is considered TRUE.",
+                    "meta": {
+                        "claim": "Achieving a Decarbonized Society",
+                        "chroma_result": "Statement: Achieving a Decarbonized Society\nResult of the statement: TRUE\nJustification: The provided text explicitly states \"Achieving a Decarbonized Society\" as a key focus area and outlines various strategies and metrics Hitachi is employing to contribute to it, including internal carbon pricing, executive compensation linked to environmental value, and specific targets for CO2 emissions reduction.",
+                        "web_rag_result": "Statement: 'Achieving a Decarbonized Society' \"\nResult of the statement: TRUE\nJustification:The provided text discusses Hitachi's efforts and strategies towards \"Achieving a Decarbonized Society\". It is mentioned multiple times as a key goal and focus of their environmental strategy.",
+                        "label": "TRUE",
+                        "justification": "Both the Database Verdict and the Web Verdict confirm that \"Achieving a Decarbonized Society\" is a key focus area, with the provided text detailing Hitachi's strategies and targets related to it. Since both sources independently corroborate the statement, it is considered TRUE.",
+                        "cti metrics_detection": [
+                            {
+                                "label": "yes",
+                                "score": 0.9932087063789368
+                            }
+                        ],
+                        "cti metrics_commitment": [
+                            {
+                                "label": "yes",
+                                "score": 0.538062334060669
+                            }
+                        ],
+                        "cti metrics_sentiment": [
+                            {
+                                "label": "opportunity",
+                                "score": 0.43625301122665405
+                            }
+                        ],
+                        "cti metrics_specificity": [
+                            {
+                                "label": "non",
+                                "score": 0.6186861395835876
+                            }
+                        ]
+                    }
+                },
+                {
+                    "annotator": "chroma_result_claim_1",
+                    "value": "Statement: CO2 emissions per unit as a metric\n                Result of the statement: TRUE\n                Justification: The provided text explicitly states: \"Therefore, we have established CO2 emissions per unit as a metric for providing customers and society with products and services that offer equivalent value while emitting less CO2.\"",
+                    "meta": {
+                        "claim": "CO2 emissions per unit as a metric",
+                        "retrieved_pages": [],
+                        "label": "TRUE",
+                        "justification": "The provided text explicitly states: \"Therefore, we have established CO2 emissions per unit as a metric for providing customers and society with products and services that offer equivalent value while emitting less CO2.\""
+                    }
+                },
+                {
+                    "annotator": "web_rag_result_claim_1",
+                    "value": "Statement: 'CO2 emissions per unit as a metric'\nResult of the statement: TRUE\nJustification: The provided information mentions \"CO2 emissions per unit from materials (t-CO2/t)\" in the context of fuel oils and \"Emissions per unit of electricity\" and \"Emissions unit values other than electricity\". This confirms that CO2 emissions per unit is used as a metric.",
+                    "meta": {
+                        "claim": "CO2 emissions per unit as a metric",
+                        "urls": [
+                            "https://www.hitachicm.com/global/en/sustainability/environment/climate_change/"
+                        ],
+                        "label": "TRUE",
+                        "justification": "The provided information mentions \"CO2 emissions per unit from materials (t-CO2/t)\" in the context of fuel oils and \"Emissions per unit of electricity\" and \"Emissions unit values other than electricity\". This confirms that CO2 emissions per unit is used as a metric."
+                    }
+                },
+                {
+                    "annotator": "aggregator_result_claim_1",
+                    "value": "Statement: CO2 emissions per unit as a metric\nResult of the statement: TRUE\nJustification: Both the Database Verdict and the Web Verdict independently confirm that CO2 emissions per unit is used as a metric. The Database Verdict directly quotes the text establishing it as such, while the Web Verdict finds corroborating evidence of its use in various contexts. There are no discrepancies between the verdicts, reinforcing the statement's accuracy.",
+                    "meta": {
+                        "claim": "CO2 emissions per unit as a metric",
+                        "chroma_result": "Statement: CO2 emissions per unit as a metric\n                Result of the statement: TRUE\n                Justification: The provided text explicitly states: \"Therefore, we have established CO2 emissions per unit as a metric for providing customers and society with products and services that offer equivalent value while emitting less CO2.\"",
+                        "web_rag_result": "Statement: 'CO2 emissions per unit as a metric'\nResult of the statement: TRUE\nJustification: The provided information mentions \"CO2 emissions per unit from materials (t-CO2/t)\" in the context of fuel oils and \"Emissions per unit of electricity\" and \"Emissions unit values other than electricity\". This confirms that CO2 emissions per unit is used as a metric.",
+                        "label": "TRUE",
+                        "justification": "Both the Database Verdict and the Web Verdict independently confirm that CO2 emissions per unit is used as a metric. The Database Verdict directly quotes the text establishing it as such, while the Web Verdict finds corroborating evidence of its use in various contexts. There are no discrepancies between the verdicts, reinforcing the statement's accuracy.",
+                        "cti metrics_detection": [
+                            {
+                                "label": "yes",
+                                "score": 0.9954710006713867
+                            }
+                        ],
+                        "cti metrics_commitment": [
+                            {
+                                "label": "no",
+                                "score": 0.9565050005912781
+                            }
+                        ],
+                        "cti metrics_sentiment": [
+                            {
+                                "label": "neutral",
+                                "score": 0.7437863349914551
+                            }
+                        ],
+                        "cti metrics_specificity": [
+                            {
+                                "label": "spec",
+                                "score": 0.604682445526123
+                            }
+                        ]
+                    }
+                },
+                {
+                    "annotator": "chroma_result_claim_2",
+                    "value": "Statement: Hitachi Internal Carbon Pricing (HICP) system\nResult of the statement: TRUE\nJustification: The provided text explicitly states: \"We continue to reduce CO2 emissions generated at our own business sites (factories and offices) by utilizing the Hitachi Internal Carbon Pricing (HICP) system, which provides incentives for capital investments that contribute to CO2 reductions.\" It also mentions the carbon price for HICP is set at 14,000 yen per ton-CO2.",
+                    "meta": {
+                        "claim": "Hitachi Internal Carbon Pricing (HICP) system",
+                        "retrieved_pages": [],
+                        "label": "TRUE",
+                        "justification": "The provided text explicitly states: \"We continue to reduce CO2 emissions generated at our own business sites (factories and offices) by utilizing the Hitachi Internal Carbon Pricing (HICP) system, which provides incentives for capital investments that contribute to CO2 reductions.\" It also mentions the carbon price for HICP is set at 14,000 yen per ton-CO2."
+                    }
+                },
+                {
+                    "annotator": "web_rag_result_claim_2",
+                    "value": "Statement: 'Hitachi Internal Carbon Pricing (HICP) system' \"\nResult of the statement: TRUE\nJustification:The provided text refers to Hitachi's Internal Carbon Pricing (ICP) system. Therefore, the statement is true.",
+                    "meta": {
+                        "claim": "Hitachi Internal Carbon Pricing (HICP) system",
+                        "urls": [
+                            "https://social-innovation.hitachi/en/article/icp/"
+                        ],
+                        "label": "TRUE",
+                        "justification": "The provided text refers to Hitachi's Internal Carbon Pricing (ICP) system. Therefore, the statement is true."
+                    }
+                },
+                {
+                    "annotator": "aggregator_result_claim_2",
+                    "value": "Statement: Hitachi Internal Carbon Pricing (HICP) system\nResult of the statement: TRUE\nJustification: Both the Database Verdict and the Web Verdict confirm the existence of the Hitachi Internal Carbon Pricing (HICP) system. The Database Verdict provides specific details about its implementation and carbon price, strengthening the confirmation. Therefore, the statement is demonstrably true.",
+                    "meta": {
+                        "claim": "Hitachi Internal Carbon Pricing (HICP) system",
+                        "chroma_result": "Statement: Hitachi Internal Carbon Pricing (HICP) system\nResult of the statement: TRUE\nJustification: The provided text explicitly states: \"We continue to reduce CO2 emissions generated at our own business sites (factories and offices) by utilizing the Hitachi Internal Carbon Pricing (HICP) system, which provides incentives for capital investments that contribute to CO2 reductions.\" It also mentions the carbon price for HICP is set at 14,000 yen per ton-CO2.",
+                        "web_rag_result": "Statement: 'Hitachi Internal Carbon Pricing (HICP) system' \"\nResult of the statement: TRUE\nJustification:The provided text refers to Hitachi's Internal Carbon Pricing (ICP) system. Therefore, the statement is true.",
+                        "label": "TRUE",
+                        "justification": "Both the Database Verdict and the Web Verdict confirm the existence of the Hitachi Internal Carbon Pricing (HICP) system. The Database Verdict provides specific details about its implementation and carbon price, strengthening the confirmation. Therefore, the statement is demonstrably true.",
+                        "cti metrics_detection": [
+                            {
+                                "label": "yes",
+                                "score": 0.9970908164978027
+                            }
+                        ],
+                        "cti metrics_commitment": [
+                            {
+                                "label": "no",
+                                "score": 0.9912512898445129
+                            }
+                        ],
+                        "cti metrics_sentiment": [
+                            {
+                                "label": "neutral",
+                                "score": 0.6586463451385498
+                            }
+                        ],
+                        "cti metrics_specificity": [
+                            {
+                                "label": "non",
+                                "score": 0.6512918472290039
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "num": 1,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "-2901800966692939258",
+                    "bbox": [
+                        141.73208618164062,
+                        68.15635681152344,
+                        4192.9130859375,
+                        1464.13037109375
+                    ],
+                    "text": "050 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Resource-Efficient Society Efforts to Achieve a Resource-Efficient Society Building a Society That Uses Resources Efficiently Building a Water-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Respond to water risks Enhance efficiency in the use of water Building a Water-Efficient Society Main initiatives at business sites Improve water use efficiency by 50% in FY2050 (compared to FY2010 level)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2901800966692939258_sent_0",
+                            "bbox": [
+                                141.73208618164062,
+                                68.15635681152344,
+                                4192.9130859375,
+                                1464.13037109375
+                            ],
+                            "span": [
+                                0,
+                                635
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7910750688901145766",
+                    "bbox": [
+                        2239.073486328125,
+                        809.992431640625,
+                        3956.107177734375,
+                        1464.13037109375
+                    ],
+                    "text": "Long-term target Shift to a circular economy Enhance efficiency in the use of resources Building a society that uses resources efficiently Long-term target Main initiatives at business sites Improve resource use efficiency by 50% in FY2050 (compared to FY2010 level)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7910750688901145766_sent_0",
+                            "bbox": [
+                                2239.073486328125,
+                                809.992431640625,
+                                3956.107177734375,
+                                1464.13037109375
+                            ],
+                            "span": [
+                                0,
+                                266
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8298989832194454445",
+                    "bbox": [
+                        1110.2362060546875,
+                        628.3829345703125,
+                        2029.5462646484375,
+                        832.6661376953125
+                    ],
+                    "text": "Environmental issues continue to intensify associated with increased economic and social activities within the conven- tional linear economy of mass production, mass consump- tion, and mass disposal.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8298989832194454445_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                628.3829345703125,
+                                2029.5462646484375,
+                                832.6661376953125
+                            ],
+                            "span": [
+                                0,
+                                199
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-3141678323120152408",
+                    "bbox": [
+                        1110.2362060546875,
+                        790.8390502929688,
+                        2041.4110107421875,
+                        995.1222534179688
+                    ],
+                    "text": "These problems involve resource shortages, water scarcity, tight supply and demand for energy, environmental pollution caused by increasing waste, global warming, and the loss of biodiversity.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-3141678323120152408_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                790.8390502929688,
+                                2041.4110107421875,
+                                995.1222534179688
+                            ],
+                            "span": [
+                                0,
+                                192
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-35987793937697392",
+                    "bbox": [
+                        1110.2362060546875,
+                        953.295166015625,
+                        2019.3818359375,
+                        1103.42626953125
+                    ],
+                    "text": "To solve these problems and create sustainable societies, we must shift away from linear economies to circular economies.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-35987793937697392_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                953.295166015625,
+                                2019.3818359375,
+                                1103.42626953125
+                            ],
+                            "span": [
+                                0,
+                                121
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8310044271050492786",
+                    "bbox": [
+                        1110.2362060546875,
+                        1061.5992431640625,
+                        2013.8568115234375,
+                        1211.7303466796875
+                    ],
+                    "text": "Hitachi works together with customers and society to help build a society that uses water and other resources efficiently.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8310044271050492786_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1061.5992431640625,
+                                2013.8568115234375,
+                                1211.7303466796875
+                            ],
+                            "span": [
+                                0,
+                                122
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8601326091217965201",
+                    "bbox": [
+                        1110.2362060546875,
+                        1274.0369873046875,
+                        2058.587890625,
+                        1428.5286865234375
+                    ],
+                    "text": "Initiatives in the Value Chain Hitachi considers the circularity of resources across the value chain to be of key importance.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8601326091217965201_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1274.0369873046875,
+                                2058.587890625,
+                                1428.5286865234375
+                            ],
+                            "span": [
+                                0,
+                                125
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "307894784182033242",
+                    "bbox": [
+                        1110.2362060546875,
+                        1386.7015380859375,
+                        2043.7132568359375,
+                        1590.985107421875
+                    ],
+                    "text": "We also believe in the impor- tance of water usage reduction that takes into consideration water risks on a region-by-region basis at each stage of the supply chain.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "307894784182033242_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1386.7015380859375,
+                                2043.7132568359375,
+                                1590.985107421875
+                            ],
+                            "span": [
+                                0,
+                                165
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6957724991966803100",
+                    "bbox": [
+                        1110.2362060546875,
+                        1549.157958984375,
+                        2041.4818115234375,
+                        1807.593505859375
+                    ],
+                    "text": "Accordingly, we drive circular-design initiatives and development tools, applications, and services that help facilitate circular economies, and optimize water usage and wastewater treatment in the supply chain, provide water- efficient products and services.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6957724991966803100_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1549.157958984375,
+                                2041.4818115234375,
+                                1807.593505859375
+                            ],
+                            "span": [
+                                0,
+                                259
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6500910633363885526",
+                    "bbox": [
+                        1110.2362060546875,
+                        1869.870361328125,
+                        2051.0087890625,
+                        2078.51416015625
+                    ],
+                    "text": "Initiatives at Business Sites We established a long-term environmental target to improve the efficiency with which water and other resources are used by fiscal 2050.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6500910633363885526_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1869.870361328125,
+                                2051.0087890625,
+                                2078.51416015625
+                            ],
+                            "span": [
+                                0,
+                                165
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-4548253924741935191",
+                    "bbox": [
+                        1110.2362060546875,
+                        2036.68701171875,
+                        1994.8731689453125,
+                        2132.666259765625
+                    ],
+                    "text": "The actual goal is to improve efficiency by 50% compared to fiscal 2010.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-4548253924741935191_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                2036.68701171875,
+                                1994.8731689453125,
+                                2132.666259765625
+                            ],
+                            "span": [
+                                0,
+                                72
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "6042337472937265674",
+                    "bbox": [
+                        1110.2362060546875,
+                        2090.839111328125,
+                        2043.6778564453125,
+                        2240.97021484375
+                    ],
+                    "text": "In addition, we will create higher economic value using fewer resources while pursuing production activities with a lower environmental burden.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6042337472937265674_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                2090.839111328125,
+                                2043.6778564453125,
+                                2240.97021484375
+                            ],
+                            "span": [
+                                0,
+                                143
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2164245705836281433",
+                    "bbox": [
+                        2174.266357421875,
+                        1566.3712158203125,
+                        3910.79541015625,
+                        1598.3565673828125
+                    ],
+                    "text": "Note: Our response to water risks that take biodiversity into consideration are detailed in Efforts to Achieve a Society Harmonized With Nature (P.055).",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2164245705836281433_sent_0",
+                            "bbox": [
+                                2174.266357421875,
+                                1566.3712158203125,
+                                3910.79541015625,
+                                1598.3565673828125
+                            ],
+                            "span": [
+                                0,
+                                152
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "513728982804688641",
+                    "bbox": [
+                        1110.2362060546875,
+                        75.50657653808594,
+                        3482.018798828125,
+                        1285.530517578125
+                    ],
+                    "text": "Efforts to Achieve a Resource-Efficient Society Approach GRI 2-13/2-24/3-3 Achieving a Resource-Efficient Society Initiatives to Achieve a Resource-Efficient Society Achieving a Resource- Efficient Society Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "513728982804688641_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                75.50657653808594,
+                                3482.018798828125,
+                                1285.530517578125
+                            ],
+                            "span": [
+                                0,
+                                289
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": []
+        },
+        {
+            "num": 2,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "-2666921560739566994",
+                    "bbox": [
+                        141.73208618164062,
+                        68.15635681152344,
+                        4192.9130859375,
+                        2240.294677734375
+                    ],
+                    "text": "051 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Resource-Efficient Society Efforts to Achieve a Resource-Efficient Society Building a Society That Uses Resources Efficiently Building a Water-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Approach to Transitioning to a Circular Economy Raw materials Raw materials Processing/ Assembly Processing/ Assembly Use Use Waste Waste plastic Toxic substances Waste Procurement Partners Procurement Partners In-house Manufacturing sites In-house Manufacturing sites Customers Customers Recycling Recycling Refurbishment Reuse Sharing and resale Heat recovery Heat recovery In-house collection Third-party collection Third-party collection Shifting to a circular economy Building a Society That Uses Resources Efficiently GRI 301-1/301-2/301-3 Approach to Transitioning to a Circular Economy Approach To help build a society that uses resources efficiently, Hitachi will advance a shift from the conventional linear economy to a circular economy.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2666921560739566994_sent_0",
+                            "bbox": [
+                                141.73208618164062,
+                                68.15635681152344,
+                                4192.9130859375,
+                                2240.294677734375
+                            ],
+                            "span": [
+                                0,
+                                1179
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1816352352001646154",
+                    "bbox": [
+                        1110.2362060546875,
+                        736.68701171875,
+                        2054.196044921875,
+                        1049.2742919921875
+                    ],
+                    "text": "Therefore, we will focus on how we can continue to use resources and assets in our business activi- ties and reduce waste, or even eliminate waste altogether, using three approaches: innovation in upstream product design, innovation in the product manufacturing process, and innovation of our business model.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1816352352001646154_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                736.68701171875,
+                                2054.196044921875,
+                                1049.2742919921875
+                            ],
+                            "span": [
+                                0,
+                                308
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1690025634033187637",
+                    "bbox": [
+                        1110.2362060546875,
+                        1112.552734375,
+                        2060.6064453125,
+                        1428.4849853515625
+                    ],
+                    "text": "1 Innovation in Product Design Through Environmentally Conscious Design Assessments and Life Cycle Assessments for new products that involve design activities, we will reduce waste by standardizing parts, extending service life, utilizing recycled materials, and design- ing for easy recyclability.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1690025634033187637_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1112.552734375,
+                                2060.6064453125,
+                                1428.4849853515625
+                            ],
+                            "span": [
+                                0,
+                                298
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8777596716040140688",
+                    "bbox": [
+                        1110.2362060546875,
+                        1386.6578369140625,
+                        2037.5859375,
+                        1536.7890625
+                    ],
+                    "text": "To this end, we revised the Hitachi Eco Design Management Guidelines and Hitachi Eco Design Activity Guidelines to reflect the latest international trends.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8777596716040140688_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1386.6578369140625,
+                                2037.5859375,
+                                1536.7890625
+                            ],
+                            "span": [
+                                0,
+                                155
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "2411906476535939946",
+                    "bbox": [
+                        1110.2362060546875,
+                        1494.9619140625,
+                        2040.0968017578125,
+                        1699.245361328125
+                    ],
+                    "text": "At the same time, we set a clear goal to apply the relevant assessments to all new products involving design activities and to achieve this goal by fiscal 2024.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "2411906476535939946_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1494.9619140625,
+                                2040.0968017578125,
+                                1699.245361328125
+                            ],
+                            "span": [
+                                0,
+                                160
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6918863015451043899",
+                    "bbox": [
+                        1110.2362060546875,
+                        1762.552734375,
+                        2042.61474609375,
+                        1916.0286865234375
+                    ],
+                    "text": "2 Innovation in the Manufacturing Process We share case studies among divisions to highlight initiatives in this area.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6918863015451043899_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1762.552734375,
+                                2042.61474609375,
+                                1916.0286865234375
+                            ],
+                            "span": [
+                                0,
+                                118
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-3461467537179272567",
+                    "bbox": [
+                        1110.2362060546875,
+                        1874.2015380859375,
+                        2058.269287109375,
+                        2186.788818359375
+                    ],
+                    "text": "Case studies include product and parts manufac- turing volume optimization based on an understanding of supply and demand, digitization of design processes for paperless work, the reduction of packaging material usage, the reduction of defective products through quality improve- ment, and the reduction of chemical substances.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-3461467537179272567_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1874.2015380859375,
+                                2058.269287109375,
+                                2186.788818359375
+                            ],
+                            "span": [
+                                0,
+                                327
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-105412242681576630",
+                    "bbox": [
+                        1110.2362060546875,
+                        628.2786254882812,
+                        2912.587890625,
+                        2295.09326171875
+                    ],
+                    "text": "Further, we established specific targets for the number of sites achieving the goal of the Zero Waste to Landfill initiative, as well as for effective utilization rates related to plastic waste.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-105412242681576630_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                628.2786254882812,
+                                2912.587890625,
+                                2295.09326171875
+                            ],
+                            "span": [
+                                0,
+                                194
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7765253248842663011",
+                    "bbox": [
+                        2173.23193359375,
+                        628.2786254882812,
+                        3108.7958984375,
+                        778.5433349609375
+                    ],
+                    "text": "In particular, we initiated activities targeting all manufacturing sites this fiscal year with the aim of achieving Zero Waste to Landfill*1.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7765253248842663011_sent_0",
+                            "bbox": [
+                                2173.23193359375,
+                                628.2786254882812,
+                                3108.7958984375,
+                                778.5433349609375
+                            ],
+                            "span": [
+                                0,
+                                141
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "4789458275491787103",
+                    "bbox": [
+                        2173.228271484375,
+                        805.8966674804688,
+                        3110.282958984375,
+                        1265.98486328125
+                    ],
+                    "text": "*1 Pursued in careful compliance with regulations, conditions, etc., in each country or region 3 Innovation of Business Model To adapt to a society that is transitioning from goods to experiences, or in other words, from ownership to leasing, we pursue the effective use of resources and assets through leasing, pay-per-use systems, subscriptions, products as a service, reuse, and sharing-based models.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "4789458275491787103_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                805.8966674804688,
+                                3110.282958984375,
+                                1265.98486328125
+                            ],
+                            "span": [
+                                0,
+                                403
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "654246081314074124",
+                    "bbox": [
+                        2173.228271484375,
+                        628.3077392578125,
+                        4158.1904296875,
+                        1320.1368408203125
+                    ],
+                    "text": "At the same time, we collect used products and consider their sale, repair, or recycling, making continuous efforts to devise strategies for the most efficient utilization of resources and assets.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "654246081314074124_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                628.3077392578125,
+                                4158.1904296875,
+                                1320.1368408203125
+                            ],
+                            "span": [
+                                0,
+                                196
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-4294114460425862212",
+                    "bbox": [
+                        3236.22412109375,
+                        682.4597778320312,
+                        4158.828125,
+                        832.5909423828125
+                    ],
+                    "text": "To this end, we share our goals with various stakeholders in the value chain and pursue collaborative creation.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-4294114460425862212_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                682.4597778320312,
+                                4158.828125,
+                                832.5909423828125
+                            ],
+                            "span": [
+                                0,
+                                111
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "5894706416351182580",
+                    "bbox": [
+                        3236.22412109375,
+                        790.763916015625,
+                        4192.9736328125,
+                        995.0470581054688
+                    ],
+                    "text": "Additionally, we pursue research and development involving raw materials, products, tools, applications, and services necessary for our goals, leveraging the advantages of Hitachi’s IT ×",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "5894706416351182580_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                790.763916015625,
+                                4192.9736328125,
+                                995.0470581054688
+                            ],
+                            "span": [
+                                0,
+                                186
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "6248447137392219266",
+                    "bbox": [
+                        3236.22412109375,
+                        953.2200317382812,
+                        4186.453125,
+                        1049.1990966796875
+                    ],
+                    "text": "Operational Technology (OT) ×",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6248447137392219266_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                953.2200317382812,
+                                4186.453125,
+                                1049.1990966796875
+                            ],
+                            "span": [
+                                0,
+                                29
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "2413086812249228048",
+                    "bbox": [
+                        3236.22412109375,
+                        1007.3720703125,
+                        4085.5146484375,
+                        1157.503173828125
+                    ],
+                    "text": "Products to support create circular economies not only in our value chain, but in customer activities as well.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "2413086812249228048_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                1007.3720703125,
+                                4085.5146484375,
+                                1157.503173828125
+                            ],
+                            "span": [
+                                0,
+                                110
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8276944821859682690",
+                    "bbox": [
+                        2173.228271484375,
+                        1188.9541015625,
+                        4111.31201171875,
+                        2370.074462890625
+                    ],
+                    "text": "P.038 Improving the Environmental Performance of Products and Services Through Eco-Design Note: Hitachi normally refers to suppliers (including vendors and providers) as procurement partners, with whom we build business together on an equal footing.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8276944821859682690_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1188.9541015625,
+                                4111.31201171875,
+                                2370.074462890625
+                            ],
+                            "span": [
+                                0,
+                                249
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5179853298244280006",
+                    "bbox": [
+                        1209.08984375,
+                        75.50657653808594,
+                        3482.018798828125,
+                        2229.43896484375
+                    ],
+                    "text": "1 Innovation in product design 2 Innovation in the manufacturing process 3 Innovation of business model Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5179853298244280006_sent_0",
+                            "bbox": [
+                                1209.08984375,
+                                75.50657653808594,
+                                3482.018798828125,
+                                2229.43896484375
+                            ],
+                            "span": [
+                                0,
+                                187
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": []
+        },
+        {
+            "num": 3,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "-9097908909997144660",
+                    "bbox": [
+                        141.73208618164062,
+                        68.15635681152344,
+                        4192.91650390625,
+                        1155.040771484375
+                    ],
+                    "text": "052 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Resource-Efficient Society Efforts to Achieve a Resource-Efficient Society Building a Society That Uses Resources Efficiently Building a Water-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Environmental Action Plan for 2024 Management Values Reduction Rate in Waste and Valuables Generation*1 per Unit (Hitachi Group) Management of Waste and Valuables Generated at Business Sites Activities GRI 306-1/306-2/306-3 We collect environmental load data for waste and valuables*1 generated at the business sites using the Environmental Data Collection System (Eco-DS) to manage centrally the volumes of waste and valuables generated and exported by type.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-9097908909997144660_sent_0",
+                            "bbox": [
+                                141.73208618164062,
+                                68.15635681152344,
+                                4192.91650390625,
+                                1155.040771484375
+                            ],
+                            "span": [
+                                0,
+                                890
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "450363509725390038",
+                    "bbox": [
+                        1110.2303466796875,
+                        628.3390502929688,
+                        2036.836669921875,
+                        832.6222534179688
+                    ],
+                    "text": "For hazardous waste, in particular, we ensure thorough compli- ance with laws and regulations, and engage in proper dis- posal within the Group.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "450363509725390038_sent_0",
+                            "bbox": [
+                                1110.2303466796875,
+                                628.3390502929688,
+                                2036.836669921875,
+                                832.6222534179688
+                            ],
+                            "span": [
+                                0,
+                                144
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "6222917982964425734",
+                    "bbox": [
+                        1110.2303466796875,
+                        844.9472045898438,
+                        2044.5540771484375,
+                        1103.3824462890625
+                    ],
+                    "text": "For fiscal 2022, which was the first year of the Environmental Action Plan for 2024 (fiscal 2022–2024), we established a 14% per-unit reduction target (compared with a base year of fiscal 2010) for waste and valuables gener- ated.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6222917982964425734_sent_0",
+                            "bbox": [
+                                1110.2303466796875,
+                                844.9472045898438,
+                                2044.5540771484375,
+                                1103.3824462890625
+                            ],
+                            "span": [
+                                0,
+                                230
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1043489664171797352",
+                    "bbox": [
+                        1110.2303466796875,
+                        1061.555419921875,
+                        2035.384521484375,
+                        1157.5345458984375
+                    ],
+                    "text": "We outperformed this target by achieving a reduction of 16%.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1043489664171797352_sent_0",
+                            "bbox": [
+                                1110.2303466796875,
+                                1061.555419921875,
+                                2035.384521484375,
+                                1157.5345458984375
+                            ],
+                            "span": [
+                                0,
+                                60
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "5361135206687182664",
+                    "bbox": [
+                        1110.230224609375,
+                        1169.859375,
+                        2038.5718994140625,
+                        1265.838623046875
+                    ],
+                    "text": "We reduced the amount of waste and valuables gener- ated by 70 kt, or 23%, compared to the base year.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "5361135206687182664_sent_0",
+                            "bbox": [
+                                1110.230224609375,
+                                1169.859375,
+                                2038.5718994140625,
+                                1265.838623046875
+                            ],
+                            "span": [
+                                0,
+                                101
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6868343595538492774",
+                    "bbox": [
+                        1110.230224609375,
+                        1224.011474609375,
+                        2065.170166015625,
+                        1590.7510986328125
+                    ],
+                    "text": "We accomplished this result by installing recycling facilities within our business sites, as well as through closed-loop recycling, whereby byproducts and scrap from the produc- tion process are reused as resources by other business sites, while packing and cushioning materials for transporta- tion are used repeatedly.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6868343595538492774_sent_0",
+                            "bbox": [
+                                1110.230224609375,
+                                1224.011474609375,
+                                2065.170166015625,
+                                1590.7510986328125
+                            ],
+                            "span": [
+                                0,
+                                320
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3288943134758548168",
+                    "bbox": [
+                        1110.2362060546875,
+                        1618.3966064453125,
+                        1948.2227783203125,
+                        1650.3819580078125
+                    ],
+                    "text": "*1 Waste and valuables: Materials generated through business activities.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3288943134758548168_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1618.3966064453125,
+                                1948.2227783203125,
+                                1650.3819580078125
+                            ],
+                            "span": [
+                                0,
+                                72
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-530938570121029517",
+                    "bbox": [
+                        1142.11328125,
+                        1618.3966064453125,
+                        2045.156982421875,
+                        1800.423583984375
+                    ],
+                    "text": "Each country has a legal definition of waste, and in Japan, the term refers to refuse, bulky refuse, ashes, sludge, excreta, waste oil, waste acid and alkali, car- casses, and other filthy and unnecessary matter, which are in a solid or liquid state according to the Waste Management and Public Cleansing Law.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-530938570121029517_sent_0",
+                            "bbox": [
+                                1142.11328125,
+                                1618.3966064453125,
+                                2045.156982421875,
+                                1800.423583984375
+                            ],
+                            "span": [
+                                0,
+                                309
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7485969200849445148",
+                    "bbox": [
+                        1142.11328125,
+                        1805.94873046875,
+                        2056.775390625,
+                        1912.954833984375
+                    ],
+                    "text": "Valuables, meanwhile, are those materials left over after business activities other than waste, and can be sold or transferred free of charge to other parties as items of value.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7485969200849445148_sent_0",
+                            "bbox": [
+                                1142.11328125,
+                                1805.94873046875,
+                                2056.775390625,
+                                1912.954833984375
+                            ],
+                            "span": [
+                                0,
+                                177
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2283854319251136310",
+                    "bbox": [
+                        2173.202880859375,
+                        1457.90087890625,
+                        3040.89794921875,
+                        1489.8861083984375
+                    ],
+                    "text": "*1 Amount of waste and valuables generated from the production process.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2283854319251136310_sent_0",
+                            "bbox": [
+                                2173.202880859375,
+                                1457.90087890625,
+                                3040.89794921875,
+                                1489.8861083984375
+                            ],
+                            "span": [
+                                0,
+                                71
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8069813686592203849",
+                    "bbox": [
+                        2173.202880859375,
+                        1495.4112548828125,
+                        3105.6005859375,
+                        1564.906982421875
+                    ],
+                    "text": "*2 Activity amount is a value closely related to waste and valuables generation at each business site (for example, output, sales, and production weight).",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8069813686592203849_sent_0",
+                            "bbox": [
+                                2173.202880859375,
+                                1495.4112548828125,
+                                3105.6005859375,
+                                1564.906982421875
+                            ],
+                            "span": [
+                                0,
+                                154
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3306416319689566257",
+                    "bbox": [
+                        2206.171630859375,
+                        469.48126220703125,
+                        4189.46533203125,
+                        1378.0303955078125
+                    ],
+                    "text": "Waste and Valuables Generation*1 (Hitachi Group) 1,500 1,000 500 461 55 130 722 418 56 148 656 311 50 100 582 331 49 87 613 109 34 69 43 2018 1,384 2019 (FY) 1,302 2020 1,061 1,111 2022*2 2021 356 0 12 4 14 10 9 9 21 10 38 62 (kt) North America Europe Other regions Japan China ASEAN, India, and other Asian regions 16% reduction Target: 14% From base year FY2010 (base year) FY2022 100% = Amount generated Activity amount*2 84% = Amount generated Activity amount *1 Waste and valuables: Through fiscal 2021, this volume was the amount of waste and valuables generated by major business sites.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3306416319689566257_sent_0",
+                            "bbox": [
+                                2206.171630859375,
+                                469.48126220703125,
+                                4189.46533203125,
+                                1378.0303955078125
+                            ],
+                            "span": [
+                                0,
+                                593
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "6199205831955478321",
+                    "bbox": [
+                        3268.097412109375,
+                        1346.0450439453125,
+                        4169.07861328125,
+                        1490.5616455078125
+                    ],
+                    "text": "Beginning in fiscal 2022, this volume is the total amount of waste and valuables generated in the manufacturing processes of all business sites and the amount generated at offices other than manufacturing processes.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6199205831955478321_sent_0",
+                            "bbox": [
+                                3268.097412109375,
+                                1346.0450439453125,
+                                4169.07861328125,
+                                1490.5616455078125
+                            ],
+                            "span": [
+                                0,
+                                215
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1419277464371673398",
+                    "bbox": [
+                        3236.22021484375,
+                        1496.086669921875,
+                        4154.5849609375,
+                        1603.0928955078125
+                    ],
+                    "text": "*2 Beginning in fiscal 2022, the report above includes waste and valuables generated by an energy-related company and auto parts companies in fiscal 2022.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1419277464371673398_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1496.086669921875,
+                                4154.5849609375,
+                                1603.0928955078125
+                            ],
+                            "span": [
+                                0,
+                                154
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6093954152100600787",
+                    "bbox": [
+                        3268.097412109375,
+                        1571.1075439453125,
+                        4132.54248046875,
+                        1640.603271484375
+                    ],
+                    "text": "Significant decrease due to deconsolidation of materials-related and construction machinery-related companies.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6093954152100600787_sent_0",
+                            "bbox": [
+                                3268.097412109375,
+                                1571.1075439453125,
+                                4132.54248046875,
+                                1640.603271484375
+                            ],
+                            "span": [
+                                0,
+                                110
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2729323973110712094",
+                    "bbox": [
+                        1209.081787109375,
+                        75.50657653808594,
+                        4091.85009765625,
+                        1810.1678466796875
+                    ],
+                    "text": "P.063 Environmental Load from Operations Case Studies of Efficient Use of Resources https://www.hitachi.com/environment/casestudy/index.html#case04 Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2729323973110712094_sent_0",
+                            "bbox": [
+                                1209.081787109375,
+                                75.50657653808594,
+                                4091.85009765625,
+                                1810.1678466796875
+                            ],
+                            "span": [
+                                0,
+                                231
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": []
+        },
+        {
+            "num": 4,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "6457759322776218891",
+                    "bbox": [
+                        141.73208618164062,
+                        68.15635681152344,
+                        4192.9130859375,
+                        1155.040771484375
+                    ],
+                    "text": "053 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Resource-Efficient Society Efforts to Achieve a Resource-Efficient Society Building a Society That Uses Resources Efficiently Building a Water-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Number of Sites Achieving the Goal of the Zero Waste to Landfill Initiative Activities",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6457759322776218891_sent_0",
+                            "bbox": [
+                                141.73208618164062,
+                                68.15635681152344,
+                                4192.9130859375,
+                                1155.040771484375
+                            ],
+                            "span": [
+                                0,
+                                517
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-7290987161656851911",
+                    "bbox": [
+                        1110.2362060546875,
+                        425.8799743652344,
+                        2059.190185546875,
+                        670.1953735351562
+                    ],
+                    "text": "Materiality We pursue activities to achieve the goals of the Zero Waste to Landfill*1 initiative, which seeks to minimize landfill disposal for the ongoing, sustainable utilization of resources.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-7290987161656851911_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                425.8799743652344,
+                                2059.190185546875,
+                                670.1953735351562
+                            ],
+                            "span": [
+                                0,
+                                194
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-3839291455742738864",
+                    "bbox": [
+                        1110.2362060546875,
+                        628.3682861328125,
+                        2043.25244140625,
+                        832.6514892578125
+                    ],
+                    "text": "This fiscal year, we set specific targets for the number of manufacturing sites to achieve zero landfill waste, and we are stepping up efforts to accelerate this initiative.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-3839291455742738864_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                628.3682861328125,
+                                2043.25244140625,
+                                832.6514892578125
+                            ],
+                            "span": [
+                                0,
+                                173
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "826249916173576493",
+                    "bbox": [
+                        1110.2362060546875,
+                        790.8244018554688,
+                        2011.1998291015625,
+                        886.8035278320312
+                    ],
+                    "text": "In fiscal 2022, 199 of the sites covered by our activities achieved zero landfill waste.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "826249916173576493_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                790.8244018554688,
+                                2011.1998291015625,
+                                886.8035278320312
+                            ],
+                            "span": [
+                                0,
+                                88
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2325814813027857681",
+                    "bbox": [
+                        2173.22412109375,
+                        300.0525817871094,
+                        3095.048095703125,
+                        616.0286865234375
+                    ],
+                    "text": "Effective Utilization Rate of Plastic Waste Activities We began strengthening our activities in fiscal 2022 toward achieving a 100% effective utilization*1 rate of waste plastics throughout the entire Hitachi Group by fiscal 2030.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2325814813027857681_sent_0",
+                            "bbox": [
+                                2173.22412109375,
+                                300.0525817871094,
+                                3095.048095703125,
+                                616.0286865234375
+                            ],
+                            "span": [
+                                0,
+                                230
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-4974765280062812833",
+                    "bbox": [
+                        2173.22412109375,
+                        574.2015991210938,
+                        3074.785400390625,
+                        724.332763671875
+                    ],
+                    "text": "In fiscal 2022, we set an effective utilization rate target of 77% and achieved 88%.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-4974765280062812833_sent_0",
+                            "bbox": [
+                                2173.22412109375,
+                                574.2015991210938,
+                                3074.785400390625,
+                                724.332763671875
+                            ],
+                            "span": [
+                                0,
+                                84
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "2753650144906397600",
+                    "bbox": [
+                        2173.22412109375,
+                        682.5057373046875,
+                        3118.564208984375,
+                        1049.2449951171875
+                    ],
+                    "text": "To improve the effective utilization rate, we are implementing measures that include design changes for equipment and products that do not generate waste, digitiza- tion of operations for paperless work, reduction of waste through yield improvements, in-house reuse, sorting and accumulation waste to enhance value, and recycling mea- sures through detailed sorting.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "2753650144906397600_sent_0",
+                            "bbox": [
+                                2173.22412109375,
+                                682.5057373046875,
+                                3118.564208984375,
+                                1049.2449951171875
+                            ],
+                            "span": [
+                                0,
+                                366
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3247805721806884707",
+                    "bbox": [
+                        1110.2215576171875,
+                        1162.7799072265625,
+                        2066.9638671875,
+                        1502.9820556640625
+                    ],
+                    "text": "Environmental Action Plan for 2024 Management Values Number of sites achieving zero landfill waste 199 business sites (58% achievement) FY2022 target: 90 business sites (approx.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3247805721806884707_sent_0",
+                            "bbox": [
+                                1110.2215576171875,
+                                1162.7799072265625,
+                                2066.9638671875,
+                                1502.9820556640625
+                            ],
+                            "span": [
+                                0,
+                                177
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "9006191702595561530",
+                    "bbox": [
+                        1992.923583984375,
+                        1468.5361328125,
+                        2058.752685546875,
+                        1502.9820556640625
+                    ],
+                    "text": "25%)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "9006191702595561530_sent_0",
+                            "bbox": [
+                                1992.923583984375,
+                                1468.5361328125,
+                                2058.752685546875,
+                                1502.9820556640625
+                            ],
+                            "span": [
+                                0,
+                                4
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2676784064814791252",
+                    "bbox": [
+                        1110.2362060546875,
+                        1594.6292724609375,
+                        2020.535888671875,
+                        1750.9541015625
+                    ],
+                    "text": "Note: All manufacturing sites are covered *1 Zero Waste to Landfill goal: Defined as a final disposal rate (landfill disposal/ waste and valuables) of less than 0.5% in any given fiscal year in the Hitachi Group.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2676784064814791252_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                1594.6292724609375,
+                                2020.535888671875,
+                                1750.9541015625
+                            ],
+                            "span": [
+                                0,
+                                212
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1817824290567145469",
+                    "bbox": [
+                        1230.43212890625,
+                        303.3828125,
+                        4160.0615234375,
+                        1750.9541015625
+                    ],
+                    "text": "Pursued in assumed conformance with regulations, conditions, etc. Environmental Action Plan for 2024 Management Values Effective utilization rate of plastic waste 88% achievement FY2022 target: 77% Hitachi Global Life Solutions, whose plastic consumption accounts for around 70% of the Hitachi Group’s total, uses recycled plastic in parts for washing machines and refrigera- tors and packing materials for ceiling lights.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1817824290567145469_sent_0",
+                            "bbox": [
+                                1230.43212890625,
+                                303.3828125,
+                                4160.0615234375,
+                                1750.9541015625
+                            ],
+                            "span": [
+                                0,
+                                422
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5784008142540076667",
+                    "bbox": [
+                        3236.22021484375,
+                        465.83892822265625,
+                        4192.92919921875,
+                        724.274169921875
+                    ],
+                    "text": "The company procures recycled plastic materials produced within the Hitachi Group, such as plastic parts recovered from end-of-life home appliances and plastic containers, and also uses recy- cled plastics sourced from other materials manufacturers.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5784008142540076667_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                465.83892822265625,
+                                4192.92919921875,
+                                724.274169921875
+                            ],
+                            "span": [
+                                0,
+                                249
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1178223685113359137",
+                    "bbox": [
+                        3236.22021484375,
+                        736.59912109375,
+                        4178.36962890625,
+                        995.0343627929688
+                    ],
+                    "text": "While large components in washing machines (enclosure bases in the lower parts of units, etc.) were previously made using a mixture of new and recycled materials, the company shifted to almost 100% recycled plastics, achieved by solving technical problems and procurement issues.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1178223685113359137_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                736.59912109375,
+                                4178.36962890625,
+                                995.0343627929688
+                            ],
+                            "span": [
+                                0,
+                                279
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5039563357815518152",
+                    "bbox": [
+                        3236.22021484375,
+                        1007.3593139648438,
+                        4185.9873046875,
+                        1320.1953125
+                    ],
+                    "text": "Hitachi Global Life Solutions works to recycle four catego- ries of end-of-life home appliances (air conditioners, TVs, refrigerators/freezers, and washing machines/dryers) at 19 recycling plants as part of cooperative efforts among five companies*2 in response to the 2001 Act on Recycling of Specified Home Appliances.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5039563357815518152_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1007.3593139648438,
+                                4185.9873046875,
+                                1320.1953125
+                            ],
+                            "span": [
+                                0,
+                                320
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2326353114453831182",
+                    "bbox": [
+                        3236.219970703125,
+                        1278.3681640625,
+                        4144.51123046875,
+                        1428.5286865234375
+                    ],
+                    "text": "A total of 91.3 kt of recyclable materials*3 were recovered in fiscal 2022, of which approxi- mately 81.9 kt were recycled.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2326353114453831182_sent_0",
+                            "bbox": [
+                                3236.219970703125,
+                                1278.3681640625,
+                                4144.51123046875,
+                                1428.5286865234375
+                            ],
+                            "span": [
+                                0,
+                                123
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1855987474828109139",
+                    "bbox": [
+                        3236.219970703125,
+                        1386.7015380859375,
+                        4182.48095703125,
+                        1645.1370849609375
+                    ],
+                    "text": "By product type, the recycling rate for refrigerators and freezers was 80% exceeding the legal requirement of 70% by 10 percentage points, and for washing machines and dryers it was 94% exceeding the legal requirement of 82% by 12 percentage points.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1855987474828109139_sent_0",
+                            "bbox": [
+                                3236.219970703125,
+                                1386.7015380859375,
+                                4182.48095703125,
+                                1645.1370849609375
+                            ],
+                            "span": [
+                                0,
+                                249
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5018414437535193966",
+                    "bbox": [
+                        3236.22021484375,
+                        1672.563232421875,
+                        4146.568359375,
+                        1742.0589599609375
+                    ],
+                    "text": "*1 Effective utilization encompasses material recycling, chemical recycling, and thermal recovery.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5018414437535193966_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1672.563232421875,
+                                4146.568359375,
+                                1742.0589599609375
+                            ],
+                            "span": [
+                                0,
+                                98
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "296914696950406587",
+                    "bbox": [
+                        3236.22021484375,
+                        1710.0736083984375,
+                        4152.06884765625,
+                        1854.59033203125
+                    ],
+                    "text": "Pursued in assumed conformance with regulations, condi- tions, etc. *2 Hitachi Global Life Solutions, Sharp Corporation, Sony Corporation, Fujitsu General Limited, and Mitsubishi Electric Corporation.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "296914696950406587_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1710.0736083984375,
+                                4152.06884765625,
+                                1854.59033203125
+                            ],
+                            "span": [
+                                0,
+                                200
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8644230365677556115",
+                    "bbox": [
+                        3236.22021484375,
+                        1860.1153564453125,
+                        4157.59130859375,
+                        2004.6319580078125
+                    ],
+                    "text": "*3 Parts and materials recovered from four categories of end-of-life home appli- ances (air conditioners, TVs, refrigerators/freezers, and washing machines/ dryers) and recycled through in-house use, sale, or transfer free of charge to other entities for use.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8644230365677556115_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1860.1153564453125,
+                                4157.59130859375,
+                                2004.6319580078125
+                            ],
+                            "span": [
+                                0,
+                                259
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-3259577240075676984",
+                    "bbox": [
+                        3268.097412109375,
+                        1972.6466064453125,
+                        4117.5107421875,
+                        2042.1424560546875
+                    ],
+                    "text": "Data values are aggregated from Hitachi Global Life Solutions and Johnson Controls-Hitachi Air Conditioning.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-3259577240075676984_sent_0",
+                            "bbox": [
+                                3268.097412109375,
+                                1972.6466064453125,
+                                4117.5107421875,
+                                2042.1424560546875
+                            ],
+                            "span": [
+                                0,
+                                108
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1559774317610959688",
+                    "bbox": [
+                        1209.08984375,
+                        75.50657653808594,
+                        3482.018798828125,
+                        117.4753189086914
+                    ],
+                    "text": "Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1559774317610959688_sent_0",
+                            "bbox": [
+                                1209.08984375,
+                                75.50657653808594,
+                                3482.018798828125,
+                                117.4753189086914
+                            ],
+                            "span": [
+                                0,
+                                83
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": []
+        },
+        {
+            "num": 5,
+            "width": 4405.499776204428,
+            "height": 2480.3166707356772,
+            "blocks": [
+                {
+                    "id": "2988825341775623676",
+                    "bbox": [
+                        141.7324981689453,
+                        68.15635681152344,
+                        4192.9130859375,
+                        1150.82861328125
+                    ],
+                    "text": "054 Hitachi Sustainability Report 2023 Environmental Environmental Advancing Our Environmental Vision and Long-Term Environmental Targets Environmental Governance Achieving a Decarbonized Society Achieving a Resource-Efficient Society Efforts to Achieve a Resource-Efficient Society Building a Society That Uses Resources Efficiently Building a Water-Efficient Society Achieving a Harmonized Society with Nature Environmental Data Building a Water-Efficient Society (FY) (million m3) 0",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "2988825341775623676_sent_0",
+                            "bbox": [
+                                141.7324981689453,
+                                68.15635681152344,
+                                4192.9130859375,
+                                1150.82861328125
+                            ],
+                            "span": [
+                                0,
+                                485
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "8828764684159014625",
+                    "bbox": [
+                        2174.763671875,
+                        656.818359375,
+                        3122.394775390625,
+                        1124.91162109375
+                    ],
+                    "text": "10 20 30 40 50 2018 2019 2020 2021 29.00 1.34 3.93 2.45 0.04 0.26 28.01 1.32 4.09 2.36 0.28 0.35 19.50 0.95 1.92 3.30 0.36 0.33 19.08 0.87 1.88 3.68 0.21 0.32 37.02 36.41 26.35 26.03 14.56 3.57 0.42 8.19 0.90 0.57 0.92 ■ Japan ■ China ■ ASEAN, India, and other Asian regions ■ North America ■ Europe ■ Other regions",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "8828764684159014625_sent_0",
+                            "bbox": [
+                                2174.763671875,
+                                656.818359375,
+                                3122.394775390625,
+                                1124.91162109375
+                            ],
+                            "span": [
+                                0,
+                                315
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "4690391482429713301",
+                    "bbox": [
+                        1110.2362060546875,
+                        462.09503173828125,
+                        3131.103759765625,
+                        1122.9173583984375
+                    ],
+                    "text": "2022*2 Water Usage*1 (Hitachi Group) Management of Water Use at Business Sites Activities Materiality GRI 303-1/303-2/303-5 For fiscal 2022, the first year of the Environmental Action Plan for 2024 (fiscal 2022–2024), we set a target reduction of 22% (compared with a base year of fiscal 2010) in water use per unit for manufacturing process and general daily usage in manufacturing sites.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "4690391482429713301_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                462.09503173828125,
+                                3131.103759765625,
+                                1122.9173583984375
+                            ],
+                            "span": [
+                                0,
+                                389
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1988133460811975075",
+                    "bbox": [
+                        1110.2362060546875,
+                        803.7265014648438,
+                        2058.9384765625,
+                        895.5619506835938
+                    ],
+                    "text": "We improved on this target with a reduc- tion of 27%.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1988133460811975075_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                803.7265014648438,
+                                2058.9384765625,
+                                895.5619506835938
+                            ],
+                            "span": [
+                                0,
+                                53
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-6494898019989704522",
+                    "bbox": [
+                        1110.2362060546875,
+                        853.73486328125,
+                        2016.0885009765625,
+                        995.5283813476562
+                    ],
+                    "text": "We reduced the volume of water used by 11 million m3, equivalent to a reduction of 45% compared with the base year.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-6494898019989704522_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                853.73486328125,
+                                2016.0885009765625,
+                                995.5283813476562
+                            ],
+                            "span": [
+                                0,
+                                115
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "1091584672614344853",
+                    "bbox": [
+                        1110.2369384765625,
+                        953.7012939453125,
+                        2061.88232421875,
+                        1145.5535888671875
+                    ],
+                    "text": "Our measures to reduce water usage included more stringent management of water intake using flowmeters, installing water pipes above ground for better leakage control, recirculating cooling water, and reusing purified waste water.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "1091584672614344853_sent_0",
+                            "bbox": [
+                                1110.2369384765625,
+                                953.7012939453125,
+                                2061.88232421875,
+                                1145.5535888671875
+                            ],
+                            "span": [
+                                0,
+                                230
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "853706172765366347",
+                    "bbox": [
+                        2173.228271484375,
+                        1139.4925537109375,
+                        3128.212890625,
+                        1246.4986572265625
+                    ],
+                    "text": "*1 Total volume of water used in manufacturing processes and general daily usage at manufacturing sites and in general daily usage at locations other than manufacturing sites.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "853706172765366347_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1139.4925537109375,
+                                3128.212890625,
+                                1246.4986572265625
+                            ],
+                            "span": [
+                                0,
+                                175
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "280084141810131089",
+                    "bbox": [
+                        2173.228271484375,
+                        1252.0238037109375,
+                        2197.8203125,
+                        1284.0091552734375
+                    ],
+                    "text": "*2",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "280084141810131089_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1252.0238037109375,
+                                2197.8203125,
+                                1284.0091552734375
+                            ],
+                            "span": [
+                                0,
+                                2
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5142828713314641349",
+                    "bbox": [
+                        2205.105224609375,
+                        1252.0238037109375,
+                        3116.2685546875,
+                        1321.51953125
+                    ],
+                    "text": "The water usage of an energy-related company included in the scope of consoli- dation since fiscal 2020 is included in the figures above beginning fiscal 2022.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5142828713314641349_sent_0",
+                            "bbox": [
+                                2205.105224609375,
+                                1252.0238037109375,
+                                3116.2685546875,
+                                1321.51953125
+                            ],
+                            "span": [
+                                0,
+                                159
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-2511439169638953634",
+                    "bbox": [
+                        2205.105224609375,
+                        1327.044677734375,
+                        3128.131591796875,
+                        1434.05078125
+                    ],
+                    "text": "The water usage for fiscal 2022 by auto parts companies included in the scope of consolidation since fiscal 2020 is not included in the figures above, but amounted to 412 million m3.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-2511439169638953634_sent_0",
+                            "bbox": [
+                                2205.105224609375,
+                                1327.044677734375,
+                                3128.131591796875,
+                                1434.05078125
+                            ],
+                            "span": [
+                                0,
+                                182
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-255027902988554075",
+                    "bbox": [
+                        2205.120849609375,
+                        1401.992431640625,
+                        3092.721923828125,
+                        1471.48828125
+                    ],
+                    "text": "The total water usage was decreased significantly due to the deconsolidation of the materials- and construction machinery companies.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-255027902988554075_sent_0",
+                            "bbox": [
+                                2205.120849609375,
+                                1401.992431640625,
+                                3092.721923828125,
+                                1471.48828125
+                            ],
+                            "span": [
+                                0,
+                                132
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7642222099297255858",
+                    "bbox": [
+                        2173.228271484375,
+                        1490.037841796875,
+                        3112.7607421875,
+                        2003.4945068359375
+                    ],
+                    "text": "P.063 Environmental Load from Operations Case Studies of Improving Water Use Efficiency https://www.hitachi.com/environment/casestudy/index.html#case03 Products and Services That Contribute to Resolving Water Issues Activities Hitachi is a comprehensive water services provider that has built a solid track record of experience and expertise in operational technology (OT), products, and services in the sector.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7642222099297255858_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1490.037841796875,
+                                3112.7607421875,
+                                2003.4945068359375
+                            ],
+                            "span": [
+                                0,
+                                411
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-4457362697272846208",
+                    "bbox": [
+                        2173.228271484375,
+                        1961.66748046875,
+                        3122.85400390625,
+                        2153.519287109375
+                    ],
+                    "text": "We con- tribute to the effective use of limited water resources by address- ing the many issues facing our customers in the water and sewage treatment business.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-4457362697272846208_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                1961.66748046875,
+                                3122.85400390625,
+                                2153.519287109375
+                            ],
+                            "span": [
+                                0,
+                                160
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "6227188621584225749",
+                    "bbox": [
+                        2173.228271484375,
+                        2111.6923828125,
+                        3119.24267578125,
+                        2253.535888671875
+                    ],
+                    "text": "We achieve these results by lever- aging a combination of our IT, extensive experience, and consid- erable expertise in a variety of fields.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "6227188621584225749_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                2111.6923828125,
+                                3119.24267578125,
+                                2253.535888671875
+                            ],
+                            "span": [
+                                0,
+                                140
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "5994687886520177129",
+                    "bbox": [
+                        2173.228271484375,
+                        461.8069152832031,
+                        4120.08203125,
+                        2353.552734375
+                    ],
+                    "text": "A recent example includes our joint venture with Mizu Mirai Hiroshima Corporation, which was awarded a contract by Hiroshima Prefecture to build a wide-area monitoring and control system for nine prefectural water treatment plants.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "5994687886520177129_sent_0",
+                            "bbox": [
+                                2173.228271484375,
+                                461.8069152832031,
+                                4120.08203125,
+                                2353.552734375
+                            ],
+                            "span": [
+                                0,
+                                231
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-476504032234782408",
+                    "bbox": [
+                        3236.22412109375,
+                        511.8153076171875,
+                        4188.9326171875,
+                        653.6591796875
+                    ],
+                    "text": "This project involves designing and build- ing a system that monitors and operates facilities centrally via a common cloud-based platform.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-476504032234782408_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                511.8153076171875,
+                                4188.9326171875,
+                                653.6591796875
+                            ],
+                            "span": [
+                                0,
+                                138
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-7877166816339966047",
+                    "bbox": [
+                        3236.22412109375,
+                        611.8320922851562,
+                        4180.431640625,
+                        803.684326171875
+                    ],
+                    "text": "The system handles data from different systems with different specifications supplied by various vendors, as well as data from software that utilizes Hitachi’s digital technology.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-7877166816339966047_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                611.8320922851562,
+                                4180.431640625,
+                                803.684326171875
+                            ],
+                            "span": [
+                                0,
+                                179
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1274249352939978046",
+                    "bbox": [
+                        3236.22412109375,
+                        761.8572387695312,
+                        4192.1201171875,
+                        853.6927490234375
+                    ],
+                    "text": "This project will contribute to wide-area control and management and as digitization (DX) in the water industry.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1274249352939978046_sent_0",
+                            "bbox": [
+                                3236.22412109375,
+                                761.8572387695312,
+                                4192.1201171875,
+                                853.6927490234375
+                            ],
+                            "span": [
+                                0,
+                                112
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "8940502334645925109",
+                    "bbox": [
+                        3274.014404296875,
+                        897.5857543945312,
+                        4149.47021484375,
+                        998.2454223632812
+                    ],
+                    "text": "Hitachi’s Water-related Products and Services Activity field Products or services (implementation to date)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "8940502334645925109_sent_0",
+                            "bbox": [
+                                3274.014404296875,
+                                897.5857543945312,
+                                4149.47021484375,
+                                998.2454223632812
+                            ],
+                            "span": [
+                                0,
+                                106
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1539801212798782447",
+                    "bbox": [
+                        3250.379150390625,
+                        1011.7786865234375,
+                        3946.11767578125,
+                        1302.716064453125
+                    ],
+                    "text": "Creating water resources Wastewater recycling systems Seawater desalination systems Developing water infrastructure Water and sewage treatment, etc.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1539801212798782447_sent_0",
+                            "bbox": [
+                                3250.379150390625,
+                                1011.7786865234375,
+                                3946.11767578125,
+                                1302.716064453125
+                            ],
+                            "span": [
+                                0,
+                                148
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-8265334749614763654",
+                    "bbox": [
+                        3520.345703125,
+                        1143.14501953125,
+                        4138.99462890625,
+                        1177.5909423828125
+                    ],
+                    "text": "(over 200 sites in about 40 countries and regions)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-8265334749614763654_sent_0",
+                            "bbox": [
+                                3520.345703125,
+                                1143.14501953125,
+                                4138.99462890625,
+                                1177.5909423828125
+                            ],
+                            "span": [
+                                0,
+                                50
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-5067386067755952764",
+                    "bbox": [
+                        3520.345703125,
+                        1191.124267578125,
+                        3964.4375,
+                        1260.9783935546875
+                    ],
+                    "text": "Water purification plants (approximately 700 plants in Japan)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-5067386067755952764_sent_0",
+                            "bbox": [
+                                3520.345703125,
+                                1191.124267578125,
+                                3964.4375,
+                                1260.9783935546875
+                            ],
+                            "span": [
+                                0,
+                                61
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "4143723245274086991",
+                    "bbox": [
+                        3520.345703125,
+                        1274.5118408203125,
+                        3964.4375,
+                        1344.3658447265625
+                    ],
+                    "text": "Sewage treatment plants (approximately 900 plants in Japan)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "4143723245274086991_sent_0",
+                            "bbox": [
+                                3520.345703125,
+                                1274.5118408203125,
+                                3964.4375,
+                                1344.3658447265625
+                            ],
+                            "span": [
+                                0,
+                                59
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "8409496474602543972",
+                    "bbox": [
+                        3236.22021484375,
+                        1357.8992919921875,
+                        4188.681640625,
+                        1753.5899658203125
+                    ],
+                    "text": "Comprehensive digital solutions for water and sewage treatment operators Integrated flood control measures Flood forecasting and simulation technology related to evacuations and emergencies We are also engaged in verification tests and joint research with national and local governments, companies, and other organi- zations in various countries to establish new technologies and systems for the water business.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "8409496474602543972_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1357.8992919921875,
+                                4188.681640625,
+                                1753.5899658203125
+                            ],
+                            "span": [
+                                0,
+                                411
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1089336143327492857",
+                    "bbox": [
+                        3236.22021484375,
+                        1711.7628173828125,
+                        4174.1962890625,
+                        1853.6065673828125
+                    ],
+                    "text": "These joint activities include recent work with Higashine City, Yamagata Prefecture, on inte- grated flood control measures.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1089336143327492857_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1711.7628173828125,
+                                4174.1962890625,
+                                1853.6065673828125
+                            ],
+                            "span": [
+                                0,
+                                124
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-1329158076471658289",
+                    "bbox": [
+                        3236.22021484375,
+                        1811.7794189453125,
+                        4152.2021484375,
+                        1953.623291015625
+                    ],
+                    "text": "The actual research involved technologies for real-time flood forecasting and for simulating evacuations and emergencies.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-1329158076471658289_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1811.7794189453125,
+                                4152.2021484375,
+                                1953.623291015625
+                            ],
+                            "span": [
+                                0,
+                                121
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3238080432827441975",
+                    "bbox": [
+                        3236.22021484375,
+                        1911.796142578125,
+                        4192.78564453125,
+                        2003.631591796875
+                    ],
+                    "text": "We also demonstrated the effectiveness of the technologies that were part of this research.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3238080432827441975_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                1911.796142578125,
+                                4192.78564453125,
+                                2003.631591796875
+                            ],
+                            "span": [
+                                0,
+                                91
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "8327648911352957209",
+                    "bbox": [
+                        3236.22021484375,
+                        2011.812744140625,
+                        4162.4375,
+                        2203.664794921875
+                    ],
+                    "text": "In addition, we began joint research with Water Agency Inc., whose business includes water and sewage treatment opera- tions, to develop a practical AI/IoT-based sludge-reduction service for sewage treatment plants.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "8327648911352957209_sent_0",
+                            "bbox": [
+                                3236.22021484375,
+                                2011.812744140625,
+                                4162.4375,
+                                2203.664794921875
+                            ],
+                            "span": [
+                                0,
+                                215
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "920990184760962295",
+                    "bbox": [
+                        1148.0303955078125,
+                        1274.9208984375,
+                        3660.215576171875,
+                        2263.349609375
+                    ],
+                    "text": "Water Environment Solutions Environmental Action Plan for 2024 Management Values Reduction in Water Usage*1 per unit (Hitachi Group) 27% reduction Target: 22% From base year FY2010 (base year)",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "920990184760962295_sent_0",
+                            "bbox": [
+                                1148.0303955078125,
+                                1274.9208984375,
+                                3660.215576171875,
+                                2263.349609375
+                            ],
+                            "span": [
+                                0,
+                                192
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "3813356130521845772",
+                    "bbox": [
+                        1110.2362060546875,
+                        2002.359619140625,
+                        2043.150146484375,
+                        2216.2412109375
+                    ],
+                    "text": "FY2022 *1 Total amount of water used in manufacturing process and general daily usage at manufacturing sites.",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "3813356130521845772_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                2002.359619140625,
+                                2043.150146484375,
+                                2216.2412109375
+                            ],
+                            "span": [
+                                0,
+                                109
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "-7340235238024428398",
+                    "bbox": [
+                        1110.2362060546875,
+                        2221.76611328125,
+                        2056.6376953125,
+                        2291.261962890625
+                    ],
+                    "text": "*2 Activity amount is a value closely related to water use at each business site (for example, output, sales, and production weight).",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "-7340235238024428398_sent_0",
+                            "bbox": [
+                                1110.2362060546875,
+                                2221.76611328125,
+                                2056.6376953125,
+                                2291.261962890625
+                            ],
+                            "span": [
+                                0,
+                                133
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                },
+                {
+                    "id": "7849481168358256130",
+                    "bbox": [
+                        1143.2403564453125,
+                        75.50657653808594,
+                        3482.041748046875,
+                        1909.004150390625
+                    ],
+                    "text": "100% = Water usage Activity amount*2 73% = Water usage Activity amount Management Social Innovation Governance Social Assurance Introduction Environmental",
+                    "layout_type": "text",
+                    "sentences": [
+                        {
+                            "id": "7849481168358256130_sent_0",
+                            "bbox": [
+                                1143.2403564453125,
+                                75.50657653808594,
+                                3482.041748046875,
+                                1909.004150390625
+                            ],
+                            "span": [
+                                0,
+                                154
+                            ],
+                            "reference": null,
+                            "annotations": []
+                        }
+                    ],
+                    "texts": [],
+                    "annotations": []
+                }
+            ],
+            "tables": [],
+            "figures": [],
+            "annotations": []
+        }
+    ]
+}

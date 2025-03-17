@@ -4,6 +4,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.annotator.web_rag import WEB_RAG_Annotator
 from reportparse.annotator.chroma_annotator import LLMAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
+from reportparse.llm_evaluation import llm_evaluation
 import argparse
 import re
 from pymongo import MongoClient
@@ -14,6 +15,10 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
+import torch  
+import gc
+import torch
+
 logger = getLogger(__name__)
 
 @BaseAnnotator.register("llm_agg")
@@ -27,6 +32,7 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
+        self.eval = llm_evaluation()
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm = ChatGoogleGenerativeAI(
@@ -168,7 +174,7 @@ class LLMAggregator(BaseAnnotator):
                 claims = [c.strip() for c in claims]
                 for c in claims:
                     # add aggregation with chroma db
-                    chroma_result, retrieved_pages = self.chroma.call_chroma(
+                    chroma_result, retrieved_pages, context = self.chroma.call_chroma(
                         c,
                         document.name,
                         text,
@@ -178,6 +184,11 @@ class LLMAggregator(BaseAnnotator):
                         use_chunks=use_chunks,
                     )
                     print("Second llm result: ", chroma_result)
+                    faith_eval = self.eval.faith_eval(answer=chroma_result, retrieved_docs=context) if context else None
+                    groundedness_eval = self.eval.groundedness_eval(answer=chroma_result, retrieved_docs=context) if context else None
+                    readability_eval = self.eval.readability_eval(chroma_result) if context else None
+                    redundancy_eval = self.eval.redundancy_eval(chroma_result)if context else None
+
                     # annotate for chroma
                     claim_dict_chroma = {
                         "claim": c,
@@ -186,6 +197,11 @@ class LLMAggregator(BaseAnnotator):
                         "Justification": self.chroma.extract_justification(
                             chroma_result
                         ),
+                        "context": context,
+                        "faith_eval": faith_eval,
+                        "groundedness_eval": groundedness_eval,
+                        "readability_eval": readability_eval,
+                        "redundancy_eval": redundancy_eval,
                     }
                     json_output = json.dumps(claim_dict_chroma)
                     _annotate(
@@ -197,12 +213,28 @@ class LLMAggregator(BaseAnnotator):
 
                     # add web_rag aggregation
                     print(f'SEARCHING FOR CLAIM {c}')
-                    web_rag_result, url_list = self.web.web_rag(c, 1, company_name)
+                    web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
+                    if web_info:
+                        faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info)
+                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info)
+                        readability_eval = self.eval.readability_eval(web_rag_result)
+                        redundancy_eval = self.eval.redundancy_eval(web_rag_result)
+                    else:
+                        faith_eval = None
+                        groundedness_eval = None
+                        readability_eval = None
+                        redundancy_eval = None
+
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,
                         "Label": self.web.extract_label(web_rag_result),
                         "Justification": self.web.extract_justification(web_rag_result),
+                        "web_info": web_info,
+                        "faith_eval": faith_eval,
+                        "groundedness_eval": groundedness_eval,
+                        "readability_eval": readability_eval,
+                        "redundancy_eval": redundancy_eval,
                     }
                     json_output = json.dumps(claim_dict_webrag)
 
