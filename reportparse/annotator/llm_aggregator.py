@@ -187,11 +187,14 @@ class LLMAggregator(BaseAnnotator):
                         use_chunks=use_chunks,
                     )
                     print("Second llm result: ", chroma_result)
-                    faith_eval = self.eval.faith_eval(answer=chroma_result, retrieved_docs=context) if context else None
-                    groundedness_eval = self.eval.groundedness_eval(answer=chroma_result, retrieved_docs=context) if context else None
-                    readability_eval = self.eval.readability_eval(chroma_result) if context else None
-                    redundancy_eval = self.eval.redundancy_eval(chroma_result)if context else None
-
+                    if context:
+                        chroma_chunks = self.eval.chunk_text(chroma_result)
+                        faith_eval = self.eval.faith_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                        readability_eval = self.eval.readability_eval(chroma_result)
+                        redundancy_eval = self.eval.redundancy_eval(chroma_result, precomputed_chunks=chroma_chunks)
+                    else:
+                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
                     # annotate for chroma
                     claim_dict_chroma = {
                         "claim": c,
@@ -218,16 +221,15 @@ class LLMAggregator(BaseAnnotator):
                     print(f'SEARCHING FOR CLAIM {c}')
                     web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
                     if web_info:
-                        faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info)
-                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info)
-                        readability_eval = self.eval.readability_eval(web_rag_result)
-                        redundancy_eval = self.eval.redundancy_eval(web_rag_result)
-                    else:
-                        faith_eval = None
-                        groundedness_eval = None
-                        readability_eval = None
-                        redundancy_eval = None
+                        web_chunks = self.eval.chunk_text(web_rag_result)
+                        web_embeddings = self.eval.embedder.encode(web_chunks, convert_to_tensor=True)
 
+                        faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks, precomputed_embeddings=web_embeddings)
+                        readability_eval = self.eval.readability_eval(web_rag_result)
+                        redundancy_eval = self.eval.redundancy_eval(web_rag_result, precomputed_chunks=web_chunks)
+                    else:
+                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,
