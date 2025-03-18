@@ -179,3 +179,5 @@ duckduckgo_search
 bs4
 stanza
 pymongo[srv]
+rank_bm25
+textstat
