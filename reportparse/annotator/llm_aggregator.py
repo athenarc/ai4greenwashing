@@ -105,7 +105,12 @@ class LLMAggregator(BaseAnnotator):
         )
         gw_pages = args.pages_to_gw if args is not None else 1
         use_chunks = args.use_chunks if args is not None else False
-
+        start_page = args.start_page if args is not None else 0
+        if start_page > len(document.pages):
+            print("Start page is greater than the number of pages in the document")
+            start_page = 0
+            print("Starting from page 1")
+        
         def _annotate(
             _annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata
         ):
@@ -136,6 +141,8 @@ class LLMAggregator(BaseAnnotator):
         gw_index = 0
         print(f"Checking the first {gw_pages} pages for greenwashing")
         for page in document.pages:
+            if page.num < start_page:
+                continue
             if gw_index >= gw_pages:
                 break
             pdf_name = document.name
@@ -225,7 +232,7 @@ class LLMAggregator(BaseAnnotator):
                         web_embeddings = self.eval.embedder.encode(web_chunks, convert_to_tensor=True)
 
                         faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks, precomputed_embeddings=web_embeddings)
+                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
                         readability_eval = self.eval.readability_eval(web_rag_result)
                         redundancy_eval = self.eval.redundancy_eval(web_rag_result, precomputed_chunks=web_chunks)
                     else:
@@ -303,4 +310,11 @@ class LLMAggregator(BaseAnnotator):
             type=int,
             help=f"Choose between 1 and esg-report max page number",
             default=1,
+        )
+
+        parser.add_argument(
+            "--start_page",
+            type=int,
+            help=f"Choose starting page number (0-indexed)",
+            default=0,
         )

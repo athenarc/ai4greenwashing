@@ -65,6 +65,13 @@ parser.add_argument("--use_chroma", action="store_true", help="Enable ChromaDB u
 parser.add_argument(
     "--use_chunks", action="store_true", help="Use chunks instead of pages"
 )
+parser.add_argument(
+            "--start_page",
+            type=int,
+            help=f"Choose starting page number (0-indexed)",
+            default=0,
+)
+
 args = parser.parse_args()
 
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
