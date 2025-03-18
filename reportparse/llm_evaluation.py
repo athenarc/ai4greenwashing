@@ -16,7 +16,7 @@ class llm_evaluation:
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=128)
         self.nlp = spacy.load("en_core_web_sm")
 
-
+    #recursive character text splitter
     def chunk_text(self, text):
         return self.text_splitter.split_text(text)
     
@@ -65,7 +65,6 @@ class llm_evaluation:
 
     # measures relevance between the user's query and the retrieved information
     def query_info_relevance_eval(self, query, retrieved_docs, precomputed_chunks=None):
-        """Measures similarity between query and retrieved documents."""
         if not retrieved_docs:
             return {"query_info_relevance_score": 0}
 
@@ -80,7 +79,6 @@ class llm_evaluation:
 
     # measures hallucination risk, by examining the llm's answer and the retrieved information
     def groundedness_eval(self, answer, retrieved_docs, precomputed_chunks=None):
-        """Measures hallucination risk using BM25 & cosine similarity."""
         if not retrieved_docs:
             return { "groundedness_score": 0 }
 
@@ -107,12 +105,14 @@ class llm_evaluation:
         final_groundedness_score = (avg_bm25_score + avg_cos_sim) / 2
         return { "groundedness_score": final_groundedness_score}
     
+    #measures the specificity of an LLM-generated answer by calculating the proportion of named entities
     def specificity_eval(self, answer):
         doc = self.nlp(answer)
         token_count = len(doc)
         specificity_score = float(len(doc.ents) / token_count) if token_count > 0 else 0
         return { "specificity_score": specificity_score}
 
+    #measures redundancy in an LLM-generated answer
     def redundancy_eval(self, answer, precomputed_chunks=None):
         answer_chunks = precomputed_chunks or self.chunk_text(answer)
         if len(answer_chunks) < 2:
@@ -124,6 +124,7 @@ class llm_evaluation:
         avg_redundancy = float(np.mean(redundancy_scores)) if redundancy_scores.size > 0 else 0
         return { "redundancy_score": avg_redundancy}
 
+    #measures readability in an LLM-generated answer
     def readability_eval(self, answer):
         readability_score = textstat.flesch_reading_ease(answer)
         return {
