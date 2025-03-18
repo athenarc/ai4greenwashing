@@ -29,8 +29,6 @@ class LLMAnnotator(BaseAnnotator):
         return
 
     def call_llm(self, text):
-
-        time.sleep(5)
         if os.getenv("USE_GROQ_API") == "True":
 
     

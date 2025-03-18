@@ -42,8 +42,6 @@ class WEB_RAG_Annotator(BaseAnnotator):
         )
 
     def call_llm(self, text):
-
-        time.sleep(5)
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm = ChatGoogleGenerativeAI(
