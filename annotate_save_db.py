@@ -75,7 +75,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
-output_path = args.output_path if args.output_path else "./results/example.pdf.json"
+base_name = os.path.basename(input_path)
+output_dir = args.output_path if args.output_path else "./results"
+outfile = f"./{output_dir}/{base_name}.json"
 
 ################### MAIN ###################
 
@@ -101,9 +103,9 @@ document = climate_sentiment_annotator.annotate(document=document)
 if not os.path.exists("./results"):
     os.makedirs("./results")
 
-document.save(output_path)
+document.save(outfile)
 
-with open(output_path, "r", encoding="utf-8") as file:
+with open(outfile, "r", encoding="utf-8") as file:
     data = json.load(file)
 
 print("Connecting to MongoDB...")
