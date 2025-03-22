@@ -13,6 +13,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import time
 from langchain_ollama import ChatOllama
+from duckduckgo_search import DDGS
 
 
 @BaseAnnotator.register("web_rag")
@@ -115,10 +116,10 @@ class WEB_RAG_Annotator(BaseAnnotator):
             result, url_list = pip.retrieve_knowledge()
             if result is None:
                 print("Result is None")
-                return "No content was found from the web", [], None
+                return "Failed to retrieve content from the web", [], None
         except Exception as e:
             print(e)
-            return "No content was found from the web", [], None
+            return "Failed to retrieve content from the web", [], None
         try:
             info = "\n".join(result.astype(str))
             if info:
@@ -143,10 +144,10 @@ class WEB_RAG_Annotator(BaseAnnotator):
                         print(e)
                         return "LLM invocation failed", [], None
             else:
-                return "No content was found from the web", [], None
+                return "Failed to retrieve content from the web", [], None
         except Exception as e:
             print(e)
-            return "No content was found from the web", [], None
+            return "Failed to retrieve content from the web", [], None
 
     def annotate(
         self,

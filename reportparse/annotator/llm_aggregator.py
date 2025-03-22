@@ -4,6 +4,7 @@ from reportparse.structure.document import Document, AnnotatableLevel, Annotatio
 from reportparse.annotator.web_rag import WEB_RAG_Annotator
 from reportparse.annotator.chroma_annotator import LLMAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
+from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_2
 from reportparse.climate_cti import cti_classification
 from reportparse.llm_evaluation import llm_evaluation
 import argparse
@@ -33,10 +34,11 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
+        self.agg_prompt_2 = LLM_AGGREGATOR_PROMPT_2
         self.eval = llm_evaluation()
         if os.getenv("USE_GROQ_API") == "True":
 
-            self.llm = ChatGoogleGenerativeAI(
+            self.llm_2 = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
                 max_tokens=None,
@@ -45,7 +47,7 @@ class LLMAggregator(BaseAnnotator):
                 google_api_key=os.getenv("GEMINI_API_KEY")
             )
 
-            self.llm_2 = ChatGroq(
+            self.llm = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
@@ -87,6 +89,34 @@ class LLMAggregator(BaseAnnotator):
             logger.error(f"Error calling LLM: {e}")
             return "Error: Could not generate a response."
 
+    def call_aggregator_2(self, claim, chroma_result, web_rag_result):
+        messages = [
+            (
+                "system",
+                self.agg_prompt,
+            ),
+            (
+                "human",
+                f"""Statement: {claim}  
+                Web Verdict: {web_rag_result}  
+                Database Verdict: {chroma_result}  
+                """,
+            ),
+        ]
+        try:
+            logger.info("Calling LLM to verify claim with context")
+            try:
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+            except Exception as e:
+                print(f'Invokation error: {e}. Invoking with the second llm....')
+                ai_msg = self.llm_2.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+        except Exception as e:
+            logger.error(f"Error calling LLM: {e}")
+            return "Error: Could not generate a response."
 
     def annotate(
         self,
@@ -195,28 +225,39 @@ class LLMAggregator(BaseAnnotator):
                     )
                     print("Second llm result: ", chroma_result)
                     if context:
-                        chroma_chunks = self.eval.chunk_text(chroma_result)
-                        faith_eval = self.eval.faith_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        readability_eval = self.eval.readability_eval(chroma_result)
-                        redundancy_eval = self.eval.redundancy_eval(chroma_result, precomputed_chunks=chroma_chunks)
+                        normalized_chroma_result = self.eval.normalize_to_string(chroma_result)
+                        chroma_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
+
+                        faith_eval = self.eval.faith_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                        readability_eval = self.eval.readability_eval(normalized_chroma_result)
+                        redundancy_eval = self.eval.redundancy_eval(normalized_chroma_result, precomputed_chunks=chroma_chunks)
+                        specificity_eval = self.eval.specificity_eval(normalized_chroma_result)
+                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_chroma_result, context)
+                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_chroma_result)
+                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_chroma_result)
                     else:
                         faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
-                    # annotate for chroma
+                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
                     claim_dict_chroma = {
                         "claim": c,
                         "retrieved_pages": retrieved_pages,
                         "label": self.chroma.extract_label(chroma_result),
-                        "justification": self.chroma.extract_justification(
-                            chroma_result
-                        ),
+                        "justification": self.chroma.extract_justification(chroma_result),
                         "context": context,
                         "faith_eval": faith_eval,
                         "groundedness_eval": groundedness_eval,
                         "readability_eval": readability_eval,
                         "redundancy_eval": redundancy_eval,
+                        "specificity_eval": specificity_eval,
+                        "compression_ratio_eval": compression_ratio_eval,
+                        "lexical_diversity_eval": lexical_diversity_eval,
+                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
                     }
+
                     json_output = json.dumps(claim_dict_chroma)
+
                     _annotate(
                         _annotate_obj=page,
                         _text=chroma_result,
@@ -228,15 +269,21 @@ class LLMAggregator(BaseAnnotator):
                     print(f'SEARCHING FOR CLAIM {c}')
                     web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
                     if web_info:
-                        web_chunks = self.eval.chunk_text(web_rag_result)
-                        web_embeddings = self.eval.embedder.encode(web_chunks, convert_to_tensor=True)
+                        normalized_web_rag_result = self.eval.normalize_to_string(web_rag_result)
+                        web_chunks = self.eval.chunk_text(self.eval.normalize_to_string(web_info))
 
-                        faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        readability_eval = self.eval.readability_eval(web_rag_result)
-                        redundancy_eval = self.eval.redundancy_eval(web_rag_result, precomputed_chunks=web_chunks)
+                        faith_eval = self.eval.faith_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
+                        readability_eval = self.eval.readability_eval(normalized_web_rag_result)
+                        redundancy_eval = self.eval.redundancy_eval(normalized_web_rag_result, precomputed_chunks=web_chunks)
+                        specificity_eval = self.eval.specificity_eval(normalized_web_rag_result)
+                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_web_rag_result, web_info)
+                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_web_rag_result)
+                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_web_rag_result)
                     else:
                         faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,
@@ -247,8 +294,14 @@ class LLMAggregator(BaseAnnotator):
                         "groundedness_eval": groundedness_eval,
                         "readability_eval": readability_eval,
                         "redundancy_eval": redundancy_eval,
+                        "specificity_eval": specificity_eval,
+                        "compression_ratio_eval": compression_ratio_eval,
+                        "lexical_diversity_eval": lexical_diversity_eval,
+                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
                     }
+
                     json_output = json.dumps(claim_dict_webrag)
+
 
                     # annotate for web rag
                     _annotate(
@@ -259,8 +312,42 @@ class LLMAggregator(BaseAnnotator):
                     )
 
                     cti_results = cti_classification(c)
+                    _annotate(
+                        _annotate_obj=page,
+                        _text=c,
+                        annotator_name=f"cti_results_{claim_index}",
+                        metadata=json.dumps(
+                            {
+                                "claim": c,
+                                "cti_metrics_climate": cti_results["climate"],
+                                "cti_metrics_commitment": cti_results["commitment"],
+                                "cti_metrics_sentiment": cti_results["sentiment"],
+                                "cti_metrics_specificity": cti_results["specificity"],
+                            }
+                        ),
+                    )
+
                     aggregator_result = self.call_aggregator(c, chroma_result, web_rag_result)
                     print("Aggregator result: ", aggregator_result)
+                    if aggregator_result:
+                        normalized_agg_rag_result = self.eval.normalize_to_string(aggregator_result)
+                        result_list = [chroma_result, web_rag_result]
+                        normalized_result_list = self.eval.normalize_to_string(result_list)
+                        agg_chunks = self.eval.chunk_text(normalized_result_list)
+
+                        faith_eval = self.eval.faith_eval(answer=normalized_agg_rag_result, retrieved_docs=agg_chunks, precomputed_chunks=agg_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_agg_rag_result, retrieved_docs=agg_chunks, precomputed_chunks=agg_chunks)
+                        readability_eval = self.eval.readability_eval(normalized_agg_rag_result)
+                        redundancy_eval = self.eval.redundancy_eval(normalized_agg_rag_result, precomputed_chunks=agg_chunks)
+                        specificity_eval = self.eval.specificity_eval(normalized_agg_rag_result)
+                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_agg_rag_result, web_info)
+                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_agg_rag_result)
+                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_agg_rag_result)
+                    else:
+                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
+
                     _annotate(
                         _annotate_obj=page,
                         _text=aggregator_result,
@@ -274,13 +361,64 @@ class LLMAggregator(BaseAnnotator):
                                 "justification": self.web.extract_justification(
                                     aggregator_result
                                 ),
-                                "cti metrics_detection": cti_results["detection"],
-                                "cti metrics_commitment": cti_results["commitment"],
-                                "cti metrics_sentiment": cti_results["sentiment"],
-                                "cti metrics_specificity": cti_results["specificity"],
+                                "faith_eval": faith_eval,
+                                "groundedness_eval": groundedness_eval,
+                                "readability_eval": readability_eval,
+                                "redundancy_eval": redundancy_eval,
+                                "specificity_eval": specificity_eval,
+                                "compression_ratio_eval": compression_ratio_eval,
+                                "lexical_diversity_eval": lexical_diversity_eval,
+                                "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
                             }
                         ),
                     )
+
+                    aggregator_result = self.call_aggregator_2(c, chroma_result, web_rag_result)
+                    print("Aggregator result: ", aggregator_result)
+                    if aggregator_result:
+                        normalized_agg_rag_result = self.eval.normalize_to_string(aggregator_result)
+                        result_list = [web_rag_result, chroma_result]
+                        normalized_result_list = self.eval.normalize_to_string(result_list)
+                        agg_chunks = self.eval.chunk_text(normalized_result_list)
+
+                        faith_eval = self.eval.faith_eval(answer=normalized_agg_rag_result, retrieved_docs=agg_chunks, precomputed_chunks=agg_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_agg_rag_result, retrieved_docs=agg_chunks, precomputed_chunks=agg_chunks)
+                        readability_eval = self.eval.readability_eval(normalized_agg_rag_result)
+                        redundancy_eval = self.eval.redundancy_eval(normalized_agg_rag_result, precomputed_chunks=agg_chunks)
+                        specificity_eval = self.eval.specificity_eval(normalized_agg_rag_result)
+                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_agg_rag_result, web_info)
+                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_agg_rag_result)
+                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_agg_rag_result)
+                    else:
+                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
+
+                    _annotate(
+                        _annotate_obj=page,
+                        _text=aggregator_result,
+                        annotator_name=f"aggregator_2_result_claim_{claim_index}",
+                        metadata=json.dumps(
+                            {
+                                "claim": c,
+                                "chroma_result": chroma_result,
+                                "web_rag_result": web_rag_result,
+                                "label": self.web.extract_label(aggregator_result),
+                                "justification": self.web.extract_justification(
+                                    aggregator_result
+                                ),
+                                "faith_eval": faith_eval,
+                                "groundedness_eval": groundedness_eval,
+                                "readability_eval": readability_eval,
+                                "redundancy_eval": redundancy_eval,
+                                "specificity_eval": specificity_eval,
+                                "compression_ratio_eval": compression_ratio_eval,
+                                "lexical_diversity_eval": lexical_diversity_eval,
+                                "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
+                            }
+                        ),
+                    )
+
                     claim_index += 1
                 gw_index += 1
             else:

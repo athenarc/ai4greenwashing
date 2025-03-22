@@ -84,3 +84,31 @@ LLM_AGGREGATOR_PROMPT='''You have at your disposal two independent verdicts rega
                 Statement: '[User Input]'  
                 Result of the statement:  
                 Justification:'''
+
+LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts regarding the accuracy of a given statement: '[User Input]'.  
+
+                - The first verdict (Web Verdict) is derived from an LLM that retrieves and analyzes information from the web to assess the claim. If no content was found from the web, the Web Verdict will contain 'No content was found from the web'. Proceed with the analysis using only the Database Verdict.
+                - The second verdict (Database Verdict) is derived from an LLM that has access to a structured database containing the entire document from which the statement was extracted.  
+
+                Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
+
+                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.  
+
+                Before making your final decision:  
+
+                1. Analyze the given statement clearly to identify its key elements.  
+                2. Examine the reasoning in both the Database Verdict and the Web Verdict.  
+                3. Compare both verdicts and resolve any discrepancies by determining which source provides stronger, more reliable justification.  
+                4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
+
+                Possible Results:  
+                - TRUE If both sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
+                - FALSE: If both sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.  
+                - PARTIALLY TRUE: If the statement contains correct elements but is incomplete or slightly misleading.  
+                - PARTIALLY FALSE: If the statement has some correct elements but is also significantly inaccurate or misleading.  
+
+                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+                
+                Statement: '[User Input]'  
+                Result of the statement:  
+                Justification:'''
