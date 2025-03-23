@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer, util
-import torch  
+import torch
 
-model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
 def single_text_embedding(text):
     embedding = model.encode(text, convert_to_tensor=True)
@@ -10,5 +10,3 @@ def single_text_embedding(text):
 
 def cos_sim(embedding1, embedding2):
     return util.pytorch_cos_sim(embedding1, embedding2).item()
-
-
