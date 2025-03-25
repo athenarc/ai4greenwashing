@@ -6,6 +6,7 @@ from reportparse.reader.base import BaseReader
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 import pandas as pd
+import subprocess
 
 # TODO CHECK ARG LOGIC AND REMOVE MOST OF THESE
 parser = argparse.ArgumentParser(description="Annotate PDF with custom settings.")
@@ -18,6 +19,15 @@ parser.add_argument(
     required=False,
     help="Path to save the annotated document.",
 )
+
+parser.add_argument(
+    "--clean",
+    type=bool,
+    default=False,
+    action='store_true',
+    help="Clean the db if true, otherwise append.",
+)
+
 parser.add_argument(
     "--max_pages", type=int, default=120, help="Maximum number of pages to process."
 )
@@ -27,6 +37,7 @@ parser.add_argument(
     default=120,
     help="Number of pages to process for greenwashing analysis.",
 )
+
 parser.add_argument(
     "--web_rag_annotator_name",
     type=str,
@@ -103,6 +114,10 @@ parser.add_argument(
     default=0,
 )
 
+group = parser.add_mutually_exclusive_group()
+group.add_argument("--clean_doc", type=str, help="Name of a document to delete from MongoDB.")
+group.add_argument("--clean_all", action="store_true", help="Drop all documents from MongoDB.")
+
 args = parser.parse_args()
 
 input_path = args.input_path if args.input_path else "./reportparse/asset/example.pdf"
@@ -110,6 +125,11 @@ base_name = os.path.basename(input_path)
 output_dir = args.output_path if args.output_path else "./results"
 outfile = f"./{output_dir}/{base_name}.json"
 
+if args.clean_doc:
+    subprocess.run(["python", "clean_mongo.py", "--doc", args.clean_doc])
+elif args.clean_all:
+    subprocess.run(["python", "clean_mongo.py", "--all"])
+    
 ################### MAIN ###################
 
 # reader and args

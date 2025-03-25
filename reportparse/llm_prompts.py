@@ -24,10 +24,8 @@ WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a st
 
                             Result: Provide a clear answer by choosing one of the following labels:
 
-                            - TRUE: If the statement is fully confirmed by the information and evidence you have.
-                            - FALSE: If the statement is clearly disproved by the information and evidence you have.
-                            - PARTIALLY TRUE: If the statement contains some correct elements, but not entirely accurate.
-                            - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
+                            - NOT_GREENWASHING: If the statement is confirmed by the information and evidence you have.
+                            - GREENWASHING: If the statement is clearly disproved by the information and evidence you have.
 
                             Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
 
@@ -47,10 +45,8 @@ CHROMA_PROMPT='''You have at your disposal information a statement: '[User Input
 
                 Result: Provide a clear answer by choosing one of the following labels:
 
-                - TRUE: If the statement is fully confirmed by the information and evidence in the rest of the report.
-                - FALSE: If the statement is clearly disproved by the information and evidence in the rest of the report.
-                - PARTIALLY TRUE: If the statement contains some correct elements but is not entirely accurate.
-                - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
+                - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
+                - GREENWASHING: If the statement is clearly disproved by the information and evidence in the rest of the report.
 
                 Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
 
@@ -74,10 +70,8 @@ LLM_AGGREGATOR_PROMPT='''You have at your disposal two independent verdicts rega
                 4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
 
                 Possible Results:  
-                - TRUE If both sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
-                - FALSE: If both sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.  
-                - PARTIALLY TRUE: If the statement contains correct elements but is incomplete or slightly misleading.  
-                - PARTIALLY FALSE: If the statement has some correct elements but is also significantly inaccurate or misleading.  
+                - NOT_GREENWASHING If the sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
+                - GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.  
 
                 Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
                 
@@ -102,10 +96,8 @@ LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts re
                 4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
 
                 Possible Results:  
-                - TRUE If both sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
-                - FALSE: If both sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.  
-                - PARTIALLY TRUE: If the statement contains correct elements but is incomplete or slightly misleading.  
-                - PARTIALLY FALSE: If the statement has some correct elements but is also significantly inaccurate or misleading.  
+                - NOT_GREENWASHING If the sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
+                - GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.
 
                 Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
                 
@@ -126,10 +118,8 @@ REDDIT_PROMPT='''You have at your disposal information a statement: '[User Input
 
                 Result: Provide a clear answer by choosing one of the following labels:
 
-                - TRUE: If the statement is fully confirmed by the information and evidence in the rest of the report.
-                - FALSE: If the statement is clearly disproved by the information and evidence in the rest of the report.
-                - PARTIALLY TRUE: If the statement contains some correct elements but is not entirely accurate.
-                - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
+                - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
+                - GREENWASHING: If the statement is clearly disproved by the information and evidence in the rest of the report.
 
                 Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
 
