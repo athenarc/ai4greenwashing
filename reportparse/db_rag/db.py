@@ -1,9 +1,6 @@
 import chromadb
 import subprocess
-from pydantic_settings import BaseSettings
-import requests
 
-from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 
 repo_root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
