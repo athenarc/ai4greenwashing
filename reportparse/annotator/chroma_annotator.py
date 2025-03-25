@@ -19,16 +19,13 @@ logger = getLogger(__name__)
 
 
 @BaseAnnotator.register("chroma")
-class LLMAnnotator(BaseAnnotator):
+class ChromaAnnotator(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
         self.chroma_db = ChromaDBHandler()
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.chroma_prompt = CHROMA_PROMPT
-        return
-
-    def call_llm(self, text):
         if os.getenv("USE_GROQ_API") == "True":
 
     
@@ -52,7 +49,9 @@ class LLMAnnotator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        return
 
+    def call_llm(self, text):
         messages = [
             (
                 "system",
@@ -81,7 +80,7 @@ class LLMAnnotator(BaseAnnotator):
         ):
             try:
                 logger.info("Retrieving context from ChromaDB")
-                collection = db.chunk_collection if use_chunks else db.page_collection
+                collection = db.collection
 
                 # only keep docs where the doc_name is the same as the document_name and exclude the current page
                 results = collection.query(
@@ -115,28 +114,30 @@ class LLMAnnotator(BaseAnnotator):
                 return "", []
 
         def verify_claim_with_context(claim, text, context):
-            
-            messages = [
-                (
-                    "system",
-                    self.chroma_prompt,
-                ),
-                (
-                    "human",
-                    f""" Statement: {claim}
-                 Relevant page text {text}
-                 Context: {context}
-                 """,
-                ),
-            ]
-            try:
-                logger.info("Calling LLM to verify claim with context")
-                ai_msg = self.llm.invoke(messages)
-                print("AI message: ", ai_msg.content)
-                return ai_msg.content
-            except Exception as e:
-                logger.error(f"Error calling LLM: {e}")
-                return "Error: Could not generate a response."
+            if context:
+                messages = [
+                    (
+                        "system",
+                        self.chroma_prompt,
+                    ),
+                    (
+                        "human",
+                        f""" Statement: {claim}
+                    Relevant page text {text}
+                    Context: {context}
+                    """,
+                    ),
+                ]
+                try:
+                    logger.info("Calling LLM to verify claim with context")
+                    ai_msg = self.llm.invoke(messages)
+                    print("AI message: ", ai_msg.content)
+                    return ai_msg.content
+                except Exception as e:
+                    logger.error(f"Error calling LLM: {e}")
+                    return "Error: Could not generate a response."
+            else:
+                return "No relevant context found in the rest of the document."
 
         context, retrieved_pages = retrieve_context(
             claim, document_name, page_number, chroma_db, k, use_chunks

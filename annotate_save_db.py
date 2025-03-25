@@ -66,10 +66,41 @@ parser.add_argument(
     "--use_chunks", action="store_true", help="Use chunks instead of pages"
 )
 parser.add_argument(
-            "--start_page",
-            type=int,
-            help=f"Choose starting page number (0-indexed)",
-            default=0,
+    "--start_page",
+    type=int,
+    help=f"Choose starting page number (0-indexed)",
+    default=0,
+)
+
+parser.add_argument(
+    "--reddit_text_level",
+    type=str,
+    choices=["page", "sentence", "block"],
+    default="page",
+)
+
+parser.add_argument(
+    "--reddit_target_layouts",
+    type=str,
+    nargs="+",
+    default=["text", "list", "cell"],
+    choices=LAYOUT_NAMES,
+)
+
+parser.add_argument("--use_reddit", action="store_true", help="Enable reddit usage")
+
+parser.add_argument(
+    "--reddit_pages_to_gw",
+    type=int,
+    help=f"Choose between 1 and esg-report max page number",
+    default=1,
+)
+
+parser.add_argument(
+    "--reddit_start_page",
+    type=int,
+    help=f"Choose starting page number (0-indexed)",
+    default=0,
 )
 
 args = parser.parse_args()

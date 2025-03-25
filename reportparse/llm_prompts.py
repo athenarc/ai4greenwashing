@@ -35,7 +35,7 @@ WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a st
                             Result of the statement:
                             Justification:'''
 CHROMA_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from the rest of the report, whose accuracy must be evaluated. 
-                            Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
+                If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
 
                 Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
 
@@ -112,3 +112,27 @@ LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts re
                 Statement: '[User Input]'  
                 Result of the statement:  
                 Justification:'''
+
+REDDIT_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from a database with reddit posts, from a greenwashing subreddit, whose accuracy must be evaluated. 
+                If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
+
+                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
+
+                Before you decide:
+
+                1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
+                2. Compare the statement with the information from the rest of the report, evaluating each element of the statement separately.
+                3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
+
+                Result: Provide a clear answer by choosing one of the following labels:
+
+                - TRUE: If the statement is fully confirmed by the information and evidence in the rest of the report.
+                - FALSE: If the statement is clearly disproved by the information and evidence in the rest of the report.
+                - PARTIALLY TRUE: If the statement contains some correct elements but is not entirely accurate.
+                - PARTIALLY FALSE: If the statement contains some correct elements but also contains misleading or inaccurate information.
+
+                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+
+                Statement: '[User Input]'
+                            Result of the statement:
+                            Justification:'''

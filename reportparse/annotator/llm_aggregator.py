@@ -2,7 +2,8 @@ from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.annotator.web_rag import WEB_RAG_Annotator
-from reportparse.annotator.chroma_annotator import LLMAnnotator
+from reportparse.annotator.chroma_annotator import ChromaAnnotator
+from reportparse.annotator.reddit_annotator import RedditAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_2
 from reportparse.climate_cti import cti_classification
@@ -29,7 +30,8 @@ class LLMAggregator(BaseAnnotator):
     def __init__(self):
         load_dotenv()
         self.web = WEB_RAG_Annotator()
-        self.chroma = LLMAnnotator()
+        self.chroma = ChromaAnnotator()
+        self.reddit = RedditAnnotator()
         self.mongo_client = MongoClient("mongodb://localhost:27017/")
         self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
@@ -75,7 +77,7 @@ class LLMAggregator(BaseAnnotator):
             ),
         ]
         try:
-            logger.info("Calling LLM to verify claim with context")
+            logger.info("Calling LLM aggregator to verify claim with context")
             try:
                 ai_msg = self.llm.invoke(messages)
                 print("AI message: ", ai_msg.content)
@@ -133,13 +135,13 @@ class LLMAggregator(BaseAnnotator):
         target_layouts = (
             args.web_rag_target_layouts if args is not None else list(target_layouts)
         )
-        gw_pages = args.pages_to_gw if args is not None else 1
+        gw_pages = args.pages_to_gw if args is not None else len(document.pages)
         use_chunks = args.use_chunks if args is not None else False
         start_page = args.start_page if args is not None else 0
         if start_page > len(document.pages):
             print("Start page is greater than the number of pages in the document")
             start_page = 0
-            print("Starting from page 1")
+            print("Starting from page 0")
         
         def _annotate(
             _annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata
@@ -214,6 +216,7 @@ class LLMAggregator(BaseAnnotator):
                 claim_index=0
                 for c in claims:
                     # add aggregation with chroma db
+                    logger.info("Chroma starting")
                     chroma_result, retrieved_pages, context = self.chroma.call_chroma(
                         c,
                         document.name,
@@ -265,6 +268,57 @@ class LLMAggregator(BaseAnnotator):
                         metadata=json_output,
                     )
 
+                    logger.info("Reddit starting")
+                    reddit_result, retrieved_posts, context = self.reddit.call_reddit(
+                        c,
+                        company_name,
+                        self.reddit.reddit_db,
+                        k=6,
+                    )
+                    
+                    print("Second llm result: ", reddit_result)
+                    if context:
+                        normalized_reddit_result= self.eval.normalize_to_string(reddit_result)
+                        reddit_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
+
+                        faith_eval = self.eval.faith_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
+                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
+                        readability_eval = self.eval.readability_eval(normalized_reddit_result)
+                        redundancy_eval = self.eval.redundancy_eval(normalized_reddit_result, precomputed_chunks=reddit_chunks)
+                        specificity_eval = self.eval.specificity_eval(normalized_reddit_result)
+                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_reddit_result, context)
+                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_reddit_result)
+                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_reddit_result)
+                    else:
+                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
+                    claim_dict_reddit = {
+                        "claim": c,
+                        "retrieved_posts": retrieved_posts,
+                        "label": self.chroma.extract_label(reddit_result),
+                        "justification": self.chroma.extract_justification(reddit_result),
+                        "context": context,
+                        "faith_eval": faith_eval,
+                        "groundedness_eval": groundedness_eval,
+                        "readability_eval": readability_eval,
+                        "redundancy_eval": redundancy_eval,
+                        "specificity_eval": specificity_eval,
+                        "compression_ratio_eval": compression_ratio_eval,
+                        "lexical_diversity_eval": lexical_diversity_eval,
+                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
+                    }
+
+                    json_output = json.dumps(claim_dict_reddit)
+
+                    _annotate(
+                        _annotate_obj=page,
+                        _text=reddit_result,
+                        annotator_name=f"reddit_result_claim_{claim_index}",
+                        metadata=json_output,
+                    )
+
+                    logger.info("Web rag starting")
                     # add web_rag aggregation
                     print(f'SEARCHING FOR CLAIM {c}')
                     web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
@@ -311,6 +365,7 @@ class LLMAggregator(BaseAnnotator):
                         metadata=json_output,
                     )
 
+                    logger.info("CTI starting")
                     cti_results = cti_classification(c)
                     _annotate(
                         _annotate_obj=page,
@@ -327,6 +382,7 @@ class LLMAggregator(BaseAnnotator):
                         ),
                     )
 
+                    logger.info("Aggregator starting")
                     aggregator_result = self.call_aggregator(c, chroma_result, web_rag_result)
                     print("Aggregator result: ", aggregator_result)
                     if aggregator_result:
@@ -373,6 +429,7 @@ class LLMAggregator(BaseAnnotator):
                         ),
                     )
 
+                    logger.info("Aggregator 2 starting")
                     aggregator_result = self.call_aggregator_2(c, chroma_result, web_rag_result)
                     print("Aggregator result: ", aggregator_result)
                     if aggregator_result:
@@ -447,7 +504,6 @@ class LLMAggregator(BaseAnnotator):
             "--pages_to_gw",
             type=int,
             help=f"Choose between 1 and esg-report max page number",
-            default=1,
         )
 
         parser.add_argument(

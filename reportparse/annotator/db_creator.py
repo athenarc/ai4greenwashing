@@ -9,8 +9,8 @@ from reportparse.db_rag.db import ChromaDBHandler
 chroma_db = ChromaDBHandler()
 
 
-@BaseAnnotator.register("chromadb")
-class ChromadbAnnotator(BaseAnnotator):
+@BaseAnnotator.register("db_creator")
+class dbCreatpr(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
@@ -22,7 +22,7 @@ class ChromadbAnnotator(BaseAnnotator):
         args=None,
         level="page",
         target_layouts=("text", "list", "cell"),
-        annotator_name="chromadb",
+        annotator_name="db_creator",
     ) -> Document:
         annotator_name = args.chromadb_annotator_name if args is not None else annotator_name
         level = args.chromadb_text_level if args is not None else level

@@ -25,6 +25,9 @@ df["techniques"] = df["Article_Content"].progress_apply(extract_techniques)
 print("Techniques extracted.")
 print(df)
 
+# save the dataframe
+df.to_csv("reportparse/reddit_db/data/reddit_greenwashing_posts_enhanced.csv", index=False)
+
 handler = RedditChromaHandler()
 
 # Store all posts (or filter as needed)
