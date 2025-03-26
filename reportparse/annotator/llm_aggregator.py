@@ -16,11 +16,12 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
-import torch  
+import torch
 import gc
 import torch
 
 logger = getLogger(__name__)
+
 
 @BaseAnnotator.register("llm_agg")
 class LLMAggregator(BaseAnnotator):
@@ -42,7 +43,7 @@ class LLMAggregator(BaseAnnotator):
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY")
+                google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
             self.llm_2 = ChatGroq(
@@ -79,14 +80,13 @@ class LLMAggregator(BaseAnnotator):
                 print("AI message: ", ai_msg.content)
                 return ai_msg.content
             except Exception as e:
-                print(f'Invokation error: {e}. Invoking with the second llm....')
+                print(f"Invokation error: {e}. Invoking with the second llm....")
                 ai_msg = self.llm_2.invoke(messages)
                 print("AI message: ", ai_msg.content)
                 return ai_msg.content
         except Exception as e:
             logger.error(f"Error calling LLM: {e}")
             return "Error: Could not generate a response."
-
 
     def annotate(
         self,
@@ -110,7 +110,7 @@ class LLMAggregator(BaseAnnotator):
             print("Start page is greater than the number of pages in the document")
             start_page = 0
             print("Starting from page 1")
-        
+
         def _annotate(
             _annotate_obj: AnnotatableLevel, _text: str, annotator_name: str, metadata
         ):
@@ -153,15 +153,22 @@ class LLMAggregator(BaseAnnotator):
 
             if existing_doc:
                 # Get the stored page with the same number
-                existing_page = next((p for p in existing_doc["pages"] if p["num"] == page_number), None)
+                existing_page = next(
+                    (p for p in existing_doc["pages"] if p["num"] == page_number), None
+                )
 
-                if existing_page and "annotations" in existing_page and existing_page["annotations"]:
-                    print(f"Skipping page {page_number} of {pdf_name} (already annotated).")
+                if (
+                    existing_page
+                    and "annotations" in existing_page
+                    and existing_page["annotations"]
+                ):
+                    print(
+                        f"Skipping page {page_number} of {pdf_name} (already annotated)."
+                    )
                     gw_index += 1
                     continue  # Skip pages that already have annotations
             # If the page has no existing annotations or doesn't exist, process it
             print(f"Processing page {page_number} of {pdf_name} (annotations missing).")
-
 
             if level == "page":
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
@@ -179,9 +186,11 @@ class LLMAggregator(BaseAnnotator):
 
                 page_number = page.num
                 claims = re.findall(r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result)
-                company_name = re.findall(r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result)
+                company_name = re.findall(
+                    r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result
+                )
                 claims = [c.strip() for c in claims]
-                claim_index=0
+                claim_index = 0
                 for c in claims:
                     # add aggregation with chroma db
                     chroma_result, retrieved_pages, context = self.chroma.call_chroma(
@@ -194,29 +203,44 @@ class LLMAggregator(BaseAnnotator):
                         use_chunks=use_chunks,
                     )
                     print("Second llm result: ", chroma_result)
+                    chroma_justification = self.chroma.extract_justification(
+                        chroma_result
+                    )
                     if context:
                         chroma_chunks = self.eval.chunk_text(chroma_result)
-                        faith_eval = self.eval.faith_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        readability_eval = self.eval.readability_eval(chroma_result)
-                        redundancy_eval = self.eval.redundancy_eval(chroma_result, precomputed_chunks=chroma_chunks)
+                        faith_eval = self.eval.faith_eval(
+                            answer=chroma_justification,
+                            retrieved_docs=context,
+                            precomputed_chunks=chroma_chunks,
+                        )
+                        groundedness_eval = self.eval.groundedness_eval(
+                            answer=chroma_justification,
+                            retrieved_docs=context,
+                            precomputed_chunks=chroma_chunks,
+                        )
+                        readability_eval = self.eval.readability_eval(
+                            chroma_justification
+                        )
+                        redundancy_eval = self.eval.redundancy_eval(
+                            chroma_justification, precomputed_chunks=chroma_chunks
+                        )
                     else:
-                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        faith_eval = groundedness_eval = readability_eval = (
+                            redundancy_eval
+                        ) = None
                     # annotate for chroma
                     claim_dict_chroma = {
                         "claim": c,
                         "retrieved_pages": retrieved_pages,
                         "label": self.chroma.extract_label(chroma_result),
-                        "justification": self.chroma.extract_justification(
-                            chroma_result
-                        ),
+                        "justification": chroma_justification,
                         "context": context,
                         "faith_eval": faith_eval,
                         "groundedness_eval": groundedness_eval,
                         "readability_eval": readability_eval,
                         "redundancy_eval": redundancy_eval,
                     }
-                    json_output = json.dumps(claim_dict_chroma)
+                    json_output = json.dumps(claim_dict_chroma, default=str)
                     _annotate(
                         _annotate_obj=page,
                         _text=chroma_result,
@@ -225,30 +249,51 @@ class LLMAggregator(BaseAnnotator):
                     )
 
                     # add web_rag aggregation
-                    print(f'SEARCHING FOR CLAIM {c}')
-                    web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
+                    print(f"SEARCHING FOR CLAIM {c}")
+                    web_rag_result, url_list, web_info = self.web.web_rag(
+                        c, 1, company_name
+                    )
                     if web_info:
+                        web_rag_justification = self.web.extract_justification(
+                            web_rag_result
+                        )
                         web_chunks = self.eval.chunk_text(web_rag_result)
-                        web_embeddings = self.eval.embedder.encode(web_chunks, convert_to_tensor=True)
+                        web_embeddings = self.eval.embedder.encode(
+                            web_chunks, convert_to_tensor=True
+                        )
 
-                        faith_eval = self.eval.faith_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        readability_eval = self.eval.readability_eval(web_rag_result)
-                        redundancy_eval = self.eval.redundancy_eval(web_rag_result, precomputed_chunks=web_chunks)
+                        faith_eval = self.eval.faith_eval(
+                            answer=web_rag_justification,
+                            retrieved_docs=web_info,
+                            precomputed_chunks=web_chunks,
+                        )
+                        groundedness_eval = self.eval.groundedness_eval(
+                            answer=web_rag_justification,
+                            retrieved_docs=web_info,
+                            precomputed_chunks=web_chunks,
+                        )
+                        readability_eval = self.eval.readability_eval(
+                            web_rag_justification
+                        )
+                        redundancy_eval = self.eval.redundancy_eval(
+                            web_rag_justification, precomputed_chunks=web_chunks
+                        )
                     else:
-                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                        faith_eval = groundedness_eval = readability_eval = (
+                            redundancy_eval
+                        ) = None
                     claim_dict_webrag = {
                         "claim": c,
                         "urls": url_list,
                         "label": self.web.extract_label(web_rag_result),
-                        "justification": self.web.extract_justification(web_rag_result),
+                        "justification": web_rag_justification,
                         "web_info": web_info,
                         "faith_eval": faith_eval,
                         "groundedness_eval": groundedness_eval,
                         "readability_eval": readability_eval,
                         "redundancy_eval": redundancy_eval,
                     }
-                    json_output = json.dumps(claim_dict_webrag)
+                    json_output = json.dumps(claim_dict_webrag, default=str)
 
                     # annotate for web rag
                     _annotate(
@@ -259,7 +304,9 @@ class LLMAggregator(BaseAnnotator):
                     )
 
                     cti_results = cti_classification(c)
-                    aggregator_result = self.call_aggregator(c, chroma_result, web_rag_result)
+                    aggregator_result = self.call_aggregator(
+                        c, chroma_result, web_rag_result
+                    )
                     print("Aggregator result: ", aggregator_result)
                     _annotate(
                         _annotate_obj=page,

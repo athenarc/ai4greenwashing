@@ -36,7 +36,7 @@ class llm_evaluation:
                 "logit_differences": []
             }
 
-        context = " ".join(retrieved_docs)
+        context = "".join(retrieved_docs)
         chunks = precomputed_chunks or self.chunk_text(context)
         stance_counts = Counter()
         entailment_scores, logit_differences = [], []
@@ -54,6 +54,8 @@ class llm_evaluation:
 
         general_stance = stance_counts.most_common(1)[0][0] if stance_counts else "NEUTRAL"
         return {
+            "answer": answer,
+            "retrieved_docs": context,
             "avg_faithfulness": float(np.mean(entailment_scores)) if entailment_scores else 0,
             "general_stance": general_stance,
             "avg_logit_diff": float(np.mean(logit_differences)) if logit_differences else 0,
@@ -75,7 +77,10 @@ class llm_evaluation:
         similarities = util.cos_sim(query_embedding, doc_embeddings).cpu().numpy().flatten()
         self.clear_memory()
         final_similarity = float(np.mean(similarities)) if similarities.size > 0 else 0
-        return {"query_info_relevance_score": final_similarity}
+        return {
+            "query": query,
+            "retrieved_docs": doc_chunks,
+            "query_info_relevance_score": final_similarity}
 
     # measures hallucination risk, by examining the llm's answer and the retrieved information
     def groundedness_eval(self, answer, retrieved_docs, precomputed_chunks=None):
@@ -103,30 +108,43 @@ class llm_evaluation:
         avg_bm25_score = float(np.mean(normalized_bm25_scores)) if normalized_bm25_scores else 0
         avg_cos_sim = float(np.mean(cos_sim_scores)) if cos_sim_scores.size > 0 else 0
         final_groundedness_score = (avg_bm25_score + avg_cos_sim) / 2
-        return { "groundedness_score": final_groundedness_score}
+        return { 
+            "answer": answer,
+            "retrieved_docs": doc_chunks,
+            "avg_bm25_score": avg_bm25_score,
+            "avg_cos_sim": avg_cos_sim,
+            "groundedness_score": final_groundedness_score}
     
     #measures the specificity of an LLM-generated answer by calculating the proportion of named entities
     def specificity_eval(self, answer):
         doc = self.nlp(answer)
         token_count = len(doc)
         specificity_score = float(len(doc.ents) / token_count) if token_count > 0 else 0
-        return { "specificity_score": specificity_score}
+        return { 
+            "answer":answer,
+            "token_count": token_count,
+            "specificity_score": specificity_score}
 
     #measures redundancy in an LLM-generated answer
     def redundancy_eval(self, answer, precomputed_chunks=None):
         answer_chunks = precomputed_chunks or self.chunk_text(answer)
         if len(answer_chunks) < 2:
-            return { "redundancy_score": 0 }
+            return { 
+                "answer":answer,
+                "redundancy_score": 0 }
 
         embeddings = self.embedder.encode(answer_chunks, convert_to_tensor=True)
         redundancy_scores = util.cos_sim(embeddings[:-1], embeddings[1:]).cpu().numpy().flatten()
         self.clear_memory()
         avg_redundancy = float(np.mean(redundancy_scores)) if redundancy_scores.size > 0 else 0
-        return { "redundancy_score": avg_redundancy}
+        return {"answer":answer,
+                "redundancy_scores":redundancy_scores,
+                 "redundancy_score": avg_redundancy}
 
     #measures readability in an LLM-generated answer
     def readability_eval(self, answer):
         readability_score = textstat.flesch_reading_ease(answer)
         return {
+            "answer":answer,
             "readability_score": readability_score
         }
