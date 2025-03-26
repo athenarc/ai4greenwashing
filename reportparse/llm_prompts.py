@@ -14,7 +14,7 @@ FIRST_PASS_PROMPT='''You are a fact-checker, that specializes in greenwashing. F
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
          '''
 WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a statement: '[User Input]' whose accuracy must be evaluated. 
-                            Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
+                            Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
 
                             Before you decide:
 
@@ -35,7 +35,7 @@ WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a st
 CHROMA_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from the rest of the report, whose accuracy must be evaluated. 
                 If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
+                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
 
                 Before you decide:
 
@@ -60,7 +60,7 @@ LLM_AGGREGATOR_PROMPT='''You have at your disposal two independent verdicts rega
 
                 Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.  
+                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.  
 
                 Before making your final decision:  
 
@@ -86,7 +86,7 @@ LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts re
 
                 Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.  
+                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.  
 
                 Before making your final decision:  
 
@@ -108,7 +108,7 @@ LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts re
 REDDIT_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from a database with reddit posts, from a greenwashing subreddit, whose accuracy must be evaluated. 
                 If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is TRUE, FALSE, PARTIALLY TRUE, or PARTIALLY FALSE.
+                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
 
                 Before you decide:
 
@@ -135,7 +135,7 @@ SOLO_AGGREGATOR_PROMPT = '''You have at your disposal three independent sources 
 
 Your task is to analyze all three contexts and reach a final conclusion regarding the statement’s accuracy.
 
-Use only the provided information in combination with your knowledge to decide whether the statement is **TRUE**, **FALSE**, **PARTIALLY TRUE**, or **PARTIALLY FALSE**.
+Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
 
 Before making your final decision:
 
