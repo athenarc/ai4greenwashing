@@ -58,10 +58,6 @@ class llm_evaluation:
             return {
                 "avg_faithfulness": 0,
                 "general_stance": "NEUTRAL",
-                "avg_logit_diff": 0,
-                "stance_counts": {},
-                "entailment_scores": [],
-                "logit_differences": []
             }
 
         context = " ".join(retrieved_docs)
@@ -93,11 +89,7 @@ class llm_evaluation:
 
         return {
             "avg_faithfulness": np.mean(entailment_scores),
-            "general_stance": general_stance,
-            "avg_logit_diff": np.mean(logit_differences),
-            "stance_counts": dict(stance_counts),
-            "entailment_scores": entailment_scores,
-            "logit_differences": logit_differences
+            "general_stance": general_stance
         }
 
     # measures relevance between the user's query and the retrieved information
