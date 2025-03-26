@@ -32,7 +32,7 @@ class RedditAnnotator(BaseAnnotator):
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY")
+                google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
             self.llm = ChatGroq(
@@ -71,89 +71,92 @@ class RedditAnnotator(BaseAnnotator):
                 print(e)
                 return None
 
-    def call_reddit(self, claim, company_name, reddit_db, k=6):
-        def retrieve_context(claim, db, k=6, distance=0.6):
-            try:
-                logger.info("Retrieving context from RedditDB")
+    def retrieve_context(self, claim, company_name, db, k=6, distance=0.6):
+        try:
+            logger.info("Retrieving context from RedditDB")
 
-                # Query only relevant posts
-                results = db.collection.query(
-                    query_texts=[claim],
-                    n_results=k,
-                )
+            # Query only relevant posts
+            results = db.collection.query(
+                query_texts=[claim],
+                n_results=k,
+            )
 
-                if results is None:
-                    return "", []
-                relevant_texts = []
-                retrieved_sources = []
-
-                for i, (doc, score) in enumerate(zip(results["documents"], results["distances"])):
-                    print("distance: ", score[0])
-                    if score[0] > distance:
-                        continue
-
-                    metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
-                    url = metadata.get("url", "Unknown")
-
-                    # Handle legacy or malformed formats
-                    company_field = metadata.get("company", "")
-                    if isinstance(company_field, list):
-                        company_str = " ".join(company_field).lower()
-                    else:
-                        company_str = str(company_field).lower()
-
-                    # Handle single or multiple target companies
-                    if isinstance(company_name, str):
-                        target_companies = [company_name.lower()]
-                    elif isinstance(company_name, list):
-                        target_companies = [c.lower() for c in company_name]
-                    else:
-                        target_companies = []
-
-                    company_words = set(re.split(r"[\s,]+", str(metadata.get("company", "")).lower()))
-                    target_companies = [c.lower() for c in company_name]
-                    if not any(tc in company_words for tc in target_companies):
-                        continue
-
-                    # Append if passed
-                    relevant_texts.append(f"From Reddit Post ({url}):\n{doc[0]}")
-                    retrieved_sources.append(url)
-
-
-                return "\n\n".join(relevant_texts).strip(), retrieved_sources
-
-            except Exception as e:
-                logger.error(f"Error retrieving context from RedditDB: {e}")
+            if results is None:
                 return "", []
+            relevant_texts = []
+            retrieved_sources = []
 
-        def verify_claim_with_context(claim, context):
-            if context:
-                messages = [
-                    (
-                        "system",
-                        self.reddit_prompt,
-                    ),
-                    (
-                        "human",
-                        f""" Statement: {claim}
+            for i, (doc, score) in enumerate(
+                zip(results["documents"], results["distances"])
+            ):
+                print("distance: ", score[0])
+                if score[0] > distance:
+                    continue
+
+                metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
+                url = metadata.get("url", "Unknown")
+
+                # Handle legacy or malformed formats
+                company_field = metadata.get("company", "")
+                if isinstance(company_field, list):
+                    company_str = " ".join(company_field).lower()
+                else:
+                    company_str = str(company_field).lower()
+
+                # Handle single or multiple target companies
+                if isinstance(company_name, str):
+                    target_companies = [company_name.lower()]
+                elif isinstance(company_name, list):
+                    target_companies = [c.lower() for c in company_name]
+                else:
+                    target_companies = []
+
+                company_words = set(
+                    re.split(r"[\s,]+", str(metadata.get("company", "")).lower())
+                )
+                target_companies = [c.lower() for c in company_name]
+                if not any(tc in company_words for tc in target_companies):
+                    continue
+
+                # Append if passed
+                relevant_texts.append(f"From Reddit Post ({url}):\n{doc[0]}")
+                retrieved_sources.append(url)
+
+            return "\n\n".join(relevant_texts).strip(), retrieved_sources
+
+        except Exception as e:
+            logger.error(f"Error retrieving context from RedditDB: {e}")
+            return "", []
+
+    def verify_claim_with_context(self, claim, context):
+        if context:
+            messages = [
+                (
+                    "system",
+                    self.reddit_prompt,
+                ),
+                (
+                    "human",
+                    f""" Statement: {claim}
                     Reddit Context: {context}
                     """,
-                    ),
-                ]
-                try:
-                    logger.info("Calling LLM to verify claim with context")
-                    ai_msg = self.llm.invoke(messages)
-                    print("AI message: ", ai_msg.content)
-                    return ai_msg.content
-                except Exception as e:
-                    logger.error(f"Error calling LLM: {e}")
-                    return "Error: Could not generate a response."
-            else:
-                return "No content in RedditDB"
+                ),
+            ]
+            try:
+                logger.info("Calling LLM to verify claim with context")
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+            except Exception as e:
+                logger.error(f"Error calling LLM: {e}")
+                return "Error: Could not generate a response."
+        else:
+            return "No content in RedditDB"
 
-        context, retrieved_sources = retrieve_context(claim=claim, db=reddit_db, k=k)
+    def call_reddit(self, claim, company_name, reddit_db, k=6):
+        context, retrieved_sources = self.retrieve_context(claim=claim, company_name=company_name, db=reddit_db, k=k)
         print("Retrieved sources: ", retrieved_sources)
-        result = verify_claim_with_context(claim=claim, context=context)
+        result = self.verify_claim_with_context(claim=claim, context=context)
         return result, retrieved_sources, context
 
     def extract_label(self, text):
@@ -219,7 +222,7 @@ class RedditAnnotator(BaseAnnotator):
                     meta=json.loads(metadata),
                 )
             )
-        
+
         gw_index = 0
         for page in document.pages:
             if page.num < start_page:

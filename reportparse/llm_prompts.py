@@ -126,3 +126,30 @@ REDDIT_PROMPT='''You have at your disposal information a statement: '[User Input
                 Statement: '[User Input]'
                             Result of the statement:
                             Justification:'''
+
+SOLO_AGGREGATOR_PROMPT = '''You have at your disposal three independent sources of context regarding the accuracy of the following statement: '[User Input]'.
+
+- The [Document Context] is derived from a structured database containing the full document from which the statement was extracted.
+- The [Web Context] is retrieved and synthesized from online sources to provide broader, up-to-date information.
+- The [Reddit Context] is extracted from a Reddit database containing relevant user-generated discussions and opinions related to the statement.
+
+Your task is to analyze all three contexts and reach a final conclusion regarding the statement’s accuracy.
+
+Use only the provided information in combination with your knowledge to decide whether the statement is **TRUE**, **FALSE**, **PARTIALLY TRUE**, or **PARTIALLY FALSE**.
+
+Before making your final decision:
+
+1. Analyze the statement clearly to identify its key elements.
+2. Examine the relevance and strength of evidence in the Document, Web, and Reddit Contexts.
+3. Compare the contexts and resolve any discrepancies by determining which sources provide stronger, more reliable justification.
+4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.
+
+Possible Results:  
+- NOT_GREENWASHING: If the sources fully confirm the statement, or if one or more provide strong confirmation and none provide credible contradictory evidence.  
+- GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while others are inconclusive or lacking.
+
+Finally, explain your reasoning clearly. Focus on the provided data and your own critical evaluation. Avoid unnecessary details and aim for precision and clarity in your analysis. Use the following format:
+
+Statement: '[User Input]'  
+Result of the statement:  
+Justification:'''
