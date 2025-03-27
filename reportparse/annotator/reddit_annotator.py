@@ -94,14 +94,7 @@ class RedditAnnotator(BaseAnnotator):
                     continue
 
                 metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
-                url = metadata.get("url", "Unknown")
-
-                # Handle legacy or malformed formats
-                company_field = metadata.get("company", "")
-                if isinstance(company_field, list):
-                    company_str = " ".join(company_field).lower()
-                else:
-                    company_str = str(company_field).lower()
+                url = metadata.get("post_url", "Unknown")
 
                 # Handle single or multiple target companies
                 if isinstance(company_name, str):
