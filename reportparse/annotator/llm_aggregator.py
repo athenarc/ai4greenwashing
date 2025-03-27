@@ -135,9 +135,9 @@ class LLMAggregator(BaseAnnotator):
         target_layouts = (
             args.web_rag_target_layouts if args is not None else list(target_layouts)
         )
-        gw_pages = args.pages_to_gw if args is not None else len(document.pages)
-        use_chunks = args.use_chunks if args is not None else False
-        start_page = args.start_page if args is not None else 0
+        gw_pages = args.pages_to_gw if args.pages_to_gw  is not None else len(document.pages)
+        use_chunks = args.use_chunks if args.use_chunks is not None else False
+        start_page = args.start_page if args.start_page is not None else 0
         if start_page > len(document.pages):
             print("Start page is greater than the number of pages in the document")
             start_page = 0
