@@ -18,6 +18,7 @@ from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 import torch
+import itertools
 
 logger = getLogger(__name__)
 
@@ -59,21 +60,17 @@ class LLMAggregator(BaseAnnotator):
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
-    def call_aggregator(self, claim, chroma_context, web_rag_context, reddit_context):
+    def call_aggregator(self, claim, context_dict):
+        # Dynamically construct the message string based on the order in context_dict
+        context_str = f"Statement: {claim}\n"
+        for label, content in context_dict.items():
+            context_str += f"{label}: {content}\n"
+
         messages = [
-            (
-                "system",
-                self.agg_prompt,
-            ),
-            (
-                "human",
-                f"""Statement: {claim}  
-                Document Context: {chroma_context}  
-                Web Context: {web_rag_context}
-                Reddit Context: {reddit_context}
-                """,
-            ),
+            ("system", self.agg_prompt),
+            ("human", context_str),
         ]
+
         try:
             logger.info("Calling LLM aggregator to verify claim with context")
             try:
@@ -81,13 +78,32 @@ class LLMAggregator(BaseAnnotator):
                 print("AI message: ", ai_msg.content)
                 return ai_msg.content
             except Exception as e:
-                print(f"Invokation error: {e}. Invoking with the second llm....")
+                print(f"Invocation error: {e}. Invoking with the second llm....")
                 ai_msg = self.llm_2.invoke(messages)
                 print("AI message: ", ai_msg.content)
                 return ai_msg.content
         except Exception as e:
             logger.error(f"Error calling LLM: {e}")
             return "Error: Could not generate a response."
+
+        
+    def run_all_context_permutations(self, claim, chroma_context, web_rag_context, reddit_context):
+        context_labels = ["Document Context", "Web Context", "Reddit Context"]
+        context_values = [chroma_context, web_rag_context, reddit_context]
+        results = []
+
+        for perm in itertools.permutations(zip(context_labels, context_values)):
+            context_dict = {label: value for label, value in perm}
+            print("\n=== Running permutation ===")
+            print(f"Order: {[label for label, _ in perm]}")
+            result = self.call_aggregator(claim, context_dict)
+            results.append({
+                "order": [label for label, _ in perm],
+                "result": result
+            })
+
+        return results
+
 
     def annotate(
         self,
@@ -239,62 +255,71 @@ class LLMAggregator(BaseAnnotator):
                     )
 
                     logger.info("Aggregator starting")
-                    aggregator_result = self.call_aggregator(
-                        c, chroma_context, reddit_context, web_context
+                    agg_permutation_results = self.run_all_context_permutations(
+                        claim=c,
+                        chroma_context=chroma_context,
+                        web_rag_context=web_context,
+                        reddit_context=reddit_context
                     )
-                    print("Aggregator result: ", aggregator_result)
-                    if aggregator_result:
-                        normalized_agg_rag_result = self.eval.normalize_to_string(
-                            aggregator_result
-                        )
-                        result_list = [chroma_context, reddit_context, web_context]
-                        normalized_result_list = self.eval.normalize_to_string(
-                            result_list
-                        )
-                        agg_chunks = self.eval.chunk_text(normalized_result_list)
-                        faith_eval = self.eval.faith_eval(
-                            answer=normalized_agg_rag_result,
-                            retrieved_docs=agg_chunks,
-                            precomputed_chunks=agg_chunks,
-                        )
-                        groundedness_eval = self.eval.groundedness_eval(
-                            answer=normalized_agg_rag_result,
-                            retrieved_docs=agg_chunks,
-                            precomputed_chunks=agg_chunks,
-                        )
-                        readability_eval = self.eval.readability_eval(
-                            normalized_agg_rag_result
-                        )
-                        redundancy_eval = self.eval.redundancy_eval(
-                            normalized_agg_rag_result, precomputed_chunks=agg_chunks
-                        )
-                        specificity_eval = self.eval.specificity_eval(
-                            normalized_agg_rag_result
-                        )
-                        compression_ratio_eval = self.eval.compression_ratio_eval(
-                            normalized_agg_rag_result, normalized_result_list
-                        )
-                        lexical_diversity_eval = self.eval.lexical_diversity_eval(
-                            normalized_agg_rag_result
-                        )
-                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
-                            normalized_agg_rag_result
-                        )
-                    else:
-                        faith_eval = groundedness_eval = readability_eval = (
-                            redundancy_eval
-                        ) = None
-                        specificity_eval = compression_ratio_eval = (
-                            lexical_diversity_eval
-                        ) = noun_to_verb_ratio_eval = None
 
-                    _annotate(
-                        _annotate_obj=page,
-                        _text=aggregator_result,
-                        annotator_name=f"aggregator_result_claim_{claim_index}",
-                        metadata=json.dumps(
-                            {
+                    for perm_result in agg_permutation_results:
+                        permutation_order = perm_result["order"]
+                        aggregator_result = perm_result["result"]
+                        context_dict = {label: context for label, context in zip(permutation_order, [chroma_context, web_context, reddit_context])}
+
+                        print(f"Aggregator result for {permutation_order}: {aggregator_result}")
+
+                        if aggregator_result:
+                            normalized_agg_rag_result = self.eval.normalize_to_string(aggregator_result)
+
+                            # Build context list directly from the context_dict in the permutation order
+                            context_list = [context_dict[label] for label in permutation_order]
+                            normalized_context_list = self.eval.normalize_to_string(context_list)
+                            agg_chunks = self.eval.chunk_text(normalized_context_list)
+
+                            faith_eval = self.eval.faith_eval(
+                                answer=normalized_agg_rag_result,
+                                retrieved_docs=normalized_context_list,
+                                precomputed_chunks=agg_chunks,
+                            )
+                            groundedness_eval = self.eval.groundedness_eval(
+                                answer=normalized_agg_rag_result,
+                                retrieved_docs=normalized_context_list,
+                                precomputed_chunks=agg_chunks,
+                            )
+                            readability_eval = self.eval.readability_eval(normalized_agg_rag_result)
+                            redundancy_eval = self.eval.redundancy_eval(
+                                normalized_agg_rag_result, precomputed_chunks=agg_chunks
+                            )
+                            specificity_eval = self.eval.specificity_eval(normalized_agg_rag_result)
+                            compression_ratio_eval = self.eval.compression_ratio_eval(
+                                normalized_agg_rag_result, normalized_context_list
+                            )
+                            lexical_diversity_eval = self.eval.lexical_diversity_eval(
+                                normalized_agg_rag_result
+                            )
+                            noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
+                                normalized_agg_rag_result
+                            )
+                        else:
+                            faith_eval = groundedness_eval = readability_eval = (
+                                redundancy_eval
+                            ) = None
+                            specificity_eval = compression_ratio_eval = (
+                                lexical_diversity_eval
+                            ) = noun_to_verb_ratio_eval = None
+
+                        # Generate annotator name like: aggregator_DocumentWebReddit_result_claim_0
+                        perm_name = "_".join([label.replace(" ", "_") for label in permutation_order])
+                        annotator_label = f"aggregator_{perm_name}_result_claim_{claim_index}"
+
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=aggregator_result,
+                            annotator_name=annotator_label,
+                            metadata=json.dumps({
                                 "claim": c,
+                                "permutation_order": permutation_order,
                                 "chroma_context": chroma_context,
                                 "retreived_pages": retrieved_pages,
                                 "reddit_context": reddit_context,
@@ -302,9 +327,7 @@ class LLMAggregator(BaseAnnotator):
                                 "web_context": web_context,
                                 "url_list": url_list,
                                 "label": self.web.extract_label(aggregator_result),
-                                "justification": self.web.extract_justification(
-                                    aggregator_result
-                                ),
+                                "justification": self.web.extract_justification(aggregator_result),
                                 "faith_eval": faith_eval,
                                 "groundedness_eval": groundedness_eval,
                                 "readability_eval": readability_eval,
@@ -313,9 +336,8 @@ class LLMAggregator(BaseAnnotator):
                                 "compression_ratio_eval": compression_ratio_eval,
                                 "lexical_diversity_eval": lexical_diversity_eval,
                                 "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
-                            }
-                        ),
-                    )
+                            }),
+                        )
                     claim_index += 1
                 gw_index += 1
             else:
