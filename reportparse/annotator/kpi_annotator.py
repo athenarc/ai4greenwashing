@@ -6,7 +6,7 @@ from reportparse.annotator.base import BaseAnnotator
 from reportparse.structure.document import Document, Annotation, AnnotatableLevel
 from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.util.my_embeddings import get_embedder
-from reportparse.remove_thinking import remove_think_blocks
+from reportparse.util.remove_thinking import remove_think_blocks
 
 from sentence_transformers import SentenceTransformer
 import faiss
