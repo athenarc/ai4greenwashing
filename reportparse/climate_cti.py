@@ -2,7 +2,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipe
 import torch
 def cti_classification(claim: str):
     model_names = {
-        "detection": "climatebert/distilroberta-base-climate-detector",
+        "climate": "climatebert/distilroberta-base-climate-detector",
         "commitment": "climatebert/distilroberta-base-climate-commitment",
         "sentiment": "climatebert/distilroberta-base-climate-sentiment",
         "specificity": "climatebert/distilroberta-base-climate-specificity",

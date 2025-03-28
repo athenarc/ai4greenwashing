@@ -1,9 +1,6 @@
 import chromadb
 import subprocess
-from pydantic_settings import BaseSettings
-import requests
 
-from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 
 repo_root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
@@ -11,15 +8,15 @@ class ChromaDBHandler:
     def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db"):
         self.client = chromadb.PersistentClient(path=db_path)
 
-        self.page_collection = self.client.get_or_create_collection(
+        self.collection = self.client.get_or_create_collection(
             name="parsed_pages",
             metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
         )
 
-        self.chunk_collection = self.client.get_or_create_collection(
-            name="chunked_pages",
-            metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
-        )
+        # self.chunk_collection = self.client.get_or_create_collection(
+        #     name="chunked_pages",
+        #     metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
+        # )
         
     def chunk_text(self, text, min_chunk_size=200, max_chunk_size=500, num_chunks=3, overlap_ratio=0.25):
         """
@@ -50,32 +47,39 @@ class ChromaDBHandler:
         Stores both full pages and chunked versions dynamically while handling ID conflicts.
         """
         try:
-            page_id = f"{doc_name}_page_{page_number}"
-            existing_page = self.page_collection.get(ids=[page_id])
+            base_id = f"{doc_name}_page_{page_number}"
 
-            # Remove existing page if needed
-            if existing_page and len(existing_page["documents"]) > 0:
-                self.page_collection.delete(ids=[page_id])
+            # Prepare full page entry
+            page_id = f"{base_id}_full"
+            page_meta = {
+                "doc_name": doc_name,
+                "page_number": page_number,
+                "type": "page"
+            }
 
-            # Store full page
-            self.page_collection.add(
+            # Remove existing full page
+            self.collection.delete(ids=[page_id])
+            self.collection.add(
                 ids=[page_id],
                 documents=[text],
-                metadatas=[{"doc_name": doc_name, "page_number": page_number, "type": "esg-report"}],
+                metadatas=[page_meta],
             )
-
-            # Store dynamically chunked text
+            
+            # Prepare chunked entries
             chunks = self.chunk_text(text)
-            chunk_ids = [f"{doc_name}_page_{page_number}_chunk_{i}" for i in range(len(chunks))]
+            chunk_ids = [f"{base_id}_chunk_{i}" for i in range(len(chunks))]
+            chunk_metadata = [
+                {
+                    "doc_name": doc_name,
+                    "page_number": page_number,
+                    "chunk_number": i,
+                    "type": "chunk"
+                }
+                for i in range(len(chunks))
+            ]
 
-            # Remove existing chunks if needed
-            existing_chunks = self.chunk_collection.get(ids=chunk_ids)
-            if existing_chunks and len(existing_chunks["documents"]) > 0:
-                self.chunk_collection.delete(ids=chunk_ids)
-
-            chunk_metadata = [{"doc_name": doc_name, "page_number": page_number, "chunk_number": i} for i in range(len(chunks))]
-
-            self.chunk_collection.add(
+            self.collection.delete(ids=chunk_ids)
+            self.collection.add(
                 ids=chunk_ids,
                 documents=chunks,
                 metadatas=chunk_metadata,
@@ -84,16 +88,3 @@ class ChromaDBHandler:
         except Exception as e:
             print(f"Error storing page: {e}")
             raise
-
-    # def retrieve_relevant_pages(self, query: str, top_k: int = 6, use_chunks=False):
-    #     """
-    #     Retrieves relevant pages or chunks based on the `use_chunks` flag.
-    #     """
-    #     collection = self.chunk_collection if use_chunks else self.page_collection
-    #     results = collection.query(query_texts=[query], n_results=top_k)
-
-    #     retrieved_texts = []
-    #     for doc, meta in zip(results["documents"], results["metadatas"]):
-    #         retrieved_texts.append(f"Page {meta['page_number']} (Doc {meta['doc_name']}):\n{doc}\n")
-
-    #     return "\n".join(retrieved_texts)

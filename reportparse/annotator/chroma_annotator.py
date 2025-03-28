@@ -19,26 +19,22 @@ logger = getLogger(__name__)
 
 
 @BaseAnnotator.register("chroma")
-class LLMAnnotator(BaseAnnotator):
+class ChromaAnnotator(BaseAnnotator):
 
     def __init__(self):
         load_dotenv()
         self.chroma_db = ChromaDBHandler()
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.chroma_prompt = CHROMA_PROMPT
-        return
-
-    def call_llm(self, text):
         if os.getenv("USE_GROQ_API") == "True":
 
-    
             self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
                 max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY")
+                google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
             self.llm_2 = ChatGroq(
@@ -52,7 +48,9 @@ class LLMAnnotator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        return
 
+    def call_llm(self, text):
         messages = [
             (
                 "system",
@@ -75,47 +73,48 @@ class LLMAnnotator(BaseAnnotator):
                 print(e)
                 return None
 
-    def call_chroma(self, claim, document_name, text, page_number, chroma_db, k=6, use_chunks=False):
-        def retrieve_context(
-            claim, document_name, page_number, db, k=6, use_chunks=False, distance=0.6
-        ):
-            try:
-                logger.info("Retrieving context from ChromaDB")
-                collection = db.chunk_collection if use_chunks else db.page_collection
+    def retrieve_context(
+        self, claim, document_name, page_number, db, k=6, use_chunks=False, distance=0.6
+    ):
+        try:
+            logger.info("Retrieving context from ChromaDB")
+            collection = db.collection
 
-                # only keep docs where the doc_name is the same as the document_name and exclude the current page
-                results = collection.query(
-                    query_texts=[claim],
-                    n_results=k,
-                    where={"$and": [{"doc_name": document_name}, {"page_number": {"$ne": page_number}}]
-                    },  # Exclude the current page
-                )
-                if results is None:
-                    return "", []
-                relevant_texts = []
-                retrieved_pages = []
-
-                for i, (doc, score) in enumerate(
-                    zip(results["documents"], results["distances"])
-                ):
-                    print("distance: ", score[0])
-                    if score[0] > distance:  # Apply distance filter
-                        continue
-                    metadata = (
-                        results["metadatas"][i][0] if results["metadatas"][i] else {}
-                    )
-                    page_num = metadata.get("page_number", "Unknown")
-                    retrieved_pages.append(page_num)
-                    relevant_texts.append(f"Page {page_num}: {doc[0]}")
-
-                return "\n".join(relevant_texts).strip(), retrieved_pages
-
-            except Exception as e:
-                logger.error(f"Error retrieving context from ChromaDB: {e}")
+            # only keep docs where the doc_name is the same as the document_name and exclude the current page
+            results = collection.query(
+                query_texts=[claim],
+                n_results=k,
+                where={
+                    "$and": [
+                        {"doc_name": document_name},
+                        {"page_number": {"$ne": page_number}},
+                    ]
+                },  # Exclude the current page
+            )
+            if results is None:
                 return "", []
+            relevant_texts = []
+            retrieved_pages = []
 
-        def verify_claim_with_context(claim, text, context):
-            
+            for i, (doc, score) in enumerate(
+                zip(results["documents"], results["distances"])
+            ):
+                print("distance: ", score[0])
+                if score[0] > distance:  # Apply distance filter
+                    continue
+                metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
+                page_num = metadata.get("page_number", "Unknown")
+                retrieved_pages.append(page_num)
+                relevant_texts.append(f"Page {page_num}: {doc[0]}")
+
+            return "\n".join(relevant_texts).strip(), retrieved_pages
+
+        except Exception as e:
+            logger.error(f"Error retrieving context from ChromaDB: {e}")
+            return "", []
+
+    def verify_claim_with_context(self, claim, text, context):
+        if context:
             messages = [
                 (
                     "system",
@@ -124,9 +123,9 @@ class LLMAnnotator(BaseAnnotator):
                 (
                     "human",
                     f""" Statement: {claim}
-                 Relevant page text {text}
-                 Context: {context}
-                 """,
+                    Relevant page text {text}
+                    Context: {context}
+                    """,
                 ),
             ]
             try:
@@ -137,12 +136,18 @@ class LLMAnnotator(BaseAnnotator):
             except Exception as e:
                 logger.error(f"Error calling LLM: {e}")
                 return "Error: Could not generate a response."
+        else:
+            return "No relevant context found in the rest of the document."
 
-        context, retrieved_pages = retrieve_context(
+    def call_chroma(
+        self, claim, document_name, text, page_number, chroma_db, k=6, use_chunks=False
+    ):
+
+        context, retrieved_pages = self.retrieve_context(
             claim, document_name, page_number, chroma_db, k, use_chunks
         )
         print("Retrieved pages: ", retrieved_pages)
-        result = verify_claim_with_context(claim=claim, text=text, context=context)
+        result = self.verify_claim_with_context(claim=claim, text=text, context=context)
         return result, retrieved_pages, context
 
     def extract_label(self, text):
@@ -317,4 +322,3 @@ class LLMAnnotator(BaseAnnotator):
         parser.add_argument(
             "--use_chunks", action="store_true", help="Use chunks instead of pages"
         )
-        

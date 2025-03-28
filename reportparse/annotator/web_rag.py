@@ -13,7 +13,10 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import time
 from langchain_ollama import ChatOllama
+from duckduckgo_search import DDGS
+import logging
 
+logger = logging.getLogger(__name__)
 
 @BaseAnnotator.register("web_rag")
 class WEB_RAG_Annotator(BaseAnnotator):
@@ -109,44 +112,54 @@ class WEB_RAG_Annotator(BaseAnnotator):
             return None
 
     # todo: add info truncation if text is too big for llm to handle.
-    def web_rag(self, claim, web_sources, company_name):
-        pip = pipeline(claim, web_sources, company_name)
+    def search_ddg(self, claim, web_sources, company_name):
         try:
+            pip = pipeline(claim, web_sources, company_name)  # Rename or clarify if needed
             result, url_list = pip.retrieve_knowledge()
             if result is None:
-                print("Result is None")
-                return "No content was found from the web", [], None
-        except Exception as e:
-            print(e)
-            return "No content was found from the web", [], None
-        try:
+                logger.warning("Retrieved result is None")
+                return None, [], None
+
             info = "\n".join(result.astype(str))
-            if info:
-                messages = [
-                    ("system", self.web_rag_prompt),
-                    (
-                        "human",
-                        f'''External info '{info}'
-                         Statement: '{claim}' "''',
-                    ),
-                ]
-                try:
-                    print("Invoking with the first llm...")
-                    ai_msg = self.llm.invoke(messages)
-                    return ai_msg.content, url_list, info
-                except Exception as e:
-                    try:
-                        print("Invoking with the second llm...")
-                        ai_msg = self.llm_2.invoke(messages)
-                        return ai_msg.content, url_list, info
-                    except Exception as e:
-                        print(e)
-                        return "LLM invocation failed", [], None
-            else:
-                return "No content was found from the web", [], None
+            if not info:
+                logger.warning("No textual info extracted from result")
+                return None, [], None
+
+            return info, url_list, result
+
         except Exception as e:
-            print(e)
-            return "No content was found from the web", [], None
+            logger.exception(f"Error during web search: {e}")
+            return None, [], None
+
+
+    def web_rag(self, claim, web_sources, company_name):
+        info, url_list, _ = self.search_ddg(claim, web_sources, company_name)
+        if not info:
+            return "Failed to retrieve content from the web", [], None
+        messages = [
+            ("system", self.web_rag_prompt),
+            (
+                "human",
+                f'''External info '{info}'
+                Statement: '{claim}' "''',
+            ),
+        ]
+        try:
+            logger.info("Invoking with the first LLM...")
+            ai_msg = self.llm.invoke(messages)
+            return ai_msg.content, url_list, info
+
+        except Exception as e1:
+            logger.warning(f"First LLM failed: {e1}")
+
+            try:
+                logger.info("Invoking with the second LLM...")
+                ai_msg = self.llm_2.invoke(messages)
+                return ai_msg.content, url_list, info
+
+            except Exception as e2:
+                logger.error(f"Second LLM failed: {e2}")
+                return "LLM invocation failed", [], None
 
     def annotate(
         self,
