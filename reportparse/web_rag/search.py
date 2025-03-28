@@ -1,6 +1,8 @@
 import time
 import re
 from duckduckgo_search import DDGS
+from googleapiclient.discovery import build
+import os
 from urllib.parse import urlparse
 
 doc_extensions = ["doc", "docx", "php", "pdf", "txt", "theFile", "file", "xls"]
@@ -21,7 +23,7 @@ def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
             results = DDGS().text(
                 keywords=search_query,
                 safesearch="off",
-                max_results=5,
+                max_results=web_sources,
             )
 
             for dict in results:
@@ -49,5 +51,18 @@ def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
                 print(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
-                print("Max retries reached. Please try again later.")
-                return []
+                print("Max retries reached. Trying with the google_api...")
+                urls = google_search_backup(query, web_sources)
+                return urls
+
+
+def google_search_backup(query, web_sources):
+    service = build("customsearch", "v1", developerKey=os.getenv("GOOGLE_SEARCH_KEY"))
+
+    res = (
+        service.cse()
+        .list(q=query, cx=os.getenv("GOOGLE_CX_KEY"), num=web_sources)
+        .execute()
+    )
+    urls = [item["link"] for item in res.get("items", [])]
+    return urls
