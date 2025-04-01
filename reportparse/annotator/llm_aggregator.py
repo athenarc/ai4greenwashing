@@ -38,28 +38,9 @@ class LLMAggregator(BaseAnnotator):
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
         self.agg_prompt_2 = LLM_AGGREGATOR_PROMPT_2
         self.eval = llm_evaluation()
-        if os.getenv("USE_GROQ_API") == "True":
 
-            self.llm_2 = ChatGoogleGenerativeAI(
-                model=os.getenv("GEMINI_MODEL"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY")
-            )
-
-            self.llm = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_1"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
-        else:
-            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
     def call_aggregator(self, claim, chroma_result, web_rag_result):

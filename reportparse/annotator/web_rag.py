@@ -26,47 +26,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.web_rag_prompt = WEB_RAG_PROMPT
 
-        self.llm = ChatGoogleGenerativeAI(
-            model=os.getenv("GEMINI_MODEL"),
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            google_api_key=os.getenv("GEMINI_API_KEY"),
-        )
-
-        self.llm_2 = ChatGroq(
-            model=os.getenv("GROQ_LLM_MODEL_1"),
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            groq_api_key=os.getenv("GROQ_API_KEY_1"),
-        )
-
     def call_llm(self, text):
-        if os.getenv("USE_GROQ_API") == "True":
-
-            self.llm = ChatGoogleGenerativeAI(
-                model=os.getenv("GEMINI_MODEL"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY"),
-            )
-
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_1"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
-        else:
-            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
 
         messages = [
             (
