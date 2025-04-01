@@ -15,6 +15,7 @@ import time
 from langchain_ollama import ChatOllama
 from duckduckgo_search import DDGS
 import logging
+from keybert import KeyBERT
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
         load_dotenv()
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.web_rag_prompt = WEB_RAG_PROMPT
+        self.kw_model = KeyBERT()
 
         self.llm = ChatGoogleGenerativeAI(
             model=os.getenv("GEMINI_MODEL"),
@@ -93,6 +95,33 @@ class WEB_RAG_Annotator(BaseAnnotator):
 
     # function to extract label value from llm
     # TODO: fix for no links
+
+
+    def extract_keywords_smart(self, text, max_keywords=10, min_len=1, max_len=3, return_as_string=True):
+        # Extract a larger set to allow for deduplication
+        keywords_with_scores = self.kw_model.extract_keywords(
+            text,
+            keyphrase_ngram_range=(min_len, max_len),
+            stop_words='english',
+            top_n=20
+        )
+
+        seen = set()
+        keywords_cleaned = []
+
+        for phrase, _ in keywords_with_scores:
+            normalized = phrase.strip().lower()
+            if normalized not in seen:
+                seen.add(normalized)
+                keywords_cleaned.append(phrase.strip())
+                if len(keywords_cleaned) >= max_keywords:
+                    break
+
+        if return_as_string:
+            return " ".join(keywords_cleaned)
+        else:
+            return keywords_cleaned
+
     def extract_label(self, text):
         try:
             match = re.search(
@@ -114,7 +143,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
     # todo: add info truncation if text is too big for llm to handle.
     def search_ddg(self, claim, web_sources, company_name):
         try:
-            pip = pipeline(claim, web_sources, company_name)  # Rename or clarify if needed
+            pip = pipeline(self.extract_keywords_smart(claim), web_sources, company_name)  # Rename or clarify if needed
             result, url_list = pip.retrieve_knowledge()
             if result is None:
                 logger.warning("Retrieved result is None")
