@@ -512,6 +512,6 @@ class LLMAggregator(BaseAnnotator):
         parser.add_argument(
             "--start_page",
             type=int,
-            help=f"Choose starting page number (0-indexed)",
+            help=f"Choose starting page number (1-indexed)",
             default=0,
         )
