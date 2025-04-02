@@ -1,12 +1,12 @@
 import chromadb
 import subprocess
-
+from chromadb.config import Settings
 
 repo_root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
 class ChromaDBHandler:
     def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db"):
-        self.client = chromadb.PersistentClient(path=db_path)
+        self.client = chromadb.PersistentClient(path=db_path, settings=Settings(anonymized_telemetry=False))
 
         self.collection = self.client.get_or_create_collection(
             name="parsed_pages",
