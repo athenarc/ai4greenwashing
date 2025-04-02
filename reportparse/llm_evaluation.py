@@ -114,9 +114,17 @@ class llm_evaluation:
             return {"groundedness_score": 0}
 
         doc_chunks = precomputed_chunks or self.chunk_text(" ".join(retrieved_docs))
-        answer_chunks = self.chunk_text(answer)
+        doc_chunks = [chunk for chunk in doc_chunks if chunk.strip()]  # remove empty chunks
 
+        if not doc_chunks:
+            return {"groundedness_score": 0}  # early exit to avoid BM25 crash
+
+        answer_chunks = self.chunk_text(answer)
         tokenized_chunks = [chunk.split() for chunk in doc_chunks]
+
+        if not tokenized_chunks:
+            return {"groundedness_score": 0}  # early exit again
+
         bm25 = BM25Okapi(tokenized_chunks)
 
         answer_tokens = [chunk.split() for chunk in answer_chunks if chunk.strip()]
@@ -136,7 +144,7 @@ class llm_evaluation:
         avg_bm25 = np.mean(normalized_bm25_scores) if normalized_bm25_scores else 0
         avg_cos_sim = np.mean(cos_sim_scores) if cos_sim_scores.size > 0 else 0
         return {"groundedness_score": (avg_bm25 + avg_cos_sim) / 2}
-    
+        
     #measures the specificity of an LLM-generated answer by calculating the proportion of named entities
     def specificity_eval(self, answer):
         doc = self.nlp(answer)
