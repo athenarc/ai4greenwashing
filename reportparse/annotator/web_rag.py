@@ -8,10 +8,8 @@ import argparse
 import re
 import os
 import json
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
-import time
+from reportparse.remove_thinking import remove_think_blocks
 from langchain_ollama import ChatOllama
 from duckduckgo_search import DDGS
 import logging
@@ -43,13 +41,14 @@ class WEB_RAG_Annotator(BaseAnnotator):
         try:
             print("Invoking the first llm...")
             ai_msg = self.llm.invoke(messages)
-
-            return ai_msg.content
+            msg = remove_think_blocks(ai_msg.content)
+            return msg
         except Exception as e:
             print(e)
             try:
                 ai_msg = self.llm_2.invoke(messages)
-                return ai_msg.content
+                msg = remove_think_blocks(ai_msg.content)
+                return msg
             except Exception as e:
                 print("llm invokation failed. Returning none...")
                 print(e)
@@ -138,7 +137,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
         try:
             logger.info("Invoking with the first LLM...")
             ai_msg = self.llm.invoke(messages)
-            return ai_msg.content, url_list, info
+            msg = remove_think_blocks(ai_msg.content)
+            return msg, url_list, info
 
         except Exception as e1:
             logger.warning(f"First LLM failed: {e1}")
@@ -146,7 +146,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
             try:
                 logger.info("Invoking with the second LLM...")
                 ai_msg = self.llm_2.invoke(messages)
-                return ai_msg.content, url_list, info
+                msg = remove_think_blocks(ai_msg.content)
+                return msg, url_list, info
 
             except Exception as e2:
                 logger.error(f"Second LLM failed: {e2}")
