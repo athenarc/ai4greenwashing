@@ -207,6 +207,7 @@ class LLMAggregator(BaseAnnotator):
                 page_number = page.num
                 claims = re.findall(r"(?i)\b(?:another )?potential greenwashing claim:\s*(.*?)(?:\n|$)", result)
                 logger.info(f"Claims extracted: {claims}")
+                
                 company_match = re.search(r"(?i)\bcompany name:\s*(.*?)(?:\n|$)", result[:100])
                 company_name = company_match.group(1).strip() if company_match else "Unknown"
                 logger.info(f"Company name extracted: {company_name}")

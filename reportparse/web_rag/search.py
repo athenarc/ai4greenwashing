@@ -15,7 +15,7 @@ def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
     urls = []
     sites_source = []
     # Removed exclude_terms and inurl_filters logic
-    search_query = f"{metadata[0]} {query}"
+    search_query = f"{metadata} {query}"
     print(f"SEARCH QUERY: {search_query}")
 
     for attempt in range(retries):

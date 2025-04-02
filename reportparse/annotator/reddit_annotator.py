@@ -98,19 +98,14 @@ class RedditAnnotator(BaseAnnotator):
                 url = metadata.get("post_url", "Unknown")
 
                 # Handle single or multiple target companies
-                if isinstance(company_name, str):
-                    target_companies = [company_name.lower()]
-                elif isinstance(company_name, list):
-                    target_companies = [c.lower() for c in company_name]
-                else:
-                    target_companies = []
+                # Word-wise partial company name matching
+                target_company_words = set(re.split(r"[\s,]+", company_name.lower()))
+                metadata_company_words = set(re.split(r"[\s,]+", str(metadata.get("company", "")).lower()))
 
-                company_words = set(
-                    re.split(r"[\s,]+", str(metadata.get("company", "")).lower())
-                )
-                target_companies = [c.lower() for c in company_name]
-                if not any(tc in company_words for tc in target_companies):
+                # If no shared words, skip
+                if not target_company_words & metadata_company_words:
                     continue
+
 
                 # Append if passed
                 relevant_texts.append(f"From Reddit Post ({url}):\n{doc[0]}")
