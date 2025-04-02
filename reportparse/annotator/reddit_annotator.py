@@ -8,9 +8,8 @@ from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.reddit_db.reddit_chroma_handler import RedditChromaHandler
 from reportparse.llm_prompts import FIRST_PASS_PROMPT, REDDIT_PROMPT
-from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
-from langchain_google_genai import ChatGoogleGenerativeAI
+from reportparse.remove_thinking import remove_think_blocks
 
 import json
 
@@ -60,12 +59,14 @@ class RedditAnnotator(BaseAnnotator):
         try:
             ai_msg = self.llm.invoke(messages)
             print("AI message 1: ", ai_msg.content)
-            return ai_msg.content
+            msg = remove_think_blocks(ai_msg.content)
+            return msg
         except Exception as e:
             print(e)
             try:
                 ai_msg = self.llm_2.invoke(messages)
-                return ai_msg.content
+                msg = remove_think_blocks(ai_msg.content)
+                return msg
             except Exception as e:
                 print("llm invokation failed. Returning none...")
                 print(e)
@@ -139,7 +140,8 @@ class RedditAnnotator(BaseAnnotator):
                 logger.info("Calling LLM to verify claim with context")
                 ai_msg = self.llm.invoke(messages)
                 print("AI message: ", ai_msg.content)
-                return ai_msg.content
+                msg = remove_think_blocks(ai_msg.content)
+                return msg
             except Exception as e:
                 logger.error(f"Error calling LLM: {e}")
                 return "Error: Could not generate a response."
