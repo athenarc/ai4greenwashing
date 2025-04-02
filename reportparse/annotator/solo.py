@@ -75,13 +75,11 @@ class LLMAggregator(BaseAnnotator):
             logger.info("Calling LLM aggregator to verify claim with context")
             try:
                 ai_msg = self.llm.invoke(messages)
-                print("AI message: ", ai_msg.content)
                 msg = remove_think_blocks(ai_msg.content)
                 return msg
             except Exception as e:
                 print(f"Invocation error: {e}. Invoking with the second llm....")
                 ai_msg = self.llm_2.invoke(messages)
-                print("AI message: ", ai_msg.content)
                 msg = remove_think_blocks(ai_msg.content)
                 return msg
         except Exception as e:
@@ -270,8 +268,7 @@ class LLMAggregator(BaseAnnotator):
                         aggregator_result = perm_result["result"]
                         context_dict = {label: context for label, context in zip(permutation_order, [chroma_context, web_context, reddit_context])}
 
-                        print(f"Aggregator result for {permutation_order}: {aggregator_result}")
-
+                        logger.info(f"Aggregator result: {aggregator_result} for order {permutation_order}")
                         if aggregator_result:
                             normalized_agg_rag_result = self.eval.normalize_to_string(aggregator_result)
 
