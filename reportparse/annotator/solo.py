@@ -140,7 +140,7 @@ class LLMAggregator(BaseAnnotator):
         print("Successfully stored all pages in chroma")
 
         gw_index = 0
-        print(f"Checking the first {gw_pages} pages for greenwashing")
+        print(f"Greenwashing detection: Starting at page {start_page} for {gw_pages} pages")
         for page in document.pages:
             if page.num < start_page:
                 continue
@@ -188,7 +188,7 @@ class LLMAggregator(BaseAnnotator):
                 page_number = page.num
                 claims = re.findall(r"(?i)\b(?:another )?potential greenwashing claim:\s*(.*?)(?:\n|$)", result)
                 logger.info(f"Claims extracted: {claims}")
-                
+
                 company_match = re.search(r"(?i)\bcompany name:\s*(.*?)(?:\n|$)", result[:100])
                 company_name = company_match.group(1).strip() if company_match else "Unknown"
                 logger.info(f"Company name extracted: {company_name}")
