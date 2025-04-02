@@ -206,7 +206,8 @@ class LLMAggregator(BaseAnnotator):
                 )
                 logger.info("First pass completed")
                 page_number = page.num
-                claims = re.findall(r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result)
+                claims = re.findall(r"(?i)\b(?:another )?potential greenwashing claim:\s*(.*?)(?:\n|$)", result)
+                logger.info(f"Claims extracted: {claims}")
                 if company_name is None:
                     company_name = re.findall(
                             r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result
