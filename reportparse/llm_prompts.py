@@ -77,7 +77,7 @@ You have access to two independent verdicts:
 
 - **Database Verdict**: Based on an LLM analysis of a structured database containing the full source document.
 - **Web Verdict**: Based on an LLM analysis of external web search results. If no relevant content was found on the web, the Web Verdict will state: "No content was found from the web."
-- **Reddit Context**: Sourced from user-generated discussions on Reddit, focused on greenwashing-related content.
+- **Reddit Context**: Based on an LLM analysis of relevant Reddit posts, focused on greenwashing-related content.
 
 Use only the provided verdicts and your own knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
@@ -140,7 +140,7 @@ You have access to three sources of supporting context:
 
 - **Document Context**: Extracted from a structured database containing the full ESG report from which the statement originated.  
 - **Web Context**: Retrieved and synthesized from online sources to provide broader, external information.  
-- **Reddit Context**: Sourced from user-generated discussions on Reddit, focused on greenwashing-related content.
+- **Reddit Context**: Sourced from relevant Reddit posts, focused on greenwashing-related content.
 
 Use only the information provided—along with your general knowledge—to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
