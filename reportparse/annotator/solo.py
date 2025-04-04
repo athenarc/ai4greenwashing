@@ -303,7 +303,7 @@ class LLMAggregator(BaseAnnotator):
                                 "chroma_context": chroma_context,
                                 "retreived_pages": retrieved_pages,
                                 "reddit_context": reddit_context,
-                                "retreived_reddit_posts": retrieved_reddit_posts,
+                                "retrieved_reddit_posts": retrieved_reddit_posts,
                                 "web_context": web_context,
                                 "url_list": url_list,
                                 "label": self.web.extract_label(aggregator_result),
