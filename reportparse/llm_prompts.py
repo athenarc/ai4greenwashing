@@ -77,6 +77,7 @@ You have access to two independent verdicts:
 
 - **Database Verdict**: Based on an LLM analysis of a structured database containing the full source document.
 - **Web Verdict**: Based on an LLM analysis of external web search results. If no relevant content was found on the web, the Web Verdict will state: "No content was found from the web."
+- **Reddit Context**: Sourced from user-generated discussions on Reddit, focused on greenwashing-related content.
 
 Use only the provided verdicts and your own knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
@@ -99,37 +100,6 @@ Respond in the following format:
 Statement: '[User Input]'  
 Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
 Justification: [Concise explanation based on the verdicts and your reasoning]
-"""
-
-LLM_AGGREGATOR_PROMPT_2 = """
-You are tasked with evaluating the accuracy of the following statement: '[User Input]'
-
-You have access to two independent verdicts:
-
-- **Web Verdict**: Based on an LLM analysis of external web sources. If no relevant information was found, it will say: "No content was found from the web." In that case, disregard the Web Verdict and base your judgment on the available Database Verdict.
-- **Database Verdict**: Based on an LLM analysis of a structured database containing the full source document from which the statement was extracted.
-
-Use only the provided verdicts and your general knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
-
-Important: If information is missing from the web or the database, **ignore the absence**. Do not treat missing evidence as either supporting or refuting the claim. Focus only on the information that is present.
-
-Before reaching a conclusion:
-
-1. Break down the statement to identify its key elements.
-2. Review the reasoning in both the Web and Database Verdicts.
-3. If the verdicts conflict, determine which provides stronger, more reliable justification.
-4. Use your own reasoning to synthesize the available evidence and make a final, well-supported decision.
-
-Possible results:
-
-- NOT_GREENWASHING: If the statement is clearly supported by the evidence, or one source confirms it while the other is neutral or lacks information.
-- GREENWASHING: If the statement is clearly contradicted by the evidence, or one source strongly refutes it while the other is inconclusive.
-
-Respond in the following format:
-
-Statement: '[User Input]'  
-Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
-Justification: [Concise explanation based on the provided evidence and your own reasoning]
 """
 
 REDDIT_PROMPT = """

@@ -1,0 +1,480 @@
+/mnt/qnap/geokaoukis/greenwashing/ai4greenwashing/reportparse/main.py:5: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+  from distutils.util import strtobool
+[32m[0404 12:33.43 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: sentence-transformers/all-mpnet-base-v2[0m
+[32m[0404 12:33.44 @SentenceTransformer.py:105][0m  [32mINF[0m  [37mUse pytorch device: cuda[0m
+[32m[0404 12:33.44 @core.py:207][0m  [32mINF[0m  [37mChecking for updates to resources.json in case models have been updated.  Note: this behavior can be turned off with download_method=None or download_method=DownloadMethod.REUSE_RESOURCES[0m
+Downloading https://raw.githubusercontent.com/stanfordnlp/stanza-resources/main/resources_1.10.0.json:   0%|          | 0.00/52.6k [00:00<?, ?B/s]Downloading https://raw.githubusercontent.com/stanfordnlp/stanza-resources/main/resources_1.10.0.json: 424kB [00:00, 13.4MB/s]                    
+[32m[0404 12:33.44 @common.py:161][0m  [32mINF[0m  [37mDownloaded file to /mnt/qnap/geokaoukis/stanza_resources/resources.json[0m
+[32m[0404 12:33.45 @core.py:271][0m  [32mINF[0m  [37mLoading these models for language: en (English):
+============================================
+| Processor    | Package                   |
+--------------------------------------------
+| tokenize     | combined                  |
+| mwt          | combined                  |
+| pos          | combined_charlm           |
+| lemma        | combined_nocharlm         |
+| constituency | ptb3-revised_charlm       |
+| depparse     | combined_charlm           |
+| sentiment    | sstplus_charlm            |
+| ner          | ontonotes-ww-multi_charlm |
+============================================
+[0m
+[32m[0404 12:33.45 @core.py:290][0m  [32mINF[0m  [37mUsing device: cuda[0m
+[32m[0404 12:33.45 @core.py:296][0m  [32mINF[0m  [37mLoading: tokenize[0m
+/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  return self.fget.__get__(instance, owner)()
+[32m[0404 12:33.45 @core.py:296][0m  [32mINF[0m  [37mLoading: mwt[0m
+[32m[0404 12:33.45 @core.py:296][0m  [32mINF[0m  [37mLoading: pos[0m
+[32m[0404 12:33.47 @core.py:296][0m  [32mINF[0m  [37mLoading: lemma[0m
+[32m[0404 12:33.47 @core.py:296][0m  [32mINF[0m  [37mLoading: constituency[0m
+[32m[0404 12:33.47 @core.py:296][0m  [32mINF[0m  [37mLoading: depparse[0m
+[32m[0404 12:33.48 @core.py:296][0m  [32mINF[0m  [37mLoading: sentiment[0m
+[32m[0404 12:33.48 @core.py:296][0m  [32mINF[0m  [37mLoading: ner[0m
+[32m[0404 12:33.50 @core.py:348][0m  [32mINF[0m  [37mDone loading processors![0m
+[32m[0404 12:33.51 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.51 @SentenceTransformer.py:105][0m  [32mINF[0m  [37mUse pytorch device: cuda[0m
+[32m[0404 12:33.51 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.51 @SentenceTransformer.py:105][0m  [32mINF[0m  [37mUse pytorch device: cuda[0m
+[32m[0404 12:33.55 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.55 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.55 @SentenceTransformer.py:105][0m  [32mINF[0m  [37mUse pytorch device: cuda[0m
+[32m[0404 12:33.58 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.58 @main.py:19][0m  [32mINF[0m  [37mArguments: Namespace(input='reportparse/asset/small/Apple_Environmental_Progress_Report_2023-8-16.pdf', output_dir='results/tmux_llm_agg/Apple_Environmental_Progress_Report_2023-8-16', input_type='pdf', reader='pymupdf', annotators=['llm_agg'], max_pages=None, skip_pages=[], skip_load_image=False, overwrite_strategy='all', output_csv_dataset=True, esg_bert_max_len=256, esg_bert_batch_size=8, esg_bert_level='sentence', esg_bert_target_layouts=['text', 'list'], climate_commitment_max_len=256, climate_commitment_batch_size=8, climate_commitment_level='block', climate_commitment_target_layouts=['text', 'list'], climate_commitment_use_deprecated=False, reddit_annotator_name='reddit', reddit_text_level='page', reddit_target_layouts=['text', 'list', 'cell'], use_reddit=False, reddit_pages_to_gw=1, reddit_start_page=0, netzero_reduction_level='block', netzero_reduction_max_len=256, netzero_reduction_batch_size=8, netzero_reduction_target_layouts=['text', 'list'], netzero_reduction_use_deprecated=False, climate_sentiment_max_len=256, climate_sentiment_batch_size=8, climate_sentiment_level='block', climate_sentiment_target_layouts=['text', 'list'], climate_sentiment_use_deprecated=False, sst2_max_len=256, sst2_batch_size=8, sst2_level='sentence', sst2_target_layouts=['text', 'list'], web_rag_annotator_name='web_rag', web_rag_text_level='page', web_rag_target_layouts=['text', 'list', 'cell'], web_rag='yes', chroma_annotator_name='chroma', chroma_text_level='page', chroma_target_layouts=['text', 'list', 'cell'], use_chroma=False, use_chunks=False, solo_agg_text_level='page', solo_agg_target_layouts=['text', 'list', 'cell'], environmental_claim_max_len=256, environmental_claim_batch_size=8, environmental_claim_level='sentence', environmental_claim_target_layouts=['text', 'list'], climate_figure_max_len=256, climate_figure_batch_size=8, climate_figure_score_threshold=0.75, keyword_search_text='\x08green\x08', keyword_annotator_name='keyword', keyword_level='sentence', keyword_target_layouts=['text', 'list', 'cell'], standard_keyword_level='sentence', standard_keyword_target_layouts=['text', 'list', 'cell'], custom_huggingface_annotator_name=None, custom_huggingface_model_name_or_path=None, custom_huggingface_tokenizer_name_or_path=None, custom_huggingface_max_len=256, custom_huggingface_batch_size=8, custom_huggingface_level='block', custom_huggingface_target_layouts=['text', 'list'], transition_physical_renewable_max_len=128, transition_physical_renewable_batch_size=8, transition_physical_renewable_level='block', transition_physical_renewable_target_layouts=['text', 'list'], transition_physical_renewable_use_deprecated=False, llm_agg_text_level='page', llm_agg_target_layouts=['text', 'list', 'cell'], pages_to_gw=None, start_page=0, chromadb_annotator_name='chromadb', chromadb_text_level='page', chromadb_target_layouts=['text', 'list', 'cell'], climate_table_max_len=256, climate_table_batch_size=8, climate_table_score_threshold=0.75, climate_max_len=256, climate_batch_size=8, climate_level='block', climate_target_layouts=['text', 'list'], climate_specificity_max_len=256, climate_specificity_batch_size=8, climate_specificity_level='block', climate_specificity_target_layouts=['text', 'list'], climate_specificity_use_deprecated=False)[0m
+[32m[0404 12:33.58 @main.py:54][0m  [32mINF[0m  [37mWe will analyze the following pdf file(s): ['reportparse/asset/small/Apple_Environmental_Progress_Report_2023-8-16.pdf'][0m
+[32m[0404 12:33.58 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:33.58 @SentenceTransformer.py:105][0m  [32mINF[0m  [37mUse pytorch device: cuda[0m
+[32m[0404 12:34.01 @SentenceTransformer.py:66][0m  [32mINF[0m  [37mLoad pretrained SentenceTransformer: all-MiniLM-L6-v2[0m
+[32m[0404 12:34.02 @main.py:70][0m  [32mINF[0m  [37m###### Processing "reportparse/asset/small/Apple_Environmental_Progress_Report_2023-8-16.pdf". ######[0m
+[32m[0404 12:34.02 @main.py:116][0m  [32mINF[0m  [37mApply the reader "<reportparse.reader.pymupdf_reader.PyMuPDFReader object at 0x76301ebe9210>"[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 0[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 0[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 1[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 1[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 2[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 2[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 3[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 3[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 4[0m
+[32m[0404 12:34.02 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 4[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 5[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 5[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 6[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 6[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 7[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 7[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.03 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.04 @pymupdf_reader.py:163][0m  [32mINF[0m  [37mRead page 8[0m
+[32m[0404 12:34.04 @pymupdf_reader.py:37][0m  [32mINF[0m  [37m	Load images from the page 8[0m
+[32m[0404 12:34.04 @pymupdf_reader.py:186][0m  [32mINF[0m  [37m	Read blocks[0m
+[32m[0404 12:34.04 @pymupdf_reader.py:109][0m  [32mINF[0m  [37m	Apply the sentence tokenization by SpaCy[0m
+[32m[0404 12:34.04 @main.py:121][0m  [32mINF[0m  [37mApply the annotator "<reportparse.annotator.llm_aggregator.LLMAggregator object at 0x76301ebe8c40>".[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_7_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_7_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_0_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_0_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_3_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_3_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_4_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_5_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_6_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_7_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_7_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_0_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_0_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_1_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: fy2023-walmart-esg-highlights-3-10.pdf_page_2_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_0_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_0_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:325][0m  [5m[35mWRN[0m  [37mDelete of nonexisting embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_6_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_7_chunk_3[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_8_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_0_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_0_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_full[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_0[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_1[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_2[0m
+[32m[0404 12:34.04 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_1_chunk_3[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_full[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_0[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_1[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_2_chunk_2[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_full[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_0[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_1[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_3_chunk_2[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_full[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_chunk_0[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_4_chunk_1[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_full[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_0[0m
+[32m[0404 12:34.10 @local_persistent_hnsw.py:339][0m  [5m[35mWRN[0m  [37mAdd of existing embedding ID: Apple_Environmental_Progress_Report_2023-8-16.pdf_page_5_chunk_1[0m
+[32m[0404 12:34.20 @_client.py:1025][0m  [32mINF[0m  [37mHTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"[0m
+[32m[0404 12:34.55 @llm_aggregator.py:202][0m  [32mINF[0m  [37mChroma starting[0m
+[32m[0404 12:34.55 @chroma_annotator.py:65][0m  [32mINF[0m  [37mRetrieving context from ChromaDB[0m
+[32m[0404 12:34.55 @chroma_annotator.py:117][0m  [32mINF[0m  [37mCalling LLM to verify claim with context[0m
+[32m[0404 12:34.56 @_client.py:1025][0m  [32mINF[0m  [37mHTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"[0m
+/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/transformers/pipelines/text_classification.py:104: UserWarning: `return_all_scores` is now deprecated,  if want a similar funcionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
+  warnings.warn(
+Starting storing in Chroma
+Stored page 0
+Stored page 1
+Stored page 2
+Stored page 3
+Stored page 4
+Stored page 5
+Stored page 6
+Stored page 7
+Stored page 8
+Successfully stored all pages in chroma
+Checking the first 9 pages for greenwashing
+Processing page 0 of Apple_Environmental_Progress_Report_2023-8-16.pdf (annotations missing).
+distance:  0.23292434215545654
+Retrieved pages:  [1]
+AI message:  <think>
+
+Okay, let's tackle this. The user wants to know if Apple's statement about achieving carbon neutrality since April 2020 is greenwashing. First, I need to break down the statement. The key claims here are threefold: they achieved carbon neutrality by April 2020 through energy efficiency, 100% renewable electricity for their facilities, and carbon offsets for remaining emissions.
+
+Looking at the provided page text, the same statement is highlighted under "Achieved" goals. The page also mentions that over 45% emissions reduction since 2015 across the value chain, and the 2030 goals for product carbon neutrality and clean electricity. The context from page 1 says Apple achieved carbon neutrality for corporate emissions in 2020 and mentions their roadmap. 
+
+The context also states that they transitioned to 100% renewable electricity in 2018, which supports the part about renewable electricity. The statement includes carbon offsets for remaining emissions, which is a common practice. Since the report itself confirms the 2020 carbon neutrality for corporate operations and the measures taken align with their stated goals and progress, there's no contradiction here. The claims in the statement are directly supported by the report's own data. So, it's not greenwashing because the evidence backs up the claims.
+</think>
+
+Statement: Achieved carbon neutrality since April 2020 by implementing energy efficiency initiatives, sourcing 100 percent renewable electricity for Apple facilities, and securing carbon offsets for the remaining corporate emissions.  
+Result of the statement: NOT_GREENWASHING  
+Justification: The statement aligns with the provided report context. The report confirms Apple achieved carbon neutrality for its corporate emissions in 2020 (as stated in the "Goals and progress" section) and explicitly mentions transitioning to 100% renewable electricity for facilities by 2018. The use of carbon offsets for residual emissions is consistent with the described strategy for achieving neutrality. The report also highlights a 45% emissions reduction since 2015 and outlines ongoing efforts toward broader 2030 goals, which support the credibility of the 2020 claim rather than undermining it. No contradictory evidence is present in the provided data.
+Second llm result:  Statement: Achieved carbon neutrality since April 2020 by implementing energy efficiency initiatives, sourcing 100 percent renewable electricity for Apple facilities, and securing carbon offsets for the remaining corporate emissions.  
+Result of the statement: NOT_GREENWASHING  
+Justification: The statement aligns with the provided report context. The report confirms Apple achieved carbon neutrality for its corporate emissions in 2020 (as stated in the "Goals and progress" section) and explicitly mentions transitioning to 100% renewable electricity for facilities by 2018. The use of carbon offsets for residual emissions is consistent with the described strategy for achieving neutrality. The report also highlights a 45% emissions reduction since 2015 and outlines ongoing efforts toward broader 2030 goals, which support the credibility of the 2020 claim rather than undermining it. No contradictory evidence is present in the provided data.
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 67.14it/s]
+[32m[0404 12:35.13 @llm_aggregator.py:254][0m  [32mINF[0m  [37mReddit starting[0m
+[32m[0404 12:35.13 @reddit_annotator.py:59][0m  [32mINF[0m  [37mRetrieving context from RedditDB[0m
+[32m[0404 12:35.13 @reddit_annotator.py:99][0m  [4m[5m[31mERR[0m  [37mError retrieving context from RedditDB: 'list' object has no attribute 'lower'[0m
+[32m[0404 12:35.13 @llm_aggregator.py:304][0m  [32mINF[0m  [37mWeb rag starting[0m
+[32m[0404 12:35.13 @lib.rs:450][0m  [32mINF[0m  [37mresponse: https://duckduckgo.com/?q=%5B%27Apple%27%5D+renewable+electricity+apple+achieved+carbon+neutrality+carbon+neutrality+april+carbon+neutrality+electricity+apple+facilities+2020+implementing+energy+energy+efficiency+initiatives+electricity+apple+apple+facilities+neutrality+april+2020 200[0m
+[32m[0404 12:35.15 @lib.rs:450][0m  [32mINF[0m  [37mresponse: https://links.duckduckgo.com/d.js?q=%5B%27Apple%27%5D+renewable+electricity+apple+achieved+carbon+neutrality+carbon+neutrality+april+carbon+neutrality+electricity+apple+facilities+2020+implementing+energy+energy+efficiency+initiatives+electricity+apple+apple+facilities+neutrality+april+2020&kl=wt-wt&l=wt-wt&p=&s=0&df=&vqd=4-27800112925301742270236421285302798964&bing_market=wt-WT&ex=-2 200[0m
+distance:  0.2888649106025696
+Retrieved sources:  []
+Second llm result:  No content in RedditDB
+SEARCHING FOR CLAIM Achieved carbon neutrality since April 2020 by implementing energy efficiency initiatives, sourcing 100 percent renewable electricity for Apple facilities, and securing carbon offsets for the remaining corporate emissions.
+SEARCH QUERY: ['Apple'] renewable electricity apple achieved carbon neutrality carbon neutrality april carbon neutrality electricity apple facilities 2020 implementing energy energy efficiency initiatives electricity apple apple facilities neutrality april 2020
+Harvesting url: https://www.apple.com/newsroom/2023/04/apple-and-global-suppliers-expand-renewable-energy-to-13-point-7-gigawatts/
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 161.44it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 85.55it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.05it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 212.90it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.04it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.92it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.46it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.25it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 214.26it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 170.85it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.10it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 174.89it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.59it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.68it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.35it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.99it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 174.28it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.45it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.56it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.69it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.31it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.85it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 177.08it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 177.97it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 178.73it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 174.28it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.05it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.80it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.15it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.04it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.47it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.37it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.14it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.52it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 184.99it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 173.23it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.14it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.79it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.93it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.50it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.60it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.02it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.78it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.96it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.04it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.28it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.82it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 188.61it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.30it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.45it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.09it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.42it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.42it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.63it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.17it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.78it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 184.97it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.28it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.46it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.74it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.95it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.34it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.12it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.18it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.85it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.52it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.35it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.69it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.16it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.76it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.56it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.36it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.00it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.77it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.92it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.33it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.62it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.34it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.86it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.99it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.19it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.99it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.01it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.99it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 184.03it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.14it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.64it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.47it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.61it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.03it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.44it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.36it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.15it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.11it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 191.01it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.36it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.34it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.54it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.81it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.03it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.84it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.78it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.47it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 214.06it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.97it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.93it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.57it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 193.46it/s]
+Batches:   0%|          | 0/4 [00:00<?, ?it/s]Batches: 100%|██████████| 4/4 [00:00<00:00, 64.04it/s]
+[32m[0404 12:35.20 @web_rag.py:138][0m  [32mINF[0m  [37mInvoking with the first LLM...[0m
+[32m[0404 12:35.20 @web_rag.py:144][0m  [5m[35mWRN[0m  [37mFirst LLM failed: 'WEB_RAG_Annotator' object has no attribute 'llm'[0m
+[32m[0404 12:35.20 @web_rag.py:147][0m  [32mINF[0m  [37mInvoking with the second LLM...[0m
+[32m[0404 12:35.20 @web_rag.py:153][0m  [4m[5m[31mERR[0m  [37mSecond LLM failed: 'WEB_RAG_Annotator' object has no attribute 'llm_2'[0m
+[32m[0404 12:35.20 @llm_aggregator.py:351][0m  [32mINF[0m  [37mCTI starting[0m
+[32m[0404 12:35.24 @llm_aggregator.py:368][0m  [32mINF[0m  [37mAggregator starting[0m
+[32m[0404 12:35.24 @llm_aggregator.py:59][0m  [32mINF[0m  [37mCalling LLM aggregator to verify claim with context[0m
+[32m[0404 12:35.24 @_client.py:1025][0m  [32mINF[0m  [37mHTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"[0m
+/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/transformers/pipelines/text_classification.py:104: UserWarning: `return_all_scores` is now deprecated,  if want a similar funcionality use `top_k=None` instead of `return_all_scores=True` or `top_k=1` instead of `return_all_scores=False`.
+  warnings.warn(
+AI message:  <think>
+
+Okay, let's tackle this evaluation step by step. The user wants to know if Apple's claim about achieving carbon neutrality since April 2020 is greenwashing or not. The database verdict says it's NOT_GREENWASHING, and the web verdict failed, so we can't use that.
+
+First, I need to break down the statement. The key points are: carbon neutrality since April 2020, energy efficiency initiatives, 100% renewable electricity for facilities, and carbon offsets for remaining emissions.
+
+Looking at the database verdict, it references a report that confirms Apple's carbon neutrality for corporate emissions in 2020. The report mentions they had already switched to 100% renewable electricity by 2018, which is before the claimed date. That part checks out. They also use carbon offsets for residual emissions, which the report supports as part of their strategy. Plus, the report notes a 45% emissions drop since 2015 and their 2030 goals, which adds credibility. The database doesn't find any contradictions.
+
+Since the web verdict failed, I can't consider it. The instructions say to ignore the absence, so I focus on the database. The database's justification seems solid because it directly references the company's own reports. Apple is known for making such claims, and their renewable energy efforts are well-documented. Carbon offsets can be a point of contention, but the database says the report supports their use here. Without conflicting info from the web, and the database backing the claim, it's hard to call this greenwashing. The company's actions align with the statement, so it's likely legitimate.
+</think>
+
+Statement: Achieved carbon neutrality since April 2020 by implementing energy efficiency initiatives, sourcing 100 percent renewable electricity for Apple facilities, and securing carbon offsets for the remaining corporate emissions.  
+Result of the statement: NOT_GREENWASHING  
+Justification: The Database Verdict confirms the claim aligns with Apple's reported achievements, including carbon neutrality for corporate emissions since 2020, 100% renewable electricity for facilities since 2018, and the use of offsets for residual emissions. The report cited in the database also highlights consistent progress toward broader sustainability goals, reinforcing the credibility of the claim. The Web Verdict is unavailable, but the database evidence provides sufficient support without contradictions. The statement reflects documented actions rather than unsubstantiated claims, ruling out greenwashing.
+Aggregator result:  Statement: Achieved carbon neutrality since April 2020 by implementing energy efficiency initiatives, sourcing 100 percent renewable electricity for Apple facilities, and securing carbon offsets for the remaining corporate emissions.  
+Result of the statement: NOT_GREENWASHING  
+Justification: The Database Verdict confirms the claim aligns with Apple's reported achievements, including carbon neutrality for corporate emissions since 2020, 100% renewable electricity for facilities since 2018, and the use of offsets for residual emissions. The report cited in the database also highlights consistent progress toward broader sustainability goals, reinforcing the credibility of the claim. The Web Verdict is unavailable, but the database evidence provides sufficient support without contradictions. The statement reflects documented actions rather than unsubstantiated claims, ruling out greenwashing.
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 223.04it/s]
+[32m[0404 12:35.43 @llm_aggregator.py:415][0m  [32mINF[0m  [37mAggregator 2 starting[0m
+[32m[0404 12:35.43 @llm_aggregator.py:90][0m  [32mINF[0m  [37mCalling LLM to verify claim with context[0m
+[32m[0404 12:35.43 @_client.py:1025][0m  [32mINF[0m  [37mHTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"[0m
+[32m[0404 12:35.48 @main.py:146][0m  [4m[5m[31mERR[0m  [37mFailed to analyze reportparse/asset/small/Apple_Environmental_Progress_Report_2023-8-16.pdf (see the error message below).[0m
+[32m[0404 12:35.48 @main.py:147][0m  [4m[5m[31mERR[0m  [37mTraceback (most recent call last):
+  File "/mnt/qnap/geokaoukis/greenwashing/ai4greenwashing/reportparse/main.py", line 122, in main
+    document = annotator.annotate(document=document, args=args)
+  File "/mnt/qnap/geokaoukis/greenwashing/ai4greenwashing/reportparse/annotator/llm_aggregator.py", line 416, in annotate
+    aggregator_result = self.call_aggregator_2(c, chroma_result, web_rag_result)
+  File "/mnt/qnap/geokaoukis/greenwashing/ai4greenwashing/reportparse/annotator/llm_aggregator.py", line 92, in call_aggregator_2
+    ai_msg = self.llm.invoke(messages)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 307, in invoke
+    self.generate_prompt(
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 843, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 683, in generate
+    self._generate_with_cache(
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 908, in _generate_with_cache
+    result = self._generate(
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_ollama/chat_models.py", line 705, in _generate
+    final_chunk = self._chat_stream_with_aggregation(
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_ollama/chat_models.py", line 642, in _chat_stream_with_aggregation
+    for chunk in self._iterate_over_stream(messages, stop, **kwargs):
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_ollama/chat_models.py", line 727, in _iterate_over_stream
+    for stream_resp in self._create_chat_stream(messages, stop, **kwargs):
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/langchain_ollama/chat_models.py", line 629, in _create_chat_stream
+    yield from self._client.chat(**chat_params)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/ollama/_client.py", line 170, in inner
+    for line in r.iter_lines():
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_models.py", line 929, in iter_lines
+    for text in self.iter_text():
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_models.py", line 916, in iter_text
+    for byte_content in self.iter_bytes():
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_models.py", line 897, in iter_bytes
+    for raw_bytes in self.iter_raw():
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_models.py", line 951, in iter_raw
+    for raw_stream_bytes in self.stream:
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_client.py", line 153, in __iter__
+    for chunk in self._stream:
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpx/_transports/default.py", line 127, in __iter__
+    for part in self._httpcore_stream:
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 407, in __iter__
+    raise exc from None
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/connection_pool.py", line 403, in __iter__
+    for part in self._stream:
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 342, in __iter__
+    raise exc
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 334, in __iter__
+    for chunk in self._connection._receive_response_body(**kwargs):
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 203, in _receive_response_body
+    event = self._receive_event(timeout=timeout)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+KeyboardInterrupt
+[0m
+Running: python -m reportparse.main --input_type pdf --overwrite_strategy all --reader pymupdf --annotators llm_agg -i reportparse/asset/small/Apple_Environmental_Progress_Report_2023-8-16.pdf -o results/tmux_llm_agg/Apple_Environmental_Progress_Report_2023-8-16
+Traceback (most recent call last):
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1959, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1917, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/qnap/geokaoukis/greenwashing/ai4greenwashing/automate.py", line 28, in <module>
+    subprocess.run(cmd, check=True)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 505, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1146, in communicate
+    self.wait()
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1222, in wait
+    self._wait(timeout=sigint_timeout)
+  File "/mnt/qnap/geokaoukis/miniforge3/envs/ai/lib/python3.10/subprocess.py", line 1953, in _wait
+    time.sleep(delay)
+KeyboardInterrupt
