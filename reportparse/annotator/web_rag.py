@@ -14,6 +14,7 @@ from langchain_ollama import ChatOllama
 from duckduckgo_search import DDGS
 import logging
 from keybert import KeyBERT
+import itertools
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.web_rag_prompt = WEB_RAG_PROMPT
         self.kw_model = KeyBERT()
+<<<<<<< HEAD
 
         self.llm = ChatGoogleGenerativeAI(
             model=os.getenv("GEMINI_MODEL"),
@@ -67,6 +69,12 @@ class WEB_RAG_Annotator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+=======
+        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+>>>>>>> 30dbab8 (changes)
+
+    def call_llm(self, text):
 
         messages = [
             (
