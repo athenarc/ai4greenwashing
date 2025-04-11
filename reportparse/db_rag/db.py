@@ -1,11 +1,18 @@
 import chromadb
 import subprocess
+import re
 
+repo_root = subprocess.run(
+    ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True
+).stdout.strip()
 
-repo_root = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
 
 class ChromaDBHandler:
-    def __init__(self, db_path=repo_root + "/reportparse/database_data/chroma_db"):
+    def __init__(self, db_path=None, extra_path=""):
+        if db_path is None:
+            db_path = repo_root + "/reportparse/database_data/chroma_db"
+        if extra_path:
+            db_path = db_path.rsplit("/", 1)[0] + f"/{extra_path}"
         self.client = chromadb.PersistentClient(path=db_path)
 
         self.collection = self.client.get_or_create_collection(
@@ -17,8 +24,15 @@ class ChromaDBHandler:
         #     name="chunked_pages",
         #     metadata={"hnsw:space": "cosine"},  # Ensure cosine similarity
         # )
-        
-    def chunk_text(self, text, min_chunk_size=200, max_chunk_size=500, num_chunks=3, overlap_ratio=0.25):
+
+    def chunk_text(
+        self,
+        text,
+        min_chunk_size=200,
+        max_chunk_size=500,
+        num_chunks=3,
+        overlap_ratio=0.25,
+    ):
         """
         Dynamically chunks text:
         - If text is short, keep it as a single chunk.
@@ -30,7 +44,9 @@ class ChromaDBHandler:
         if total_length < min_chunk_size:
             return [text]  # Keep as a single chunk
 
-        chunk_size = max(min_chunk_size, min(max_chunk_size, total_length // num_chunks))
+        chunk_size = max(
+            min_chunk_size, min(max_chunk_size, total_length // num_chunks)
+        )
         overlap = int(chunk_size * overlap_ratio)
 
         chunks = []
@@ -54,7 +70,8 @@ class ChromaDBHandler:
             page_meta = {
                 "doc_name": doc_name,
                 "page_number": page_number,
-                "type": "page"
+                "type": "page",
+                "year": re.sub(r"\.\w+$", "", doc_name.split("_")[-1]),
             }
 
             # Remove existing full page
@@ -64,7 +81,7 @@ class ChromaDBHandler:
                 documents=[text],
                 metadatas=[page_meta],
             )
-            
+
             # Prepare chunked entries
             chunks = self.chunk_text(text)
             chunk_ids = [f"{base_id}_chunk_{i}" for i in range(len(chunks))]
@@ -73,7 +90,8 @@ class ChromaDBHandler:
                     "doc_name": doc_name,
                     "page_number": page_number,
                     "chunk_number": i,
-                    "type": "chunk"
+                    "year": re.sub(r"\.\w+$", "", doc_name.split("_")[-1]),
+                    "type": "chunk",
                 }
                 for i in range(len(chunks))
             ]

@@ -24,6 +24,7 @@ class ChromaAnnotator(BaseAnnotator):
     def __init__(self):
         load_dotenv()
         self.chroma_db = ChromaDBHandler()
+        self.chroma_esg_db = ChromaDBHandler(extra_path="chroma_esg")
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.chroma_prompt = CHROMA_PROMPT
         if os.getenv("USE_GROQ_API") == "True":
