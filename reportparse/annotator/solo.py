@@ -36,7 +36,6 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt = SOLO_AGGREGATOR_PROMPT
         self.eval = llm_evaluation()
-<<<<<<< HEAD
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm_2 = ChatGoogleGenerativeAI(
@@ -59,10 +58,6 @@ class LLMAggregator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-=======
-        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=16000, top_k=40, top_p=0.95)
-        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
->>>>>>> 30dbab8 (changes)
         return
 
     def call_aggregator(self, claim, context_dict):
@@ -328,7 +323,7 @@ class LLMAggregator(BaseAnnotator):
                                 "chroma_context": chroma_context,
                                 "retreived_pages": retrieved_pages,
                                 "reddit_context": reddit_context,
-                                "retrieved_reddit_posts": retrieved_reddit_posts,
+                                "retreived_reddit_posts": retrieved_reddit_posts,
                                 "web_context": web_context,
                                 "url_list": url_list,
                                 "label": self.web.extract_label(aggregator_result),

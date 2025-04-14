@@ -29,7 +29,6 @@ class ChromaAnnotator(BaseAnnotator):
         self.chroma_prompt = CHROMA_PROMPT
         if os.getenv("USE_GROQ_API") == "True":
 
-<<<<<<< HEAD
             self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
@@ -50,10 +49,6 @@ class ChromaAnnotator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-=======
-        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=16000, top_k=40, top_p=0.95)
-        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
->>>>>>> 30dbab8 (changes)
         return
 
     def call_llm(self, text):

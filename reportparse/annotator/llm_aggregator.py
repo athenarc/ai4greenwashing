@@ -36,7 +36,6 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
         self.eval = llm_evaluation()
-<<<<<<< HEAD
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm_2 = ChatGoogleGenerativeAI(
@@ -59,10 +58,6 @@ class LLMAggregator(BaseAnnotator):
         else:
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-=======
-        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=16000, top_k=40, top_p=0.95)
-        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
->>>>>>> 30dbab8 (changes)
         return
 
     def call_aggregator(self, claim, context_dict):
@@ -72,7 +67,10 @@ class LLMAggregator(BaseAnnotator):
             context_str += f"{label}: {content}\n"
 
         messages = [
-            ("system", self.agg_prompt),
+            (
+                "system",
+                self.agg_prompt,
+            ),
             ("human", context_str),
         ]
         try:
@@ -84,6 +82,38 @@ class LLMAggregator(BaseAnnotator):
             except Exception as e:
                 print(f"Invocation error: {e}. Invoking with the second llm....")
                 ai_msg = self.llm_2.invoke(messages)
+                msg = remove_think_blocks(ai_msg.content)
+                return msg
+        except Exception as e:
+            logger.error(f"Error calling LLM: {e}")
+            return "Error: Could not generate a response."
+
+
+    def call_aggregator_2(self, claim, chroma_result, web_rag_result):
+        messages = [
+            (
+                "system",
+                self.agg_prompt,
+            ),
+            (
+                "human",
+                f"""Statement: {claim}  
+                Web Verdict: {web_rag_result}  
+                Database Verdict: {chroma_result}  
+                """,
+            ),
+        ]
+        try:
+            logger.info("Calling LLM to verify claim with context")
+            try:
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                msg = remove_think_blocks(ai_msg.content)
+                return msg
+            except Exception as e:
+                print(f'Invokation error: {e}. Invoking with the second llm....')
+                ai_msg = self.llm_2.invoke(messages)
+                print("AI message: ", ai_msg.content)
                 msg = remove_think_blocks(ai_msg.content)
                 return msg
         except Exception as e:
@@ -123,7 +153,6 @@ class LLMAggregator(BaseAnnotator):
             args.web_rag_target_layouts if args is not None else list(target_layouts)
         )
         gw_pages = args.pages_to_gw if args.pages_to_gw  is not None else len(document.pages)
-        print(f"Annotating {gw_pages} pages")
         use_chunks = args.use_chunks if args.use_chunks is not None else False
         start_page = args.start_page if args.start_page is not None else 0
         if start_page > len(document.pages):
@@ -142,6 +171,7 @@ class LLMAggregator(BaseAnnotator):
                     meta=json.loads(metadata),
                 )
             )
+
         # add pages to chroma_db. The total number of stored pages is defined by the --max_pages parameter
         # todo: differenciate between storing pages and greenwashing pages
         print("Starting storing in Chroma")
@@ -196,6 +226,7 @@ class LLMAggregator(BaseAnnotator):
                     metadata=json.dumps({"info": "Simple greenwashing detection"}),
                 )
 
+                page_number = page.num
                 logger.info("First pass completed")
                 page_number = page.num
                 claims = re.findall(r"(?i)\b(?:another )?potential greenwashing claim:\s*(.*?)(?:\n|$)", result)
@@ -441,9 +472,9 @@ class LLMAggregator(BaseAnnotator):
                                 "claim": c,
                                 "permutation_order": permutation_order,
                                 "chroma_result": chroma_result,
-                                "retrieved_pages": retrieved_pages,
+                                "retreived_pages": retrieved_pages,
                                 "reddit_result": reddit_result,
-                                "retrieved_reddit_posts": retrieved_posts,
+                                "retreived_reddit_posts": retrieved_posts,
                                 "web_rag_result": web_rag_result,
                                 "url_list": url_list,
                                 "label": self.web.extract_label(aggregator_result),
@@ -462,7 +493,6 @@ class LLMAggregator(BaseAnnotator):
                 gw_index += 1
             else:
                 return "Page extraction failed"
-        return document
 
     def add_argument(self, parser: argparse.ArgumentParser):
 
