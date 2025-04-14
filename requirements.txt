@@ -181,3 +181,4 @@ stanza
 pymongo[srv]
 rank_bm25
 textstat
+keybert

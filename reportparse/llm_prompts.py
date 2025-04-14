@@ -1,155 +1,196 @@
-FIRST_PASS_PROMPT='''You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
-         Your answer should follow the following format: 
+FIRST_PASS_PROMPT = """
+You are a professional fact-checker specializing in detecting potential greenwashing in corporate ESG disclosures. Analyze the following text and identify any statements that could reasonably be considered greenwashing claims.
+
+Your response must strictly follow this format:
         
-         Company Name: [the name of the company that the esg report belongs to]
-         Potential greenwashing claim: [the claim]
-         Justification: [short justification]
+Company Name: [The name of the company that the ESG report belongs to]
 
-         Another potential greenwashing claim: [another claim]
-         Justification: [another justification]
-         
-         If no greenwashing claims are found, return this message:
-         "No greenwashing claims found"
+Potential greenwashing claim: [The claim from the text]
+Justification: [Briefly explain why the claim might be considered greenwashing, based on vagueness, lack of evidence, contradiction with known facts, or overstatement]
 
-         DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
-         '''
-WEB_RAG_PROMPT='''You have at your disposal information '[Information]' and a statement: '[User Input]' whose accuracy must be evaluated. 
-                            Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
+Another potential greenwashing claim: [Another suspicious statement]
+Justification: [Short justification]
 
-                            Before you decide:
+[Repeat as needed for each additional potential greenwashing claim found]
 
-                            1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
-                            2. Compare the statement with the information you have, evaluating each element of the statement separately.
-                            3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
+If no such claims are found, return only this line:
+"No greenwashing claims found"
 
-                            Result: Provide a clear answer by choosing one of the following labels:
+Do not include any commentary, explanations, or text outside of the format above.
+"""
 
-                            - NOT_GREENWASHING: If the statement is confirmed by the information and evidence you have.
-                            - GREENWASHING: If the statement is clearly disproved by the information and evidence you have.
+WEB_RAG_PROMPT = """
+You are tasked with evaluating whether the following statement constitutes greenwashing. You have access to supporting evidence under [Information] and the statement under [User Input].
+Use only the provided information, combined with your general knowledge, to make your judgment.
 
-                            Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+Before making a decision:
 
-                            Statement: '[User Input]'
-                            Result of the statement:
-                            Justification:'''
-CHROMA_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from the rest of the report, whose accuracy must be evaluated. 
-                If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
+1. Break down the statement to identify its key claims.
+2. Cross-check each part of the statement against the provided information.
+3. Use your own knowledge only in support of what is confirmed by the data. Do not speculate or use unverifiable facts.
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
+Label the statement using one of the following:
 
-                Before you decide:
+- GREENWASHING: if the statement is contradicted or undermined by the information provided.
+- NOT_GREENWASHING: if the statement is supported or aligned with the information provided.
 
-                1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
-                2. Compare the statement with the information from the rest of the report, evaluating each element of the statement separately.
-                3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
+Respond in this format:
 
-                Result: Provide a clear answer by choosing one of the following labels:
+Statement: '[User Input]'  
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Brief and precise reasoning based on the evidence and knowledge]
+"""
 
-                - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
-                - GREENWASHING: If the statement is clearly disproved by the information and evidence in the rest of the report.
+CHROMA_PROMPT = """
+You are evaluating whether the following statement constitutes greenwashing. You have access to:
 
-                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+- The statement: '[User Input]'  
+- The page it was extracted from: '[page_text]'  
+- Additional relevant context from the report: '[Context]'
 
-                Statement: '[User Input]'
-                            Result of the statement:
-                            Justification:'''
-LLM_AGGREGATOR_PROMPT='''You have at your disposal two independent verdicts regarding the accuracy of a given statement: '[User Input]'.  
+If some information is missing, proceed with the evaluation using only the available inputs and your general knowledge. Do not speculate or use unverifiable information.
 
-                - The first verdict (Database Verdict) is derived from an LLM that has access to a structured database containing the entire document from which the statement was extracted.  
-                - The second verdict (Web Verdict) is derived from an LLM that retrieves and analyzes information from the web to assess the claim. If no content was found from the web, the Web Verdict will contain 'No content was found from the web'. Proceed with the analysis using only the Database Verdict.
+Use the provided context and your grounded knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
-                Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
+Before deciding:
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.  
+1. Analyze the statement to identify its key claims.
+2. Cross-reference the statement with the provided page and broader report context.
+3. Apply your own knowledge only to support what is confirmed by the input data.
 
-                Before making your final decision:  
+Label your result as one of the following:
 
-                1. Analyze the given statement clearly to identify its key elements.  
-                2. Examine the reasoning in both the Database Verdict and the Web Verdict.  
-                3. Compare both verdicts and resolve any discrepancies by determining which source provides stronger, more reliable justification.  
-                4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
+- GREENWASHING: if the statement is contradicted or undermined by the evidence in the report.
+- NOT_GREENWASHING: if the statement is supported or consistent with the information provided.
 
-                Possible Results:  
-                - NOT_GREENWASHING If the sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
-                - GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.  
+Respond strictly in the following format:
 
-                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
-                
-                Statement: '[User Input]'  
-                Result of the statement:  
-                Justification:'''
+Statement: '[User Input]'  
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Concise explanation based on the evidence and contextual information]
+"""
 
-LLM_AGGREGATOR_PROMPT_2='''You have at your disposal two independent verdicts regarding the accuracy of a given statement: '[User Input]'.  
+LLM_AGGREGATOR_PROMPT = """
+You are tasked with evaluating the accuracy of the following statement: '[User Input]'
 
-                - The first verdict (Web Verdict) is derived from an LLM that retrieves and analyzes information from the web to assess the claim. If no content was found from the web, the Web Verdict will contain 'No content was found from the web'. Proceed with the analysis using only the Database Verdict.
-                - The second verdict (Database Verdict) is derived from an LLM that has access to a structured database containing the entire document from which the statement was extracted.  
+You have access to two independent verdicts:
 
-                Your task is to analyze both verdicts and reach a final conclusion regarding the statement's accuracy.  
+- **Database Verdict**: Based on an LLM analysis of a structured database containing the full source document.
+- **Web Verdict**: Based on an LLM analysis of external web search results. If no relevant content was found on the web, the Web Verdict will state: "No content was found from the web."
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.  
+Use only the provided verdicts and your own knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
-                Before making your final decision:  
+Important: If either the database or the web yields no relevant information, **ignore the absence** and proceed using the information that is available. Do not interpret a lack of evidence as support for or against the statement.
 
-                1. Analyze the given statement clearly to identify its key elements.  
-                2. Examine the reasoning in both the Database Verdict and the Web Verdict.  
-                3. Compare both verdicts and resolve any discrepancies by determining which source provides stronger, more reliable justification.  
-                4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
+Before reaching your conclusion:
 
-                Possible Results:  
-                - NOT_GREENWASHING If the sources fully confirm the statement, or if one provides strong confirmation while the other lacks contradictory evidence.  
-                - GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while the other is inconclusive.
+1. Break down the statement to identify its key claims.
+2. Examine the reasoning in both the Database and Web Verdicts.
+3. If they disagree, assess which provides stronger, clearer justification.
+4. Use your own reasoning to synthesize the evidence and arrive at a well-supported conclusion.
 
-                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
-                
-                Statement: '[User Input]'  
-                Result of the statement:  
-                Justification:'''
+Possible results:
 
-REDDIT_PROMPT='''You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from a database with reddit posts, from a greenwashing subreddit, whose accuracy must be evaluated. 
-                If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
+- NOT_GREENWASHING: If the verdicts support the statement, or one provides strong support while the other is neutral or inconclusive.
+- GREENWASHING: If the verdicts contradict the statement, or one provides strong refutation while the other is neutral or inconclusive.
 
-                Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
+Respond in the following format:
 
-                Before you decide:
+Statement: '[User Input]'  
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Concise explanation based on the verdicts and your reasoning]
+"""
 
-                1. Analyze the statement clearly to understand its content and identify the main points that need to be evaluated.
-                2. Compare the statement with the information from the rest of the report, evaluating each element of the statement separately.
-                3. Use your knowledge ONLY in combination with the provided information, avoiding reference to unverified information.
+LLM_AGGREGATOR_PROMPT_2 = """
+You are tasked with evaluating the accuracy of the following statement: '[User Input]'
 
-                Result: Provide a clear answer by choosing one of the following labels:
+You have access to two independent verdicts:
 
-                - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
-                - GREENWASHING: If the statement is clearly disproved by the information and evidence in the rest of the report.
+- **Web Verdict**: Based on an LLM analysis of external web sources. If no relevant information was found, it will say: "No content was found from the web." In that case, disregard the Web Verdict and base your judgment on the available Database Verdict.
+- **Database Verdict**: Based on an LLM analysis of a structured database containing the full source document from which the statement was extracted.
 
-                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+Use only the provided verdicts and your general knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
 
-                Statement: '[User Input]'
-                            Result of the statement:
-                            Justification:'''
+Important: If information is missing from the web or the database, **ignore the absence**. Do not treat missing evidence as either supporting or refuting the claim. Focus only on the information that is present.
 
-SOLO_AGGREGATOR_PROMPT = '''You have at your disposal three independent sources of context regarding the accuracy of the following statement: '[User Input]'.
+Before reaching a conclusion:
 
-- The [Document Context] is derived from a structured database containing the full document from which the statement was extracted.
-- The [Web Context] is retrieved and synthesized from online sources to provide broader, up-to-date information.
-- The [Reddit Context] is extracted from a Reddit database containing relevant user-generated discussions and opinions related to the statement.
+1. Break down the statement to identify its key elements.
+2. Review the reasoning in both the Web and Database Verdicts.
+3. If the verdicts conflict, determine which provides stronger, more reliable justification.
+4. Use your own reasoning to synthesize the available evidence and make a final, well-supported decision.
 
-Your task is to analyze all three contexts and reach a final conclusion regarding the statement’s accuracy.
+Possible results:
 
-Use only the provided information in combination with your knowledge to decide whether the statement is GREENWASHING or NOT_GREENWASHING.
+- NOT_GREENWASHING: If the statement is clearly supported by the evidence, or one source confirms it while the other is neutral or lacks information.
+- GREENWASHING: If the statement is clearly contradicted by the evidence, or one source strongly refutes it while the other is inconclusive.
+
+Respond in the following format:
+
+Statement: '[User Input]'  
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Concise explanation based on the provided evidence and your own reasoning]
+"""
+
+REDDIT_PROMPT = """
+You are tasked with evaluating the accuracy of the following statement: '[User Input]'
+
+You have access to:
+
+- The page the statement was extracted from: '[page_text]'
+- Additional context: '[Context]', retrieved from a database of Reddit posts sourced from a greenwashing-focused subreddit
+
+Use only the provided information and your grounded knowledge to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
+
+Important: If some information is missing from the context or the Reddit database, proceed using what is available. Do **not** treat missing information as support for or against the statement.
+
+Before making a decision:
+
+1. Break down the statement to identify its key claims.
+2. Cross-check the statement with the report content and Reddit-derived context.
+3. Use your own reasoning and general knowledge **only** to support conclusions that are grounded in the provided information. Do not speculate or rely on unverifiable claims.
+
+Label your conclusion using one of the following:
+
+- NOT_GREENWASHING : If the statement is supported or confirmed by the provided context.
+- GREENWASHING: If the statement is contradicted or undermined by the provided context.
+
+Respond strictly in the following format:
+
+Statement: '[User Input]'  
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Concise explanation based on the provided evidence and your reasoning]
+
+"""
+
+SOLO_AGGREGATOR_PROMPT = """
+You are tasked with evaluating the accuracy of the following statement: '[User Input]'
+
+You have access to three sources of supporting context:
+
+- **Document Context**: Extracted from a structured database containing the full ESG report from which the statement originated.  
+- **Web Context**: Retrieved and synthesized from online sources to provide broader, external information.  
+- **Reddit Context**: Sourced from user-generated discussions on Reddit, focused on greenwashing-related content.
+
+Use only the information provided—along with your general knowledge—to determine whether the statement is GREENWASHING or NOT_GREENWASHING.
+
+Important: If any context is missing or lacks relevant information, proceed using what is available. Do **not** treat the absence of evidence as either supporting or refuting the statement.
 
 Before making your final decision:
 
-1. Analyze the statement clearly to identify its key elements.
-2. Examine the relevance and strength of evidence in the Document, Web, and Reddit Contexts.
-3. Compare the contexts and resolve any discrepancies by determining which sources provide stronger, more reliable justification.
-4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.
+1. Break down the statement to identify its key claims.
+2. Assess the relevance and strength of evidence in the Document, Web, and Reddit Contexts.
+3. If sources conflict, determine which provides stronger, clearer justification.
+4. Use your reasoning to synthesize the evidence and draw a final, well-supported conclusion.
 
-Possible Results:  
-- NOT_GREENWASHING: If the sources fully confirm the statement, or if one or more provide strong confirmation and none provide credible contradictory evidence.  
-- GREENWASHING: If the sources clearly disprove the statement, or if one strongly refutes it while others are inconclusive or lacking.
+Possible results:
 
-Finally, explain your reasoning clearly. Focus on the provided data and your own critical evaluation. Avoid unnecessary details and aim for precision and clarity in your analysis. Use the following format:
+- NOT_GREENWASHING: If the statement is supported by one or more sources and none provide credible contradictory evidence.
+- GREENWASHING: If the statement is clearly contradicted by one or more sources, while others are inconclusive or lacking.
+
+Respond strictly in the following format:
 
 Statement: '[User Input]'  
-Result of the statement:  
-Justification:'''
+Result of the statement: [GREENWASHING or NOT_GREENWASHING]  
+Justification: [Concise explanation based on the provided evidence and your own reasoning]
+"""

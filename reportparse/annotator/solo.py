@@ -188,6 +188,7 @@ class LLMAggregator(BaseAnnotator):
             # If the page has no existing annotations or doesn't exist, process it
             print(f"Processing page {page_number} of {pdf_name} (annotations missing).")
 
+            company_name = None
             if level == "page":
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
                 # call the first llm from chroma, that finds all potential greenwashing claims
@@ -204,9 +205,10 @@ class LLMAggregator(BaseAnnotator):
                 logger.info("First pass completed")
                 page_number = page.num
                 claims = re.findall(r"(?i)(?:\b\w*\s*)*claim:\s*(.*?)(?:\n|$)", result)
-                company_name = re.findall(
-                    r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result
-                )
+                if company_name is None:
+                    company_name = re.findall(
+                            r"(?i)(?:\b\w*\s*)*Company Name:\s*(.*?)(?:\n|$)", result
+                        )
 
                 claims = [c.strip() for c in claims]
                 claim_index = 0
