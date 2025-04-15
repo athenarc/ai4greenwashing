@@ -38,7 +38,7 @@ class LLMAggregator(BaseAnnotator):
         self.eval = llm_evaluation()
         if os.getenv("USE_GROQ_API") == "True":
 
-            self.llm_2 = ChatGoogleGenerativeAI(
+            self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
                 max_tokens=None,
@@ -47,7 +47,7 @@ class LLMAggregator(BaseAnnotator):
                 google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
-            self.llm = ChatGroq(
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
