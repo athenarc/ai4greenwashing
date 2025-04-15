@@ -1,6 +1,6 @@
 import os
-from reportparse.web_rag.search import google_search
-from reportparse.web_rag.harvest import Harvester
+from reportparse.rags.web_rag.search import google_search
+from reportparse.rags.web_rag.harvest import Harvester
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

@@ -1,24 +1,24 @@
-from reportparse.annotator.base import BaseAnnotator
-from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
-from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.annotator.web_rag import WEB_RAG_Annotator
-from reportparse.annotator.chroma_annotator import ChromaAnnotator
-from reportparse.annotator.reddit_annotator import RedditAnnotator
-from reportparse.llm_prompts import SOLO_AGGREGATOR_PROMPT
-from reportparse.climate_cti import cti_classification
-from reportparse.llm_evaluation import llm_evaluation
 import argparse
-import re
-from pymongo import MongoClient
+import itertools
 import json
+import os
+import re
 from dotenv import load_dotenv
 from logging import getLogger
-from langchain_groq import ChatGroq
+from pymongo import MongoClient
 from langchain_ollama import ChatOllama
-from langchain_google_genai import ChatGoogleGenerativeAI
-import os
-from reportparse.remove_thinking import remove_think_blocks
-import itertools
+
+from reportparse.annotator.base import BaseAnnotator
+from reportparse.annotator.chroma_annotator import ChromaAnnotator
+from reportparse.annotator.reddit_annotator import RedditAnnotator
+from reportparse.annotator.web_rag import WEB_RAG_Annotator
+from reportparse.structure.document import Document, AnnotatableLevel, Annotation
+from reportparse.util.climate_cti import cti_classification
+from reportparse.util.label_extraction import extract_label, extract_justification
+from reportparse.util.llm_evaluation import llm_evaluation
+from reportparse.util.llm_prompts import SOLO_AGGREGATOR_PROMPT
+from reportparse.util.remove_thinking import remove_think_blocks
+from reportparse.util.settings import LAYOUT_NAMES
 
 logger = getLogger(__name__)
 
@@ -36,8 +36,8 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt = SOLO_AGGREGATOR_PROMPT
         self.eval = llm_evaluation()
-        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=16000, top_k=40, top_p=0.95)
-        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=32000, top_k=40, top_p=0.95, seed=42)
+        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=32000, top_k=40, top_p=0.95, seed=42)
         return
 
     def call_aggregator(self, claim, context_dict):
@@ -104,6 +104,10 @@ class LLMAggregator(BaseAnnotator):
         print(f"Annotating {gw_pages} pages")
         use_chunks = args.use_chunks if args.use_chunks is not None else False
         start_page = args.start_page if args.start_page is not None else 0
+        disable_chroma = args.disable_chroma if args.disable_chroma is not None else False
+        disable_reddit = args.disable_reddit if args.disable_reddit is not None else False
+        disable_web_rag = args.disable_web_rag if args.disable_web_rag is not None else False
+
         if start_page > len(document.pages):
             print("Start page is greater than the number of pages in the document")
             start_page = 0
@@ -123,18 +127,19 @@ class LLMAggregator(BaseAnnotator):
 
         # add pages to chroma_db. The total number of stored pages is defined by the --max_pages parameter
         # todo: differenciate between storing pages and greenwashing pages
-        print("Starting storing in Chroma")
-        for page in document.pages:
-            if level == "page":
-                page_number = page.num
-                text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                self.chroma.chroma_db.store_page(
-                    doc_name=document.name, page_number=page_number, text=text
-                )
-                print(f"Stored page {page_number}")
-            else:
-                print("Page level is not specified")
-        print("Successfully stored all pages in chroma")
+        if not disable_chroma:
+            print("Starting storing in Chroma")
+            for page in document.pages:
+                if level == "page":
+                    page_number = page.num
+                    text = page.get_text_by_target_layouts(target_layouts=target_layouts)
+                    self.chroma.chroma_db.store_page(
+                        doc_name=document.name, page_number=page_number, text=text
+                    )
+                    print(f"Stored page {page_number}")
+                else:
+                    print("Page level is not specified")
+            print("Successfully stored all pages in chroma")
 
         gw_index = 0
         print(f"Greenwashing detection: Starting at page {start_page} for {gw_pages} pages")
@@ -186,37 +191,63 @@ class LLMAggregator(BaseAnnotator):
                 claims = re.findall(r"(?i)\b(?:another )?potential greenwashing claim:\s*(.*?)(?:\n|$)", result)
                 logger.info(f"Claims extracted: {claims}")
 
-                company_match = re.search(r"(?i)\bcompany name:\s*(.*?)(?:\n|$)", result[:100])
-                company_name = company_match.group(1).strip() if company_match else "Unknown"
+                if company_name is None or company_name == "" or company_name == "Unknown":
+                    # Extract company name from the result
+                    company_match = re.search(r"(?i)\bcompany name:\s*(.*?)(?:\n|$)", result[:100])
+                    company_name = company_match.group(1).strip() if company_match else "Unknown"
+
                 logger.info(f"Company name extracted: {company_name}")
                 claims = [c.strip() for c in claims]
                 claim_index = 0
                 logger.info("Starting for loop")
                 for c in claims:
-                    logger.info("Chroma starting")
-                    chroma_context, retrieved_pages = self.chroma.retrieve_context(
-                        c,
-                        document.name,
-                        page_number,
-                        self.chroma.chroma_db,
-                        k=6,
-                        use_chunks=use_chunks,
-                    )
-
-                    logger.info("Reddit starting")
-                    reddit_context, retrieved_reddit_posts = (
-                        self.reddit.retrieve_context(
-                            claim=c,
-                            company_name=company_name,
-                            db=self.reddit.reddit_db,
+                    if not disable_chroma:
+                        logger.info("Chroma starting")
+                        chroma_context, retrieved_pages = self.chroma.retrieve_context(
+                            c,
+                            document.name,
+                            page_number,
+                            self.chroma.chroma_db,
                             k=6,
+                            use_chunks=use_chunks,
                         )
-                    )
+                        # if chroma_context is empty string
+                        if chroma_context == "":
+                            chroma_context = "No relevant content found in the rest of the document."
+                            retrieved_pages = None
+                    else:
+                        chroma_context = "Chroma context not used"
+                        retrieved_pages = None
 
-                    logger.info("Web rag starting")
-                    web_context, url_list, _ = self.web.search_ddg(
-                        c, 3, company_name
-                    )
+                    if not disable_reddit:
+                        logger.info("Reddit starting")
+                        reddit_context, retrieved_reddit_posts = (
+                            self.reddit.retrieve_context(
+                                claim=c,
+                                company_name=company_name,
+                                db=self.reddit.reddit_db,
+                                k=10,
+                                distance=0.6
+                            )
+                        )
+                        if reddit_context == "":
+                            reddit_context = "No relevant content found in Reddit Database."
+                            retrieved_reddit_posts = None
+                    else:
+                        reddit_context = "Reddit context not used"
+                        retrieved_reddit_posts = None
+
+                    if not disable_web_rag:
+                        logger.info("Web rag starting")
+                        web_context, url_list, _ = self.web.search_ddg(
+                            c, 3, company_name
+                        )
+                        if web_context == "":
+                            web_context = "No relevant content found through Web Search."
+                            url_list = None
+                    else:
+                        web_context = "Web context not used"
+                        url_list = None
 
                     logger.info("CTI starting")
                     cti_results = cti_classification(c)
@@ -306,8 +337,8 @@ class LLMAggregator(BaseAnnotator):
                                 "retrieved_reddit_posts": retrieved_reddit_posts,
                                 "web_context": web_context,
                                 "url_list": url_list,
-                                "label": self.web.extract_label(aggregator_result),
-                                "justification": self.web.extract_justification(aggregator_result),
+                                "label": extract_label(aggregator_result),
+                                "justification": extract_justification(aggregator_result),
                                 "faith_eval": faith_eval,
                                 "groundedness_eval": groundedness_eval,
                                 "readability_eval": readability_eval,
@@ -340,4 +371,20 @@ class LLMAggregator(BaseAnnotator):
             nargs="+",
             default=["text", "list", "cell"],
             choices=LAYOUT_NAMES,
+        )
+
+        parser.add_argument(
+            "--disable_chroma",
+            action="store_true",
+            help="Disable Chroma for context retrieval",
+        )
+        parser.add_argument(
+            "--disable_reddit",
+            action="store_true",
+            help="Disable Reddit for context retrieval",
+        )
+        parser.add_argument(
+            "--disable_web_rag",
+            action="store_true",
+            help="Disable Web RAG for context retrieval",
         )

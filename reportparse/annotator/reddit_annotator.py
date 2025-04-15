@@ -1,17 +1,19 @@
 import os
 import re
+import string
+import json
 import argparse
 from dotenv import load_dotenv
 from logging import getLogger
+from langchain_ollama import ChatOllama
+
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.reddit_db.reddit_chroma_handler import RedditChromaHandler
-from reportparse.llm_prompts import FIRST_PASS_PROMPT, REDDIT_PROMPT
-from langchain_ollama import ChatOllama
-from reportparse.remove_thinking import remove_think_blocks
-
-import json
+from reportparse.rags.reddit_db.reddit_chroma_handler import RedditChromaHandler
+from reportparse.util.llm_prompts import FIRST_PASS_PROMPT, REDDIT_PROMPT
+from reportparse.util.remove_thinking import remove_think_blocks
+from reportparse.util.label_extraction import extract_label, extract_justification
 
 logger = getLogger(__name__)
 
@@ -53,25 +55,33 @@ class RedditAnnotator(BaseAnnotator):
                 print("llm invokation failed. Returning none...")
                 print(e)
                 return None
+    
+    def normalize_company_name(self, name: str) -> set:
+        # Remove punctuation and convert to lowercase
+        translator = str.maketrans('', '', string.punctuation)
+        cleaned = name.translate(translator)
+        # Split on whitespace and commas, and filter out any empty strings
+        return set(filter(None, re.split(r"[\s,]+", cleaned.lower())))
 
-    def retrieve_context(self, claim, company_name, db, k=6, distance=0.6):
+    def retrieve_context(self, claim, company_name, db, k=6, distance=0.9):
         try:
             logger.info("Retrieving context from RedditDB")
-
-            # Query only relevant posts
+            
+            # Query relevant posts based on claim (this part remains unchanged)
             results = db.collection.query(
                 query_texts=[claim],
                 n_results=k,
             )
-
+            logger.info("Results from RedditDB retrieved")
             if results is None:
                 return "", []
             relevant_texts = []
             retrieved_sources = []
 
-            for i, (doc, score) in enumerate(
-                zip(results["documents"], results["distances"])
-            ):
+            # Normalize the target company name for better matching
+            target_company_words = self.normalize_company_name(company_name)
+
+            for i, (doc, score) in enumerate(zip(results["documents"], results["distances"])):
                 print("distance: ", score[0])
                 if score[0] > distance:
                     continue
@@ -79,17 +89,18 @@ class RedditAnnotator(BaseAnnotator):
                 metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
                 url = metadata.get("post_url", "Unknown")
 
-                # Handle single or multiple target companies
-                # Word-wise partial company name matching
-                target_company_words = set(re.split(r"[\s,]+", company_name.lower()))
-                metadata_company_words = set(re.split(r"[\s,]+", str(metadata.get("company", "")).lower()))
+                # Normalize metadata company name
+                metadata_company = str(metadata.get("company", ""))
+                metadata_company_words = self.normalize_company_name(metadata_company)
 
-                # If no shared words, skip
+                # If no shared words between target and metadata company, skip
                 if not target_company_words & metadata_company_words:
+                    logger.info(
+                        f"Skipping post {url} due to no shared company names"
+                    )
                     continue
 
-
-                # Append if passed
+                # Append if criteria are met
                 relevant_texts.append(f"From Reddit Post ({url}):\n{doc[0]}")
                 retrieved_sources.append(url)
 
@@ -126,28 +137,11 @@ class RedditAnnotator(BaseAnnotator):
             return "No content in RedditDB"
 
     def call_reddit(self, claim, company_name, reddit_db, k=6):
-        context, retrieved_sources = self.retrieve_context(claim=claim, company_name=company_name, db=reddit_db, k=k)
+        seacrch_string = claim + " " + company_name
+        context, retrieved_sources = self.retrieve_context(claim=seacrch_string, company_name=company_name, db=reddit_db, k=k)
         print("Retrieved sources: ", retrieved_sources)
         result = self.verify_claim_with_context(claim=claim, context=context)
         return result, retrieved_sources, context
-
-    def extract_label(self, text):
-        try:
-            match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
-            )
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during label extraction: {e}")
-            return None
-
-    def extract_justification(self, text):
-        try:
-            match = re.search(r"Justification:\s*(.*)", text, re.DOTALL)
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during justification extraction: {e}")
-            return None
 
     def annotate(
         self,
@@ -234,8 +228,8 @@ class RedditAnnotator(BaseAnnotator):
                         claim_dict = {
                             "claim": c,
                             "retrieved_sources": retrieved_sources,
-                            "label": self.extract_label(reddit_result),
-                            "justification": self.extract_justification(reddit_result),
+                            "label": extract_label(reddit_result),
+                            "justification": extract_justification(reddit_result),
                             "context": context,
                         }
                         json_output = json.dumps(claim_dict)

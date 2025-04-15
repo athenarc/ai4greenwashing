@@ -4,7 +4,7 @@ import requests
 import sys
 
 sys.path.append("scripts")
-from reportparse.web_rag.text_embedding import single_text_embedding, cos_sim
+from reportparse.rags.web_rag.text_embedding import single_text_embedding, cos_sim
 import numpy as np
 import pandas as pd
 import datetime

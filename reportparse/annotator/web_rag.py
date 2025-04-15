@@ -2,19 +2,20 @@ from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.web_rag.pipeline import pipeline
-from reportparse.llm_prompts import FIRST_PASS_PROMPT, WEB_RAG_PROMPT
+from reportparse.rags.web_rag.pipeline import pipeline
+from reportparse.util.llm_prompts import FIRST_PASS_PROMPT, WEB_RAG_PROMPT
 import argparse
 import re
 import os
 import json
 from dotenv import load_dotenv
-from reportparse.remove_thinking import remove_think_blocks
+from reportparse.util.remove_thinking import remove_think_blocks
 from langchain_ollama import ChatOllama
 from duckduckgo_search import DDGS
 import logging
 from keybert import KeyBERT
 import itertools
+from reportparse.util.label_extraction import extract_label, extract_justification
 
 logger = logging.getLogger(__name__)
 
@@ -83,24 +84,6 @@ class WEB_RAG_Annotator(BaseAnnotator):
             return " ".join(keywords_cleaned)
         else:
             return keywords_cleaned
-
-    def extract_label(self, text):
-        try:
-            match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
-            )
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during label extraction: {e}")
-            return None
-
-    def extract_justification(self, text):
-        try:
-            match = re.search(r"Justification:\s*(.*)", text, re.DOTALL)
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during justification extraction: {e}")
-            return None
 
     # todo: add info truncation if text is too big for llm to handle.
     def search_ddg(self, claim, web_sources, company_name):
@@ -215,8 +198,8 @@ class WEB_RAG_Annotator(BaseAnnotator):
                         claim_dict = {
                             "claim": c,
                             "urls": url_list,
-                            "Label": self.extract_label(web_rag_result),
-                            "Justification": self.extract_justification(web_rag_result),
+                            "Label": extract_label(web_rag_result),
+                            "Justification": extract_justification(web_rag_result),
                             "web_info": web_info,
                         }
                         json_output = json.dumps(claim_dict)

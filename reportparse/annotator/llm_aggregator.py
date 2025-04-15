@@ -1,25 +1,25 @@
 from reportparse.annotator.base import BaseAnnotator
-from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
-from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.annotator.web_rag import WEB_RAG_Annotator
-from reportparse.annotator.chroma_annotator import ChromaAnnotator
-from reportparse.annotator.reddit_annotator import RedditAnnotator
-from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
-from reportparse.climate_cti import cti_classification
-from reportparse.llm_evaluation import llm_evaluation
 import argparse
-import re
-from pymongo import MongoClient
+import itertools
 import json
+import os
+import re
 from dotenv import load_dotenv
 from logging import getLogger
-from langchain_groq import ChatGroq
+from pymongo import MongoClient
 from langchain_ollama import ChatOllama
-from langchain_google_genai import ChatGoogleGenerativeAI
-import os
-from reportparse.remove_thinking import remove_think_blocks
-import torch
-import itertools
+
+from reportparse.annotator.base import BaseAnnotator
+from reportparse.annotator.chroma_annotator import ChromaAnnotator
+from reportparse.annotator.reddit_annotator import RedditAnnotator
+from reportparse.annotator.web_rag import WEB_RAG_Annotator
+from reportparse.structure.document import Document, AnnotatableLevel, Annotation
+from reportparse.util.climate_cti import cti_classification
+from reportparse.util.label_extraction import extract_label, extract_justification
+from reportparse.util.llm_evaluation import llm_evaluation
+from reportparse.util.llm_prompts import LLM_AGGREGATOR_PROMPT
+from reportparse.util.remove_thinking import remove_think_blocks
+from reportparse.util.settings import LAYOUT_NAMES
 
 logger = getLogger(__name__)
 
@@ -101,6 +101,9 @@ class LLMAggregator(BaseAnnotator):
         print(f"Annotating {gw_pages} pages")
         use_chunks = args.use_chunks if args.use_chunks is not None else False
         start_page = args.start_page if args.start_page is not None else 0
+        disable_chroma = args.disable_chroma if args.disable_chroma is not None else False
+        disable_reddit = args.disable_reddit if args.disable_reddit is not None else False
+        disable_web_rag = args.disable_web_rag if args.disable_web_rag is not None else False
         if start_page > len(document.pages):
             print("Start page is greater than the number of pages in the document")
             start_page = 0
@@ -119,18 +122,21 @@ class LLMAggregator(BaseAnnotator):
             )
         # add pages to chroma_db. The total number of stored pages is defined by the --max_pages parameter
         # todo: differenciate between storing pages and greenwashing pages
-        print("Starting storing in Chroma")
-        for page in document.pages:
-            if level == "page":
-                page_number = page.num
-                text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                self.chroma.chroma_db.store_page(
-                    doc_name=document.name, page_number=page_number, text=text
-                )
-                print(f"Stored page {page_number}")
-            else:
-                print("Page level is not specified")
-        print("Successfully stored all pages in chroma")
+        if not disable_chroma:
+            print("Starting storing in Chroma")
+            for page in document.pages:
+                if level == "page":
+                    page_number = page.num
+                    text = page.get_text_by_target_layouts(target_layouts=target_layouts)
+                    self.chroma.chroma_db.store_page(
+                        doc_name=document.name, page_number=page_number, text=text
+                    )
+                    print(f"Stored page {page_number}")
+                else:
+                    print("Page level is not specified")
+            print("Successfully stored all pages in chroma")
+        else:
+            print("Skipping storing in Chroma")
 
         gw_index = 0
         print(f"Checking the first {gw_pages} pages for greenwashing")
@@ -184,155 +190,168 @@ class LLMAggregator(BaseAnnotator):
                 logger.info("Starting for loop")
                 for c in claims:
                     # add aggregation with chroma db
-                    logger.info("Chroma starting")
-                    chroma_result, retrieved_pages, context = self.chroma.call_chroma(
-                        c,
-                        document.name,
-                        text,
-                        page_number,
-                        self.chroma.chroma_db,
-                        k=6,
-                        use_chunks=use_chunks,
-                    )
-                    print("Second llm result: ", chroma_result)
-                    if context:
-                        normalized_chroma_result = self.eval.normalize_to_string(chroma_result)
-                        chroma_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
+                    if not disable_chroma:         
+                        logger.info("Chroma starting")
+                        chroma_result, retrieved_pages, context = self.chroma.call_chroma(
+                            c,
+                            document.name,
+                            text,
+                            page_number,
+                            self.chroma.chroma_db,
+                            k=6,
+                            use_chunks=use_chunks,
+                        )
+                        print("Second llm result: ", chroma_result)
+                        if context:
+                            normalized_chroma_result = self.eval.normalize_to_string(chroma_result)
+                            chroma_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
 
-                        faith_eval = self.eval.faith_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
-                        readability_eval = self.eval.readability_eval(normalized_chroma_result)
-                        redundancy_eval = self.eval.redundancy_eval(normalized_chroma_result, precomputed_chunks=chroma_chunks)
-                        specificity_eval = self.eval.specificity_eval(normalized_chroma_result)
-                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_chroma_result, context)
-                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_chroma_result)
-                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_chroma_result)
+                            faith_eval = self.eval.faith_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                            groundedness_eval = self.eval.groundedness_eval(answer=normalized_chroma_result, retrieved_docs=context, precomputed_chunks=chroma_chunks)
+                            readability_eval = self.eval.readability_eval(normalized_chroma_result)
+                            redundancy_eval = self.eval.redundancy_eval(normalized_chroma_result, precomputed_chunks=chroma_chunks)
+                            specificity_eval = self.eval.specificity_eval(normalized_chroma_result)
+                            compression_ratio_eval = self.eval.compression_ratio_eval(normalized_chroma_result, context)
+                            lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_chroma_result)
+                            noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_chroma_result)
+                        else:
+                            faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                            specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+
+                        claim_dict_chroma = {
+                            "claim": c,
+                            "retrieved_pages": retrieved_pages,
+                            "label": extract_label(chroma_result),
+                            "justification": extract_justification(chroma_result),
+                            "context": context,
+                            "faith_eval": faith_eval,
+                            "groundedness_eval": groundedness_eval,
+                            "readability_eval": readability_eval,
+                            "redundancy_eval": redundancy_eval,
+                            "specificity_eval": specificity_eval,
+                            "compression_ratio_eval": compression_ratio_eval,
+                            "lexical_diversity_eval": lexical_diversity_eval,
+                            "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
+                        }
+
+                        json_output = json.dumps(claim_dict_chroma)
+
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=chroma_result,
+                            annotator_name=f"chroma_result_claim_{claim_index}",
+                            metadata=json_output,
+                        )
                     else:
-                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
-                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+                        chroma_result = "Chroma database disabled"
+                        retrieved_pages = None
+                        context = None
 
-                    claim_dict_chroma = {
-                        "claim": c,
-                        "retrieved_pages": retrieved_pages,
-                        "label": self.chroma.extract_label(chroma_result),
-                        "justification": self.chroma.extract_justification(chroma_result),
-                        "context": context,
-                        "faith_eval": faith_eval,
-                        "groundedness_eval": groundedness_eval,
-                        "readability_eval": readability_eval,
-                        "redundancy_eval": redundancy_eval,
-                        "specificity_eval": specificity_eval,
-                        "compression_ratio_eval": compression_ratio_eval,
-                        "lexical_diversity_eval": lexical_diversity_eval,
-                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
-                    }
+                    if not disable_reddit:
+                        logger.info("Reddit starting")
+                        reddit_result, retrieved_posts, context = self.reddit.call_reddit(
+                            c,
+                            company_name,
+                            self.reddit.reddit_db,
+                            k=6,
+                        )
+                        
+                        print("Second llm result: ", reddit_result)
+                        if context:
+                            normalized_reddit_result= self.eval.normalize_to_string(reddit_result)
+                            reddit_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
 
-                    json_output = json.dumps(claim_dict_chroma)
+                            faith_eval = self.eval.faith_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
+                            groundedness_eval = self.eval.groundedness_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
+                            readability_eval = self.eval.readability_eval(normalized_reddit_result)
+                            redundancy_eval = self.eval.redundancy_eval(normalized_reddit_result, precomputed_chunks=reddit_chunks)
+                            specificity_eval = self.eval.specificity_eval(normalized_reddit_result)
+                            compression_ratio_eval = self.eval.compression_ratio_eval(normalized_reddit_result, context)
+                            lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_reddit_result)
+                            noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_reddit_result)
+                        else:
+                            faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                            specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
 
-                    _annotate(
-                        _annotate_obj=page,
-                        _text=chroma_result,
-                        annotator_name=f"chroma_result_claim_{claim_index}",
-                        metadata=json_output,
-                    )
+                        claim_dict_reddit = {
+                            "claim": c,
+                            "retrieved_posts": retrieved_posts,
+                            "label": extract_label(reddit_result),
+                            "justification": self.chroma.extract_justification(reddit_result),
+                            "context": context,
+                            "faith_eval": faith_eval,
+                            "groundedness_eval": groundedness_eval,
+                            "readability_eval": readability_eval,
+                            "redundancy_eval": redundancy_eval,
+                            "specificity_eval": specificity_eval,
+                            "compression_ratio_eval": compression_ratio_eval,
+                            "lexical_diversity_eval": lexical_diversity_eval,
+                            "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
+                        }
 
-                    logger.info("Reddit starting")
-                    reddit_result, retrieved_posts, context = self.reddit.call_reddit(
-                        c,
-                        company_name,
-                        self.reddit.reddit_db,
-                        k=6,
-                    )
-                    
-                    print("Second llm result: ", reddit_result)
-                    if context:
-                        normalized_reddit_result= self.eval.normalize_to_string(reddit_result)
-                        reddit_chunks = self.eval.chunk_text(self.eval.normalize_to_string(context))
+                        json_output = json.dumps(claim_dict_reddit)
 
-                        faith_eval = self.eval.faith_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_reddit_result, retrieved_docs=context, precomputed_chunks=reddit_chunks)
-                        readability_eval = self.eval.readability_eval(normalized_reddit_result)
-                        redundancy_eval = self.eval.redundancy_eval(normalized_reddit_result, precomputed_chunks=reddit_chunks)
-                        specificity_eval = self.eval.specificity_eval(normalized_reddit_result)
-                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_reddit_result, context)
-                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_reddit_result)
-                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_reddit_result)
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=reddit_result,
+                            annotator_name=f"reddit_result_claim_{claim_index}",
+                            metadata=json_output,
+                        )
                     else:
-                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
-                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
+                        reddit_result = "Reddit database disabled"
+                        retrieved_posts = None
+                        context = None
+                    if not disable_web_rag:
+                        logger.info("Web rag starting")
+                        # add web_rag aggregation
+                        print(f'SEARCHING FOR CLAIM {c}')
+                        web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
+                        if web_info:
+                            normalized_web_rag_result = self.eval.normalize_to_string(web_rag_result)
+                            web_chunks = self.eval.chunk_text(self.eval.normalize_to_string(web_info))
 
-                    claim_dict_reddit = {
-                        "claim": c,
-                        "retrieved_posts": retrieved_posts,
-                        "label": self.chroma.extract_label(reddit_result),
-                        "justification": self.chroma.extract_justification(reddit_result),
-                        "context": context,
-                        "faith_eval": faith_eval,
-                        "groundedness_eval": groundedness_eval,
-                        "readability_eval": readability_eval,
-                        "redundancy_eval": redundancy_eval,
-                        "specificity_eval": specificity_eval,
-                        "compression_ratio_eval": compression_ratio_eval,
-                        "lexical_diversity_eval": lexical_diversity_eval,
-                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
-                    }
+                            faith_eval = self.eval.faith_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
+                            groundedness_eval = self.eval.groundedness_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
+                            readability_eval = self.eval.readability_eval(normalized_web_rag_result)
+                            redundancy_eval = self.eval.redundancy_eval(normalized_web_rag_result, precomputed_chunks=web_chunks)
+                            specificity_eval = self.eval.specificity_eval(normalized_web_rag_result)
+                            compression_ratio_eval = self.eval.compression_ratio_eval(normalized_web_rag_result, web_info)
+                            lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_web_rag_result)
+                            noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_web_rag_result)
+                        else:
+                            faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
+                            specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
 
-                    json_output = json.dumps(claim_dict_reddit)
+                        claim_dict_webrag = {
+                            "claim": c,
+                            "urls": url_list,
+                            "label": extract_label(web_rag_result),
+                            "justification": self.web.extract_justification(web_rag_result),
+                            "web_info": web_info,
+                            "faith_eval": faith_eval,
+                            "groundedness_eval": groundedness_eval,
+                            "readability_eval": readability_eval,
+                            "redundancy_eval": redundancy_eval,
+                            "specificity_eval": specificity_eval,
+                            "compression_ratio_eval": compression_ratio_eval,
+                            "lexical_diversity_eval": lexical_diversity_eval,
+                            "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
+                        }
 
-                    _annotate(
-                        _annotate_obj=page,
-                        _text=reddit_result,
-                        annotator_name=f"reddit_result_claim_{claim_index}",
-                        metadata=json_output,
-                    )
+                        json_output = json.dumps(claim_dict_webrag)
 
-                    logger.info("Web rag starting")
-                    # add web_rag aggregation
-                    print(f'SEARCHING FOR CLAIM {c}')
-                    web_rag_result, url_list, web_info = self.web.web_rag(c, 1, company_name)
-                    if web_info:
-                        normalized_web_rag_result = self.eval.normalize_to_string(web_rag_result)
-                        web_chunks = self.eval.chunk_text(self.eval.normalize_to_string(web_info))
 
-                        faith_eval = self.eval.faith_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        groundedness_eval = self.eval.groundedness_eval(answer=normalized_web_rag_result, retrieved_docs=web_info, precomputed_chunks=web_chunks)
-                        readability_eval = self.eval.readability_eval(normalized_web_rag_result)
-                        redundancy_eval = self.eval.redundancy_eval(normalized_web_rag_result, precomputed_chunks=web_chunks)
-                        specificity_eval = self.eval.specificity_eval(normalized_web_rag_result)
-                        compression_ratio_eval = self.eval.compression_ratio_eval(normalized_web_rag_result, web_info)
-                        lexical_diversity_eval = self.eval.lexical_diversity_eval(normalized_web_rag_result)
-                        noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(normalized_web_rag_result)
+                        # annotate for web rag
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=web_rag_result,
+                            annotator_name=f"web_rag_result_claim_{claim_index}",
+                            metadata=json_output,
+                        )
                     else:
-                        faith_eval = groundedness_eval = readability_eval = redundancy_eval = None
-                        specificity_eval = compression_ratio_eval = lexical_diversity_eval = noun_to_verb_ratio_eval = None
-
-                    claim_dict_webrag = {
-                        "claim": c,
-                        "urls": url_list,
-                        "label": self.web.extract_label(web_rag_result),
-                        "justification": self.web.extract_justification(web_rag_result),
-                        "web_info": web_info,
-                        "faith_eval": faith_eval,
-                        "groundedness_eval": groundedness_eval,
-                        "readability_eval": readability_eval,
-                        "redundancy_eval": redundancy_eval,
-                        "specificity_eval": specificity_eval,
-                        "compression_ratio_eval": compression_ratio_eval,
-                        "lexical_diversity_eval": lexical_diversity_eval,
-                        "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval
-                    }
-
-                    json_output = json.dumps(claim_dict_webrag)
-
-
-                    # annotate for web rag
-                    _annotate(
-                        _annotate_obj=page,
-                        _text=web_rag_result,
-                        annotator_name=f"web_rag_result_claim_{claim_index}",
-                        metadata=json_output,
-                    )
-
+                        web_rag_result = "Web rag disabled"
+                        url_list = None
+                        web_info = None
                     logger.info("CTI starting")
                     cti_results = cti_classification(c)
                     _annotate(
@@ -421,7 +440,7 @@ class LLMAggregator(BaseAnnotator):
                                 "retrieved_reddit_posts": retrieved_posts,
                                 "web_rag_result": web_rag_result,
                                 "url_list": url_list,
-                                "label": self.web.extract_label(aggregator_result),
+                                "label": extract_label(aggregator_result),
                                 "justification": self.web.extract_justification(aggregator_result),
                                 "faith_eval": faith_eval,
                                 "groundedness_eval": groundedness_eval,
