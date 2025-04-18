@@ -177,7 +177,7 @@ class ChromaAnnotator(BaseAnnotator):
         self,
         document: Document,
         args=None,
-        level="block",
+        level="page",
         target_layouts=("text", "list", "cell"),
         annotator_name="chroma",
     ) -> Document:

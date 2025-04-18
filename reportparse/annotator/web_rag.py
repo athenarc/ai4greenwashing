@@ -11,6 +11,8 @@ import json
 from dotenv import load_dotenv
 from reportparse.remove_thinking import remove_think_blocks
 from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from duckduckgo_search import DDGS
 import logging
 from keybert import KeyBERT

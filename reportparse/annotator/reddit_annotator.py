@@ -10,7 +10,8 @@ from reportparse.reddit_db.reddit_chroma_handler import RedditChromaHandler
 from reportparse.llm_prompts import FIRST_PASS_PROMPT, REDDIT_PROMPT
 from langchain_ollama import ChatOllama
 from reportparse.remove_thinking import remove_think_blocks
-
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 import json
 
 logger = getLogger(__name__)
