@@ -5,14 +5,16 @@ from dotenv import load_dotenv
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.structure.document import Document, Annotation, AnnotatableLevel
 from reportparse.util.settings import LAYOUT_NAMES
+from reportparse.util.my_embeddings import get_embedder
+from reportparse.remove_thinking import remove_think_blocks
 
 from sentence_transformers import SentenceTransformer
 import faiss
-from reportparse.remove_thinking import remove_think_blocks
 
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 logger = getLogger(__name__)
 
@@ -23,16 +25,12 @@ class KPIAnnotator(BaseAnnotator):
     def __init__(self):
 
         defs_path = "/home/geoka/Desktop/greenwashing/ai4greenwashing/reportparse/kpi_definitions.json"
+        # in __init__  (or wherever you load the JSON)
         with open(defs_path, "r", encoding="utf‑8") as f:
-            self.kpi_defs = json.load(f)
-        self.build_kpi_index()
+            self.all_kpi_defs = json.load(f)
 
-        units = [r"kWh", r"MWh", r"tCO2e?", r"mtCO2e?", r"%"]
-        number = r"[\d][\d\s,.\']*"
-        self.candidate_regex = re.compile(
-            rf"({number})\s*({'|'.join(units)})", re.IGNORECASE
-        )
-
+        self._indices_by_sector = {}
+        self.embedder = get_embedder()      
         load_dotenv()
         if os.getenv("USE_GROQ_API") == "True":
 
@@ -58,22 +56,98 @@ class KPIAnnotator(BaseAnnotator):
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
-    def build_kpi_index(self):
-        self.embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-        kpi_sentences = [
-            f"{d['id']} – {d['name']} – {d.get('definition','')}" for d in self.kpi_defs
+    def detect_company_and_sector(self, text: str):
+        """Return (company_name, sector) using one LLM round‑trip."""
+        SECTORS = [
+            "Industrial Transportation",
+            "Banks",
+            "Nonlife Insurance",
+            "Automobiles",
+            "Electricity Utilities",
+            "None of the listed",
         ]
-        self.kpi_emb = self.embedder.encode(kpi_sentences, normalize_embeddings=True)
-        dim = self.kpi_emb.shape[1]
-        self.kpi_index = faiss.IndexFlatIP(dim)
-        self.kpi_index.add(self.kpi_emb)
+        schema = '{"company name": "string", "sector": "string"}'
+        sector_list = "\n".join(f"- {s}" for s in SECTORS)
 
-    def _closest_kpis(self, page_text, k=8):
+        prompt = (
+            "Extract the legal company name **exactly as written** and classify it.\n"
+            f"Choose the sector strictly from this list:\n{sector_list}\n\n"
+            f"TEXT SOURCE (may be partial):\n\"\"\"\n{text}\n\"\"\"\n\n"
+            f"Respond ONLY with a JSON object that follows this schema:\n{schema}"
+        )
+
+        for llm in (self.llm, self.llm_2):
+            try:
+                raw = llm.invoke(
+                    [("system", "Company sector extractor"), ("human", prompt)]
+                ).content
+                reply = remove_think_blocks(raw).strip()
+                logger.info("LLM reply: %s", reply)
+
+                try:
+                    if reply.startswith("```"):
+                        reply = reply.lstrip("`").split("```")[0]
+                    data = json.loads(reply)
+                    company = str(data.get("company name", "")).strip()
+                    sector  = str(data.get("sector", "")).strip()
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    data = None
+
+                if not data:
+                    company_match = re.search(
+                        r'"?company name"?\s*:\s*"([^"]+)"', reply, re.I
+                    )
+                    sector_match = re.search(
+                        r'"?sector"?\s*:\s*"([^"]+)"', reply, re.I
+                    )
+                    company = company_match.group(1).strip() if company_match else ""
+                    sector  = sector_match.group(1).strip()  if sector_match  else ""
+
+                if not company:
+                    company = "Unknown company"
+
+                sector_norm = sector.casefold()
+                sector = next(
+                    (s for s in SECTORS if s.casefold() == sector_norm),
+                    "None of the listed",
+                )
+
+                return company, sector
+
+            except Exception as e:
+                logger.warning("sector‑LLM failed (%s): %s", type(llm), e)
+        return "Unknown company", "None of the listed"
+    
+    def get_sector_view(self, sector: str):
+        sector_key = sector or "None of the listed"
+
+        if sector_key in self._indices_by_sector:
+            return self._indices_by_sector[sector_key]
+
+        kpi_defs = [
+            d for d in self.all_kpi_defs
+            if sector_key in d["sector"]           
+            or "None of the listed" in d["sector"]  
+        ]
+        if not kpi_defs:                          
+            kpi_defs = self.all_kpi_defs
+
+        sentences = [f"{d['id']} – {d['name']} – {d.get('definition','')}"
+                    for d in kpi_defs]
+        emb = self.embedder.encode(sentences, normalize_embeddings=True)
+        index = faiss.IndexFlatIP(emb.shape[1])
+        index.add(emb)
+
+        self._indices_by_sector[sector_key] = (kpi_defs, index)
+        return kpi_defs, index
+
+    def closest_kpis(self, page_text: str, k: int = 8):
         emb = self.embedder.encode(page_text[:2048], normalize_embeddings=True)
         sim, idx = self.kpi_index.search(emb.reshape(1, -1), k=k)
         return [self.kpi_defs[i] for i in idx[0]]
+    
 
-    def _page_llm(self, page_text: str, kpi_subset: list[dict]):
+    def page_llm_extract(self, page_text: str, kpi_subset: list[dict]):
         schema = """
         [
         {
@@ -88,54 +162,24 @@ class KPIAnnotator(BaseAnnotator):
         """.strip()
 
         defs = "\n".join(f"{d['id']}: {d['definition']}" for d in kpi_subset)
-        prompt = (f"You are an ESG‑KPI extractor. "
-                f"Return ONLY a JSON array that follows the schema.\n\n"
-                f"# KPI_DEFINITIONS\n{defs}\n\n"
-                f"# PAGE_TEXT\n\"\"\"\n{page_text}\n\"\"\"")
+        prompt = (
+            "You are an ESG‑KPI extractor.\n"
+            "Return ONLY a JSON array with **one object per KPI you can spot**.\n"
+            f"Schema:\n{schema}\n\n"
+            f"# KPI_DEFINITIONS (subset)\n{defs}\n\n"
+            f"# PAGE_TEXT\n\"\"\"\n{page_text[:3500]}\n\"\"\""
+        )
 
         for llm in (self.llm, self.llm_2):
             try:
-                res = llm.invoke([("system", "Extract KPIs"), ("human", prompt)])
-                return self.safe_json(res.content) or []
-            except Exception as e:
-                logger.warning(f"page‑LLM failed ({type(llm)}): {e}")
+                raw = llm.invoke([("system", "KPI extractor"), ("human", prompt)]).content
+                raw = remove_think_blocks(raw).strip()
+                if raw.startswith("```"):
+                    raw = raw.lstrip("`").split("```")[0]
+                return json.loads(raw)
+            except Exception:
+                continue
         return []
-
-    def call_llm_extract(self, snippet: str, best_kpi: dict):
-        """Prompt small context –> strict JSON."""
-        schema = """
-        {
-          "kpi_id": "string",
-          "value":  number,
-          "unit":   "string",
-          "year":   integer | null,
-          "confidence": number,
-          "snippet": "string"
-        }
-        """.strip()
-
-        system = ("You are an ESG‑KPI extractor. "
-                  "Return EXACTLY one JSON object conforming to the schema.")
-        user   = (f"# KPI_DEFINITION\n{best_kpi}\n\n"
-                  f"# PAGE_SNIPPET\n\"\"\"\n{snippet}\n\"\"\"\n\n"
-                  f"# JSON_SCHEMA\n{schema}")
-
-        for llm in (self.llm, self.llm_2):
-            try:
-                res = llm.invoke([("system", system), ("human", user)])
-                return self.safe_json(res.content)
-            except Exception as e:
-                logger.warning(f"KPI LLM failed ({type(llm)}): {e}")
-        return None
-
-    @staticmethod
-    def safe_json(text):
-        try:
-            first_brace = text.find("{")
-            last_brace = text.rfind("}")
-            return json.loads(text[first_brace : last_brace + 1])
-        except Exception:
-            return None
 
     def annotate(
         self,
@@ -163,18 +207,36 @@ class KPIAnnotator(BaseAnnotator):
                     meta=json.loads(metadata),
                 )
             )
+        company_name = None
+        sector = None
+
+        first_page_text = document.pages[0].get_text_by_target_layouts(target_layouts)
+        company, sector = self.detect_company_and_sector(first_page_text)
+        logger.info("Company=%s  |  Sector=%s", company, sector)
+        self.kpi_defs, self.kpi_index = self.get_sector_view(sector)
 
         for page in document.pages:
             if level == "page":
-                text = page.get_text_by_target_layouts(target_layouts=target_layouts)
+                text = page.get_text_by_target_layouts(target_layouts)
                 if not text.strip():
                     continue
-                kpi_subset = self._closest_kpis(text)          # ≤ TOP_K defs
-                hits = self._page_llm(text, kpi_subset) 
-                for h in hits:
-                    h.update({"page": page.num, "doc_name": document.name})
-                _annotate(page, h)
-
+                kpi_subset = self.closest_kpis(text, k=8)
+                hits = self.page_llm_extract(text, kpi_subset)
+                for hit in hits:
+                    hit.update({
+                        "page": page.num,
+                        "doc_name": document.name,
+                        "sector": sector,
+                        "company": company,
+                    })
+                    page.add_annotation(
+                        Annotation(
+                            parent_object=page,
+                            annotator=annotator_name,
+                            value=json.dumps(hit, ensure_ascii=False),
+                            meta=hit,
+                        )
+                    )
             else:
                 for block in page.blocks + page.table_blocks:
                     if (

@@ -8,6 +8,7 @@ import spacy
 import textstat
 import torch
 import gc
+from reportparse.util.my_embeddings import get_embedder
 
 class llm_evaluation:
     def __init__(self, clear_mem=True):
@@ -20,7 +21,8 @@ class llm_evaluation:
             model="facebook/bart-large-mnli",
             device=0 if device == "cuda" else -1
         )
-        self.embedder = SentenceTransformer("all-MiniLM-L6-v2", device=device)
+        self.embedder = get_embedder()
+
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=128)
         self.nlp = spacy.load("en_core_web_sm")
         self.embedding_cache = {}
