@@ -1,18 +1,17 @@
 import os
 import re
-import time
 import argparse
 from dotenv import load_dotenv
 from logging import getLogger
+from langchain_ollama import ChatOllama
+
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-from reportparse.db_rag.db import ChromaDBHandler
-from reportparse.llm_prompts import FIRST_PASS_PROMPT, CHROMA_PROMPT
-from langchain_groq import ChatGroq
-from langchain_ollama import ChatOllama
-from langchain_google_genai import ChatGoogleGenerativeAI
-from reportparse.remove_thinking import remove_think_blocks
+from reportparse.rags.db_rag.db import ChromaDBHandler
+from reportparse.util.llm_prompts import FIRST_PASS_PROMPT, CHROMA_PROMPT
+from reportparse.util.label_extraction import extract_label, extract_justification
+from reportparse.util.remove_thinking import remove_think_blocks
 
 import json
 
@@ -27,28 +26,9 @@ class ChromaAnnotator(BaseAnnotator):
         self.chroma_db = ChromaDBHandler()
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.chroma_prompt = CHROMA_PROMPT
-        if os.getenv("USE_GROQ_API") == "True":
 
-            self.llm = ChatGoogleGenerativeAI(
-                model=os.getenv("GEMINI_MODEL"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                google_api_key=os.getenv("GEMINI_API_KEY"),
-            )
-
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_1"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
-        else:
-            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+        self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0, num_ctx=16000, top_k=40, top_p=0.95)
+        self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
     def call_llm(self, text):
@@ -155,24 +135,6 @@ class ChromaAnnotator(BaseAnnotator):
         result = self.verify_claim_with_context(claim=claim, text=text, context=context)
         return result, retrieved_pages, context
 
-    def extract_label(self, text):
-        try:
-            match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
-            )
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during label extraction: {e}")
-            return None
-
-    def extract_justification(self, text):
-        try:
-            match = re.search(r"Justification:\s*(.*)", text, re.DOTALL)
-            return match.group(1).strip() if match else ""
-        except Exception as e:
-            print(f"Error during justification extraction: {e}")
-            return None
-
     def annotate(
         self,
         document: Document,
@@ -262,8 +224,8 @@ class ChromaAnnotator(BaseAnnotator):
                         claim_dict = {
                             "claim": c,
                             "retrieved_pages": retrieved_pages,
-                            "Label": self.extract_label(chroma_result),
-                            "Justification": self.extract_justification(chroma_result),
+                            "Label": extract_label(chroma_result),
+                            "Justification": extract_justification(chroma_result),
                             "context": context,
                         }
                         json_output = json.dumps(claim_dict)

@@ -153,4 +153,9 @@ backup/
 
 reqs.txt
 
+<<<<<<< HEAD
 cli_results/
+=======
+cli_results/
+example_outputs/
+>>>>>>> giannena

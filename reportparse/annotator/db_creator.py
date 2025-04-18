@@ -1,10 +1,12 @@
+import argparse
+from dotenv import load_dotenv
+
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
-import argparse
-from dotenv import load_dotenv
-from reportparse.db_rag.db import ChromaDBHandler
+from reportparse.rags.db_rag.db import ChromaDBHandler
+
 
 chroma_db = ChromaDBHandler()
 

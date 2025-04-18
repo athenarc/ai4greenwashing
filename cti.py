@@ -5,7 +5,7 @@ import pandas as pd
 from reportparse.reader.base import BaseReader
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
-from reportparse.document import Document
+from reportparse.structure.document import Document
 import matplotlib.pyplot as plt
 import seaborn as sns
 import argparse
