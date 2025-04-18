@@ -7,8 +7,9 @@ import re
 from dotenv import load_dotenv
 from logging import getLogger
 from pymongo import MongoClient
+from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
-
+from langchain_google_genai import ChatGoogleGenerativeAI
 from reportparse.annotator.base import BaseAnnotator
 from reportparse.annotator.chroma_annotator import ChromaAnnotator
 from reportparse.annotator.reddit_annotator import RedditAnnotator

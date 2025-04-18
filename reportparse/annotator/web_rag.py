@@ -10,7 +10,9 @@ import os
 import json
 from dotenv import load_dotenv
 from reportparse.util.remove_thinking import remove_think_blocks
+from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 from duckduckgo_search import DDGS
 import logging
 from keybert import KeyBERT
@@ -27,25 +29,27 @@ class WEB_RAG_Annotator(BaseAnnotator):
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.web_rag_prompt = WEB_RAG_PROMPT
         self.kw_model = KeyBERT()
+        if os.getenv("USE_GROQ_API") == "True":
+            self.llm = ChatGoogleGenerativeAI(
+                model=os.getenv("GEMINI_MODEL"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                google_api_key=os.getenv("GEMINI_API_KEY"),
+            )
 
-        self.llm = ChatGoogleGenerativeAI(
-            model=os.getenv("GEMINI_MODEL"),
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            google_api_key=os.getenv("GEMINI_API_KEY"),
-        )
-
-        self.llm_2 = ChatGroq(
-            model=os.getenv("GROQ_LLM_MODEL_1"),
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=1,
-            groq_api_key=os.getenv("GROQ_API_KEY_1"),
-        )
-
+            self.llm_2 = ChatGroq(
+                model=os.getenv("GROQ_LLM_MODEL_1"),
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=1,
+                groq_api_key=os.getenv("GROQ_API_KEY_1"),
+            )
+        else:
+            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
     def call_llm(self, text):
 
         messages = [
