@@ -97,7 +97,7 @@ class ChromaESGAnnotator(BaseAnnotator):
                 metadata = results["metadatas"][i][0] if results["metadatas"][i] else {}
                 year = metadata.get("year", "Unknown")
                 doc_name = metadata.get("doc_name", "Unknown")
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                 print(metadata)
                 print(type(metadata))
                 print(metadata.get("year"))
