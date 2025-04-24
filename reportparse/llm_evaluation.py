@@ -9,6 +9,7 @@ import textstat
 import torch
 import gc
 
+
 class llm_evaluation:
     def __init__(self, clear_mem=True):
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -18,10 +19,12 @@ class llm_evaluation:
         self.nli_model = pipeline(
             "text-classification",
             model="facebook/bart-large-mnli",
-            device=0 if device == "cuda" else -1
+            device=0 if device == "cuda" else -1,
         )
         self.embedder = SentenceTransformer("all-MiniLM-L6-v2", device=device)
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=128)
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=512, chunk_overlap=128
+        )
         self.nlp = spacy.load("en_core_web_sm")
         self.embedding_cache = {}
 
@@ -35,11 +38,10 @@ class llm_evaluation:
         else:
             return str(content)
 
-
-    #recursive character text splitter
+    # recursive character text splitter
     def chunk_text(self, text):
         return self.text_splitter.split_text(text)
-    
+
     def clear_memory(self):
         torch.cuda.empty_cache()
         gc.collect()
@@ -72,7 +74,9 @@ class llm_evaluation:
 
         for result in results:
             label_scores = {res["label"]: res["score"] for res in result}
-            label_logits = {label: np.log(score) for label, score in label_scores.items()}
+            label_logits = {
+                label: np.log(score) for label, score in label_scores.items()
+            }
 
             top_label = max(label_scores, key=label_scores.get)
             stance_counts[top_label] += 1
@@ -85,11 +89,13 @@ class llm_evaluation:
         if self.clear_mem:
             self.clear_memory()
 
-        general_stance = stance_counts.most_common(1)[0][0] if stance_counts else "NEUTRAL"
+        general_stance = (
+            stance_counts.most_common(1)[0][0] if stance_counts else "NEUTRAL"
+        )
 
         return {
             "avg_faithfulness": np.mean(entailment_scores),
-            "general_stance": general_stance
+            "general_stance": general_stance,
         }
 
     # measures relevance between the user's query and the retrieved information
@@ -102,7 +108,9 @@ class llm_evaluation:
         query_embedding = embeddings[0]
         doc_embeddings = embeddings[1:]
 
-        similarities = util.cos_sim(query_embedding, doc_embeddings).cpu().numpy().flatten()
+        similarities = (
+            util.cos_sim(query_embedding, doc_embeddings).cpu().numpy().flatten()
+        )
         if self.clear_mem:
             self.clear_memory()
 
@@ -117,18 +125,24 @@ class llm_evaluation:
         answer_chunks = self.chunk_text(answer)
 
         tokenized_chunks = [chunk.split() for chunk in doc_chunks]
+        if not tokenized_chunks:
+            return {"groundedness_score": 0}
         bm25 = BM25Okapi(tokenized_chunks)
 
         answer_tokens = [chunk.split() for chunk in answer_chunks if chunk.strip()]
-        bm25_scores = [np.mean(bm25.get_scores(tokens)) for tokens in answer_tokens if tokens]
+        bm25_scores = [
+            np.mean(bm25.get_scores(tokens)) for tokens in answer_tokens if tokens
+        ]
         max_bm25 = max(bm25_scores) if bm25_scores else 1
         normalized_bm25_scores = [score / max_bm25 for score in bm25_scores]
 
         embeddings = self.encode_cached(answer_chunks + doc_chunks)
-        answer_embeddings = embeddings[:len(answer_chunks)]
-        doc_embeddings = embeddings[len(answer_chunks):]
+        answer_embeddings = embeddings[: len(answer_chunks)]
+        doc_embeddings = embeddings[len(answer_chunks) :]
 
-        cos_sim_scores = util.cos_sim(answer_embeddings, doc_embeddings).cpu().numpy().flatten()
+        cos_sim_scores = (
+            util.cos_sim(answer_embeddings, doc_embeddings).cpu().numpy().flatten()
+        )
 
         if self.clear_mem:
             self.clear_memory()
@@ -136,32 +150,34 @@ class llm_evaluation:
         avg_bm25 = np.mean(normalized_bm25_scores) if normalized_bm25_scores else 0
         avg_cos_sim = np.mean(cos_sim_scores) if cos_sim_scores.size > 0 else 0
         return {"groundedness_score": (avg_bm25 + avg_cos_sim) / 2}
-    
-    #measures the specificity of an LLM-generated answer by calculating the proportion of named entities
+
+    # measures the specificity of an LLM-generated answer by calculating the proportion of named entities
     def specificity_eval(self, answer):
         doc = self.nlp(answer)
         token_count = len(doc)
         specificity_score = len(doc.ents) / token_count if token_count > 0 else 0
         return {"specificity_score": specificity_score}
 
-    #measures redundancy in an LLM-generated answer
+    # measures redundancy in an LLM-generated answer
     def redundancy_eval(self, answer, precomputed_chunks=None):
         answer_chunks = precomputed_chunks or self.chunk_text(answer)
         if len(answer_chunks) < 2:
             return {"redundancy_score": 0}
 
         embeddings = self.encode_cached(answer_chunks)
-        redundancy_scores = util.cos_sim(embeddings[:-1], embeddings[1:]).cpu().numpy().flatten()
+        redundancy_scores = (
+            util.cos_sim(embeddings[:-1], embeddings[1:]).cpu().numpy().flatten()
+        )
 
         if self.clear_mem:
             self.clear_memory()
 
         return {"redundancy_score": float(np.mean(redundancy_scores))}
 
-    #measures readability in an LLM-generated answer
+    # measures readability in an LLM-generated answer
     def readability_eval(self, answer):
         return {"readability_score": textstat.flesch_reading_ease(answer)}
-    
+
     def compression_ratio_eval(self, answer, retrieved_docs):
         if isinstance(retrieved_docs, str):
             retrieved_text = retrieved_docs

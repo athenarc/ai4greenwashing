@@ -30,7 +30,11 @@ pip install langchain-ollama chromadb langchain-groq
 pip install sentence-transformers
 ```
 
+You will also need to install the Crawl4AI tool in order to run the web_crawler annotator. Instructions can be found [here](https://github.com/unclecode/crawl4ai). You should install it inside your virtual environment.
+
 Additionally, for the llm API to work, you need to create your own private API key [here](https://console.groq.com/keys), and add it to the .env file that you must create in accordance with the .env.example file.
+
+Our databases that are utilized for the various RAG pipelines, are located in the ./reportparse/database_data folder. This folder is a prerequisite for the project to run. The folder has not been uploaded to the GitHub repository because of its size constraints. In case need access to it, feel free to contact us.
 
 Your private .env file must also include two large language models that are instaniated on the llm.py file. The Groq llm models that can be inserted can be found [here](https://console.groq.com/docs/models). We recommend the usage of `llama-3.3-70b-versatile` and `llama3-70b-8192` as a secondary one, in case the first one fails. Feel free to experiment with various models, as long as they are supported by the Groq API.
 

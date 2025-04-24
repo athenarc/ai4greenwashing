@@ -6,6 +6,7 @@ from reportparse.annotator.chroma_annotator import ChromaAnnotator
 from reportparse.annotator.reddit_annotator import RedditAnnotator
 from reportparse.annotator.chroma_esg_annotator import ChromaESGAnnotator
 from reportparse.annotator.news_annotator import NewsAnnotator
+from reportparse.annotator.crawler_annotator import WebCrawlerAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_2
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_FINAL
@@ -34,6 +35,7 @@ class LLMAggregator(BaseAnnotator):
     def __init__(self):
         load_dotenv()
         self.web = WEB_RAG_Annotator()
+        self.web_crawler = WebCrawlerAnnotator()
         self.chroma = ChromaAnnotator()
         self.reddit = RedditAnnotator()
         self.chroma_esg = ChromaESGAnnotator()
@@ -50,12 +52,13 @@ class LLMAggregator(BaseAnnotator):
         self.chroma_esg_result = ""
         self.news_result = ""
         self.web_info = ""
-        self.news_flag = True
-        self.chroma_esg_flag = True
+        self.news_flag = False
+        self.chroma_esg_flag = False
         self.web_rag_flag = False
-        self.chroma_db_flag = True
-        self.reddit_flag = True
-        self.aggregator_flag = True
+        self.web_crawler_flag = True
+        self.chroma_db_flag = False
+        self.reddit_flag = False
+        self.aggregator_flag = False
         self.first_pass_flag = True
         self.eval = llm_evaluation()
 
@@ -221,18 +224,21 @@ class LLMAggregator(BaseAnnotator):
             )
 
         # add pages to chroma_db. The total number of stored pages is defined by the --max_pages parameter
-        print("Starting storing in Chroma")
-        for page in document.pages:
-            if level == "page":
-                page_number = page.num
-                text = page.get_text_by_target_layouts(target_layouts=target_layouts)
-                self.chroma.chroma_db.store_page(
-                    doc_name=document.name, page_number=page_number, text=text
-                )
-                print(f"Stored page {page_number}")
-            else:
-                print("Page level is not specified")
-        print("Successfully stored all pages in chroma")
+        if self.chroma_db_flag:
+            print("Starting storing in Chroma")
+            for page in document.pages:
+                if level == "page":
+                    page_number = page.num
+                    text = page.get_text_by_target_layouts(
+                        target_layouts=target_layouts
+                    )
+                    self.chroma.chroma_db.store_page(
+                        doc_name=document.name, page_number=page_number, text=text
+                    )
+                    print(f"Stored page {page_number}")
+                else:
+                    print("Page level is not specified")
+            print("Successfully stored all pages in chroma")
 
         # temporary block of code to run for the past Hitachi esg reports
         # print("Starting storing in Chroma ESG")
@@ -290,7 +296,7 @@ class LLMAggregator(BaseAnnotator):
 
                 if self.first_pass_flag:
                     # call the first llm from chroma, that finds all potential greenwashing claims
-                    result = self.chroma.call_llm(text)
+                    result = self.web_crawler.call_llm(text)
                     result = str(result)
 
                     # add initial greenwashing detection without any annotators
@@ -398,8 +404,8 @@ class LLMAggregator(BaseAnnotator):
                             metadata=json_output,
                         )
 
-                    logger.info("News Annotator starting")
                     if self.news_flag:
+                        logger.info("News Annotator starting")
                         news_result, retrieved_sources, context = (
                             self.news_annotator.call_news_db(
                                 c, list(company_name), self.news_annotator.news_db, k=6
@@ -733,6 +739,87 @@ class LLMAggregator(BaseAnnotator):
                             metadata=json_output,
                         )
 
+                    if self.web_crawler_flag:
+                        logger.info("Web rag crawler starting")
+                        # add web_rag aggregation
+                        print(f"SEARCHING FOR CLAIM {c}")
+                        web_rag_result, url_list, web_info = (
+                            self.web_crawler.web_crawler_rag(c, 3, company_name)
+                        )
+                        self.web_rag_result = web_rag_result
+                        self.web_info = web_info
+                        if web_info:
+                            normalized_web_rag_result = self.eval.normalize_to_string(
+                                web_rag_result
+                            )
+                            web_chunks = self.eval.chunk_text(
+                                self.eval.normalize_to_string(web_info)
+                            )
+
+                            faith_eval = self.eval.faith_eval(
+                                answer=normalized_web_rag_result,
+                                retrieved_docs=web_info,
+                                precomputed_chunks=web_chunks,
+                            )
+                            groundedness_eval = self.eval.groundedness_eval(
+                                answer=normalized_web_rag_result,
+                                retrieved_docs=web_info,
+                                precomputed_chunks=web_chunks,
+                            )
+                            readability_eval = self.eval.readability_eval(
+                                normalized_web_rag_result
+                            )
+                            redundancy_eval = self.eval.redundancy_eval(
+                                normalized_web_rag_result, precomputed_chunks=web_chunks
+                            )
+                            specificity_eval = self.eval.specificity_eval(
+                                normalized_web_rag_result
+                            )
+                            compression_ratio_eval = self.eval.compression_ratio_eval(
+                                normalized_web_rag_result, web_info
+                            )
+                            lexical_diversity_eval = self.eval.lexical_diversity_eval(
+                                normalized_web_rag_result
+                            )
+                            noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
+                                normalized_web_rag_result
+                            )
+                        else:
+                            faith_eval = groundedness_eval = readability_eval = (
+                                redundancy_eval
+                            ) = None
+                            specificity_eval = compression_ratio_eval = (
+                                lexical_diversity_eval
+                            ) = noun_to_verb_ratio_eval = None
+
+                        claim_dict_webrag = {
+                            "claim": c,
+                            "urls": url_list,
+                            "label": self.web.extract_label(web_rag_result),
+                            "justification": self.web.extract_justification(
+                                web_rag_result
+                            ),
+                            "web_info": web_info,
+                            "faith_eval": faith_eval,
+                            "groundedness_eval": groundedness_eval,
+                            "readability_eval": readability_eval,
+                            "redundancy_eval": redundancy_eval,
+                            "specificity_eval": specificity_eval,
+                            "compression_ratio_eval": compression_ratio_eval,
+                            "lexical_diversity_eval": lexical_diversity_eval,
+                            "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                        }
+
+                        json_output = json.dumps(claim_dict_webrag)
+
+                        # annotate for web rag
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=web_rag_result,
+                            annotator_name=f"web_crawler_rag_result_claim_{claim_index}",
+                            metadata=json_output,
+                        )
+
                     logger.info("CTI starting")
                     cti_results = cti_classification(c)
                     _annotate(
@@ -841,154 +928,6 @@ class LLMAggregator(BaseAnnotator):
                                 }
                             ),
                         )
-
-                    # logger.info("Aggregator starting")
-                    # aggregator_result = self.call_aggregator(
-                    #     c, chroma_result, web_rag_result
-                    # )
-                    # print("Aggregator result: ", aggregator_result)
-                    # if aggregator_result:
-                    #     normalized_agg_rag_result = self.eval.normalize_to_string(
-                    #         aggregator_result
-                    #     )
-                    #     result_list = [chroma_result, web_rag_result]
-                    #     normalized_result_list = self.eval.normalize_to_string(result_list)
-                    #     agg_chunks = self.eval.chunk_text(normalized_result_list)
-
-                    #     faith_eval = self.eval.faith_eval(
-                    #         answer=normalized_agg_rag_result,
-                    #         retrieved_docs=agg_chunks,
-                    #         precomputed_chunks=agg_chunks,
-                    #     )
-                    #     groundedness_eval = self.eval.groundedness_eval(
-                    #         answer=normalized_agg_rag_result,
-                    #         retrieved_docs=agg_chunks,
-                    #         precomputed_chunks=agg_chunks,
-                    #     )
-                    #     readability_eval = self.eval.readability_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     redundancy_eval = self.eval.redundancy_eval(
-                    #         normalized_agg_rag_result, precomputed_chunks=agg_chunks
-                    #     )
-                    #     specificity_eval = self.eval.specificity_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     compression_ratio_eval = self.eval.compression_ratio_eval(
-                    #         normalized_agg_rag_result, web_info
-                    #     )
-                    #     lexical_diversity_eval = self.eval.lexical_diversity_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    # else:
-                    #     faith_eval = groundedness_eval = readability_eval = (
-                    #         redundancy_eval
-                    #     ) = None
-                    #     specificity_eval = compression_ratio_eval = (
-                    #         lexical_diversity_eval
-                    #     ) = noun_to_verb_ratio_eval = None
-
-                    # _annotate(
-                    #     _annotate_obj=page,
-                    #     _text=aggregator_result,
-                    #     annotator_name=f"aggregator_result_claim_{claim_index}",
-                    #     metadata=json.dumps(
-                    #         {
-                    #             "claim": c,
-                    #             "chroma_result": chroma_result,
-                    #             "web_rag_result": web_rag_result,
-                    #             "label": self.web.extract_label(aggregator_result),
-                    #             "justification": self.web.extract_justification(
-                    #                 aggregator_result
-                    #             ),
-                    #             "faith_eval": faith_eval,
-                    #             "groundedness_eval": groundedness_eval,
-                    #             "readability_eval": readability_eval,
-                    #             "redundancy_eval": redundancy_eval,
-                    #             "specificity_eval": specificity_eval,
-                    #             "compression_ratio_eval": compression_ratio_eval,
-                    #             "lexical_diversity_eval": lexical_diversity_eval,
-                    #             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
-                    #         }
-                    #     ),
-                    # )
-
-                    # logger.info("Aggregator 2 starting")
-                    # aggregator_result = self.call_aggregator_2(
-                    #     c, chroma_result, web_rag_result
-                    # )
-                    # print("Aggregator result: ", aggregator_result)
-                    # if aggregator_result:
-                    #     normalized_agg_rag_result = self.eval.normalize_to_string(
-                    #         aggregator_result
-                    #     )
-                    #     result_list = [web_rag_result, chroma_result]
-                    #     normalized_result_list = self.eval.normalize_to_string(result_list)
-                    #     agg_chunks = self.eval.chunk_text(normalized_result_list)
-
-                    #     faith_eval = self.eval.faith_eval(
-                    #         answer=normalized_agg_rag_result,
-                    #         retrieved_docs=agg_chunks,
-                    #         precomputed_chunks=agg_chunks,
-                    #     )
-                    #     groundedness_eval = self.eval.groundedness_eval(
-                    #         answer=normalized_agg_rag_result,
-                    #         retrieved_docs=agg_chunks,
-                    #         precomputed_chunks=agg_chunks,
-                    #     )
-                    #     readability_eval = self.eval.readability_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     redundancy_eval = self.eval.redundancy_eval(
-                    #         normalized_agg_rag_result, precomputed_chunks=agg_chunks
-                    #     )
-                    #     specificity_eval = self.eval.specificity_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     compression_ratio_eval = self.eval.compression_ratio_eval(
-                    #         normalized_agg_rag_result, web_info
-                    #     )
-                    #     lexical_diversity_eval = self.eval.lexical_diversity_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    #     noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
-                    #         normalized_agg_rag_result
-                    #     )
-                    # else:
-                    #     faith_eval = groundedness_eval = readability_eval = (
-                    #         redundancy_eval
-                    #     ) = None
-                    #     specificity_eval = compression_ratio_eval = (
-                    #         lexical_diversity_eval
-                    #     ) = noun_to_verb_ratio_eval = None
-
-                    # _annotate(
-                    #     _annotate_obj=page,
-                    #     _text=aggregator_result,
-                    #     annotator_name=f"aggregator_2_result_claim_{claim_index}",
-                    #     metadata=json.dumps(
-                    #         {
-                    #             "claim": c,
-                    #             "chroma_result": chroma_result,
-                    #             "web_rag_result": web_rag_result,
-                    #             "label": self.web.extract_label(aggregator_result),
-                    #             "justification": self.web.extract_justification(
-                    #                 aggregator_result
-                    #             ),
-                    #             "faith_eval": faith_eval,
-                    #             "groundedness_eval": groundedness_eval,
-                    #             "readability_eval": readability_eval,
-                    #             "redundancy_eval": redundancy_eval,
-                    #             "specificity_eval": specificity_eval,
-                    #             "compression_ratio_eval": compression_ratio_eval,
-                    #             "lexical_diversity_eval": lexical_diversity_eval,
-                    #             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
-                    #         }
-                    #     ),
-                    # )
 
                     claim_index += 1
                 gw_index += 1
