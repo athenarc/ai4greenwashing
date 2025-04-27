@@ -24,7 +24,7 @@ class KPIAnnotator(BaseAnnotator):
 
     def __init__(self):
 
-        defs_path = "/home/geoka/Desktop/greenwashing/ai4greenwashing/reportparse/kpi_definitions.json"
+        defs_path = "../kpi_definitions.json"
         # in __init__  (or wherever you load the JSON)
         with open(defs_path, "r", encoding="utf‑8") as f:
             self.all_kpi_defs = json.load(f)
