@@ -26,7 +26,7 @@ def filter_urls(url_list, metadata):
 
 def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
     urls = []
-    sites_source = []
+    sites_source = ["www.google.com"]
     # Removed exclude_terms and inurl_filters logic
     search_query = f"{query+' '+str(metadata[0])}"
     print("DDG QUERY IS:", search_query)

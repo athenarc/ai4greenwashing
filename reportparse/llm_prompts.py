@@ -21,9 +21,11 @@ FIRST_PASS_PROMPT = """You are a fact-checker, that specializes in greenwashing.
         
          Company Name: [the name of the company that the esg report belongs to]
          Potential greenwashing claim: [the text's snippet of the potentian greenwashing claim]
-         Justification: [short justification]
+         Label: [The type of greenwashing detected. For example, GREENWASHING TYPE 1]
+         Justification: [short justification about the greenwashing type detected and how the claim fits that type]
 
          Another potential greenwashing claim: [another text snippet]
+         Label: [The type of greenwashing detected. For example, GREENWASHING TYPE 1]
          Justification: [another justification]
          
          If no greenwashing claims are found, return this message:
@@ -33,8 +35,7 @@ FIRST_PASS_PROMPT = """You are a fact-checker, that specializes in greenwashing.
          """
 
 
-FIRST_PASS_PROMPT_WEB = """You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims.
-                           
+FIRST_PASS_PROMPT_WEB = """You are a fact-checker, that specializes in greenwashing. Fact-check the given text, and find if there are any greenwashing claims. 
         
          Greenwashing is defined as one of the following types
          
@@ -56,17 +57,19 @@ FIRST_PASS_PROMPT_WEB = """You are a fact-checker, that specializes in greenwash
          Your answer should follow the following format: 
         
          Company Name: [the name of the company that the esg report belongs to]
-         Potential greenwashing claim: [Make the potential greenwashing claim you found look like a query to a search engine mention the company name, and make it specific to filter out noise.]
-         Justification: [short justification]
+         Potential greenwashing claim raw: [The claim as you found it on the text] 
+         Potential greenwashing claim: [A rewritten, specific, company-named sentence that can be queried.]
+         Label: [The type of greenwashing detected. For example, GREENWASHING TYPE 1]
+         Justification: [short justification about the greenwashing type detected and how the claim fits that type]
 
-         Another potential greenwashing claim: [another claim]
+         Another potential greenwashing claim raw: [another claim as you found it on the text]    
+         Another potential greenwashing claim: [another text snippet]
+         Label: [The type of greenwashing detected. For example, GREENWASHING TYPE 1]
          Justification: [another justification]
          
          If no greenwashing claims are found, return this message:
          "No greenwashing claims found"
-         
-         
-         
+
          DO NOT MAKE ANY COMMENTARY JUST PROVIDE THE MENTIONED FORMAT.
          """
 
@@ -82,22 +85,9 @@ WEB_RAG_PROMPT = """You have at your disposal information '[Information]' and a 
 
                             Result: Provide a clear answer by choosing one of the following labels:
 
-                            - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
+                            - NOT_GREENWASHING: If the statement is confirmed by the information and evidence.
                 
-                            - GREENWASHING TYPE 1:  1. using unreliable sustainability labels (e.g., H&M and Decathlon have used labels such as eco design and conscious
-                                                    and were prompted by the Netherlands Authority for Consumers and Markets to stop the practice in 2022 as the
-                                                    retailers did not clearly describe why the products received those labels).
-
-                            - GREENWASHING TYPE 2:  presenting legal requirements for the product as its distinctive features (e.g., McDonald’s advertises its reduction
-                                                    of plastic waste by using reusable cutlery, while this is a legal obligation since January 2023 in France)
-
-                            - GREENWASHING TYPE 3:  making green claims about the entire product when the claim applies only to a part/aspect of the product (e.g.,
-                                                    Kohl’s and Walmart were fined by the U.S. Federal Trade Commission for the misleading claim that their products
-                                                    were made of bamboo, a sustainable material, when they were made out of rayon, which is derived from bamboo
-                                                    via a highly toxic process that removes any environmental benefits of bamboo)
-
-                            - GREENWASHING TYPE 4:  making environmental claims for which the company cannot provide evidence (e.g., Keurig was fined by Canada’s
-                                                    Competition Bureau for misleading claims about the recycling process of its single-use coffee pods). 
+                            - GREENWASHING: If the statement is a greenwashing statement based on the information and evidence.
                                                                         
                             - UNCLEAR: If the sources do not provide a clear conclusion regarding the statement's accuracy.
 
@@ -106,6 +96,8 @@ WEB_RAG_PROMPT = """You have at your disposal information '[Information]' and a 
                             Statement: '[User Input]'
                             Result of the statement:
                             Justification:"""
+
+
 CHROMA_PROMPT = """You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from the rest of the report, whose accuracy must be evaluated. 
                 If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
 
@@ -121,20 +113,7 @@ CHROMA_PROMPT = """You have at your disposal information a statement: '[User Inp
 
                 - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
                 
-                - GREENWASHING TYPE 1:  1. using unreliable sustainability labels (e.g., H&M and Decathlon have used labels such as eco design and conscious
-                                        and were prompted by the Netherlands Authority for Consumers and Markets to stop the practice in 2022 as the
-                                        retailers did not clearly describe why the products received those labels).
-
-                - GREENWASHING TYPE 2:  presenting legal requirements for the product as its distinctive features (e.g., McDonald’s advertises its reduction
-                                        of plastic waste by using reusable cutlery, while this is a legal obligation since January 2023 in France)
-
-                - GREENWASHING TYPE 3:  making green claims about the entire product when the claim applies only to a part/aspect of the product (e.g.,
-                                        Kohl’s and Walmart were fined by the U.S. Federal Trade Commission for the misleading claim that their products
-                                        were made of bamboo, a sustainable material, when they were made out of rayon, which is derived from bamboo
-                                        via a highly toxic process that removes any environmental benefits of bamboo)
-
-                - GREENWASHING TYPE 4:  making environmental claims for which the company cannot provide evidence (e.g., Keurig was fined by Canada’s
-                                        Competition Bureau for misleading claims about the recycling process of its single-use coffee pods). 
+                - GREENWASHING: If the statement is a greenwashing statement based on the information and evidence.
                                                                
                 - UNCLEAR: If the sources do not provide a clear conclusion regarding the statement's accuracy.
 
@@ -144,6 +123,8 @@ CHROMA_PROMPT = """You have at your disposal information a statement: '[User Inp
                 Statement: '[User Input]'
                             Result of the statement:
                             Justification:"""
+
+
 LLM_AGGREGATOR_PROMPT = """You have at your disposal two independent verdicts regarding the accuracy of a given statement: '[User Input]'.  
 
                 - The first verdict (Database Verdict) is derived from an LLM that has access to a structured database containing the entire document from which the statement was extracted.  
@@ -256,20 +237,7 @@ LLM_AGGREGATOR_PROMPT_FINAL = """You have at your disposal multiple independent 
                   
                 - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
                 
-                - GREENWASHING TYPE 1:  using unreliable sustainability labels (e.g., H&M and Decathlon have used labels such as eco design and conscious
-                                        and were prompted by the Netherlands Authority for Consumers and Markets to stop the practice in 2022 as the
-                                        retailers did not clearly describe why the products received those labels).
-
-                - GREENWASHING TYPE 2:  presenting legal requirements for the product as its distinctive features (e.g., McDonald’s advertises its reduction
-                                        of plastic waste by using reusable cutlery, while this is a legal obligation since January 2023 in France)
-
-                - GREENWASHING TYPE 3:  making green claims about the entire product when the claim applies only to a part/aspect of the product (e.g.,
-                                        Kohl’s and Walmart were fined by the U.S. Federal Trade Commission for the misleading claim that their products
-                                        were made of bamboo, a sustainable material, when they were made out of rayon, which is derived from bamboo
-                                        via a highly toxic process that removes any environmental benefits of bamboo)
-
-                - GREENWASHING TYPE 4:  making environmental claims for which the company cannot provide evidence (e.g., Keurig was fined by Canada’s
-                                        Competition Bureau for misleading claims about the recycling process of its single-use coffee pods). 
+                - GREENWASING: If the statement is a greenwashing claim based on the evidence.
                                                                
                 - UNCLEAR: If the sources do not provide a clear conclusion regarding the statement's accuracy.
 
@@ -398,22 +366,9 @@ NEWS_PROMPT = """You have at your disposal information '[Information]' and a sta
 
                             Result: Provide a clear answer by choosing one of the following labels:
 
-                             - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
+                             - NOT_GREENWASHING: If the statement is confirmed by the information and evidence.
                 
-                             - GREENWASHING TYPE 1: using unreliable sustainability labels (e.g., H&M and Decathlon have used labels such as eco design and conscious
-                                        and were prompted by the Netherlands Authority for Consumers and Markets to stop the practice in 2022 as the
-                                        retailers did not clearly describe why the products received those labels).
-
-                             - GREENWASHING TYPE 2:  presenting legal requirements for the product as its distinctive features (e.g., McDonald’s advertises its reduction
-                                        of plastic waste by using reusable cutlery, while this is a legal obligation since January 2023 in France)
-
-                             - GREENWASHING TYPE 3:  making green claims about the entire product when the claim applies only to a part/aspect of the product (e.g.,
-                                        Kohl’s and Walmart were fined by the U.S. Federal Trade Commission for the misleading claim that their products
-                                        were made of bamboo, a sustainable material, when they were made out of rayon, which is derived from bamboo
-                                        via a highly toxic process that removes any environmental benefits of bamboo)
-
-                             - GREENWASHING TYPE 4:  making environmental claims for which the company cannot provide evidence (e.g., Keurig was fined by Canada’s
-                                        Competition Bureau for misleading claims about the recycling process of its single-use coffee pods). 
+                             - GREENWASING: If the statement is a greenwashing claim based on the evidence.
                                                                
                              - UNCLEAR: If the sources do not provide a clear conclusion regarding the statement's accuracy.
                             

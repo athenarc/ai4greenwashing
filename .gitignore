@@ -157,3 +157,4 @@ reportparse/asset/example_output/
 reportparse/asset/example_inputs/
 reportparse/asset/example_outputs/
 cli_results/
+cti_plots.py

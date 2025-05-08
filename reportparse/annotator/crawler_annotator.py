@@ -81,7 +81,6 @@ class WebCrawlerAnnotator(BaseAnnotator):
         try:
             print("Invoking the first llm...")
             ai_msg = self.llm.invoke(messages)
-
             return ai_msg.content
         except Exception as e:
             print(e)

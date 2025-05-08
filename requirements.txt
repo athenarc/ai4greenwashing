@@ -182,3 +182,5 @@ pymongo[srv]
 rank_bm25
 textstat
 markdown
+seaborn
+rouge-score

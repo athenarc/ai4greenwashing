@@ -52,19 +52,22 @@ class LLMAggregator(BaseAnnotator):
         self.chroma_esg_result = ""
         self.news_result = ""
         self.web_info = ""
+        # flags for RAG pipelines
         self.news_flag = False
         self.chroma_esg_flag = False
         self.web_rag_flag = False
-        self.web_crawler_flag = True
+        self.web_crawler_flag = False
         self.chroma_db_flag = False
         self.reddit_flag = False
         self.aggregator_flag = False
         self.first_pass_flag = True
+        # flags for cti metrics
+        self.cti_flag = True
         self.eval = llm_evaluation()
 
         if os.getenv("USE_GROQ_API") == "True":
 
-            self.llm_2 = ChatGoogleGenerativeAI(
+            self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
                 max_tokens=None,
@@ -73,7 +76,7 @@ class LLMAggregator(BaseAnnotator):
                 google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
-            self.llm = ChatGroq(
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
@@ -258,6 +261,7 @@ class LLMAggregator(BaseAnnotator):
         print(f"Checking the first {gw_pages} pages for greenwashing")
         company_name = None
         for page in document.pages:
+
             if page.num < start_page:
                 continue
             if gw_index >= gw_pages:
@@ -295,10 +299,8 @@ class LLMAggregator(BaseAnnotator):
                 text = page.get_text_by_target_layouts(target_layouts=target_layouts)
 
                 if self.first_pass_flag:
-                    # call the first llm from chroma, that finds all potential greenwashing claims
                     result = self.web_crawler.call_llm(text)
                     result = str(result)
-
                     # add initial greenwashing detection without any annotators
                     _annotate(
                         _annotate_obj=page,
@@ -369,6 +371,17 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_chroma_esg_result
                             )
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_chroma_esg_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_chroma_esg_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_chroma_esg_result, context
+                            )
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -393,6 +406,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict)
@@ -450,6 +466,17 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_news_result
                             )
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_news_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_news_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_news_result, context
+                            )
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -474,6 +501,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict)
@@ -538,6 +568,19 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_chroma_result
                             )
+
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_chroma_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_chroma_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_chroma_result, context
+                            )
+
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -562,6 +605,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict_chroma)
@@ -623,6 +669,18 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_reddit_result
                             )
+
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_reddit_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_reddit_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_reddit_result, context
+                            )
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -647,6 +705,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict_reddit)
@@ -703,6 +764,19 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_web_rag_result
                             )
+
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_web_rag_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_web_rag_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_web_rag_result, context
+                            )
+
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -727,6 +801,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict_webrag)
@@ -784,6 +861,18 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_web_rag_result
                             )
+
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_web_rag_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_web_rag_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_web_rag_result, context
+                            )
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -808,6 +897,9 @@ class LLMAggregator(BaseAnnotator):
                             "compression_ratio_eval": compression_ratio_eval,
                             "lexical_diversity_eval": lexical_diversity_eval,
                             "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                            "bleu_score": bleu_score,
+                            "rouge_score": rouge_score,
+                            "meteor_score": meteor_score,
                         }
 
                         json_output = json.dumps(claim_dict_webrag)
@@ -819,23 +911,25 @@ class LLMAggregator(BaseAnnotator):
                             annotator_name=f"web_crawler_rag_result_claim_{claim_index}",
                             metadata=json_output,
                         )
-
-                    logger.info("CTI starting")
-                    cti_results = cti_classification(c)
-                    _annotate(
-                        _annotate_obj=page,
-                        _text=c,
-                        annotator_name=f"cti_results_{claim_index}",
-                        metadata=json.dumps(
-                            {
-                                "claim": c,
-                                "cti_metrics_climate": cti_results["climate"],
-                                "cti_metrics_commitment": cti_results["commitment"],
-                                "cti_metrics_sentiment": cti_results["sentiment"],
-                                "cti_metrics_specificity": cti_results["specificity"],
-                            }
-                        ),
-                    )
+                    if self.cti_flag:
+                        logger.info("CTI starting")
+                        cti_results = cti_classification(c)
+                        _annotate(
+                            _annotate_obj=page,
+                            _text=c,
+                            annotator_name=f"cti_results_{claim_index}",
+                            metadata=json.dumps(
+                                {
+                                    "claim": c,
+                                    "cti_metrics_climate": cti_results["climate"],
+                                    "cti_metrics_commitment": cti_results["commitment"],
+                                    "cti_metrics_sentiment": cti_results["sentiment"],
+                                    "cti_metrics_specificity": cti_results[
+                                        "specificity"
+                                    ],
+                                }
+                            ),
+                        )
 
                     if self.aggregator_flag:
                         logger.info("Final Aggregator starting")
@@ -893,6 +987,18 @@ class LLMAggregator(BaseAnnotator):
                             noun_to_verb_ratio_eval = self.eval.noun_to_verb_ratio_eval(
                                 normalized_agg_rag_result
                             )
+
+                            bleu_score = self.eval.compute_bleu(
+                                normalized_agg_rag_result, context
+                            )
+
+                            rouge_score = self.eval.compute_rouge(
+                                normalized_agg_rag_result, context
+                            )
+
+                            meteor_score = self.eval.compute_meteor(
+                                normalized_agg_rag_result, context
+                            )
                         else:
                             faith_eval = groundedness_eval = readability_eval = (
                                 redundancy_eval
@@ -925,6 +1031,9 @@ class LLMAggregator(BaseAnnotator):
                                     "compression_ratio_eval": compression_ratio_eval,
                                     "lexical_diversity_eval": lexical_diversity_eval,
                                     "noun_to_verb_ratio_eval": noun_to_verb_ratio_eval,
+                                    "bleu_score": bleu_score,
+                                    "rouge_score": rouge_score,
+                                    "meteor_score": meteor_score,
                                 }
                             ),
                         )

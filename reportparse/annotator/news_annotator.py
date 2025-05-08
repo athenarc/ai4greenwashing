@@ -25,7 +25,7 @@ class NewsAnnotator(BaseAnnotator):
         self.first_pass_prompt = FIRST_PASS_PROMPT
         self.news_prompt = NEWS_PROMPT
         if os.getenv("USE_GROQ_API") == "True":
-            self.llm_2 = ChatGoogleGenerativeAI(
+            self.llm = ChatGoogleGenerativeAI(
                 model=os.getenv("GEMINI_MODEL"),
                 temperature=0,
                 max_tokens=None,
@@ -34,7 +34,7 @@ class NewsAnnotator(BaseAnnotator):
                 google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
-            self.llm = ChatGroq(
+            self.llm_2 = ChatGroq(
                 model=os.getenv("GROQ_LLM_MODEL_1"),
                 temperature=0,
                 max_tokens=None,
@@ -218,10 +218,3 @@ class NewsAnnotator(BaseAnnotator):
             help=f"Choose between 1 and esg-report max page number",
             default=1,
         )
-
-        # parser.add_argument(
-        #     "--reddit_start_page",
-        #     type=int,
-        #     help=f"Choose starting page number (0-indexed)",
-        #     default=0,
-        # )

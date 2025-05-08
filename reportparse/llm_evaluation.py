@@ -8,6 +8,12 @@ import spacy
 import textstat
 import torch
 import gc
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from nltk.translate.meteor_score import meteor_score
+from rouge_score import rouge_scorer
+from nltk.data import find
+from nltk import download
+from nltk.tokenize import word_tokenize
 
 
 class llm_evaluation:
@@ -27,6 +33,13 @@ class llm_evaluation:
         )
         self.nlp = spacy.load("en_core_web_sm")
         self.embedding_cache = {}
+
+        try:
+            find("wordnet")
+            find("omw-1.4")
+        except LookupError:
+            download("wordnet")
+            download("omw-1.4")
 
     def normalize_to_string(self, content):
         if isinstance(content, str):
@@ -207,3 +220,29 @@ class llm_evaluation:
         verb_count = len([token for token in doc if token.pos_ == "VERB"])
         ratio = noun_count / verb_count if verb_count > 0 else 0
         return {"noun_to_verb_ratio": ratio}
+
+    # BLEU
+    def compute_bleu(self, answer, context):
+        context = " ".join(context) if isinstance(context, list) else context
+        context_tokens = [context.split()]
+        answer_tokens = answer.split()
+        smoothie = SmoothingFunction().method4
+        return sentence_bleu(context_tokens, answer_tokens, smoothing_function=smoothie)
+
+    # rouge score
+    def compute_rouge(self, answer, context):
+        context = " ".join(context) if isinstance(context, list) else context
+        scorer = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
+        score = scorer.score(context, answer)
+        return score["rougeL"].fmeasure
+
+    def compute_meteor(self, answer, context):
+        # Ensure context is a single string
+        context = " ".join(context) if isinstance(context, list) else context
+
+        # Tokenize the inputs
+        tokenized_context = word_tokenize(context)
+        tokenized_answer = word_tokenize(answer)
+
+        # Compute and return METEOR score
+        return meteor_score([tokenized_context], tokenized_answer)
