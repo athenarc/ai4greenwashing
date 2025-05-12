@@ -10,7 +10,7 @@ import ast
 class NewsChromaHandler(ChromaDBHandler):
     def __init__(self):
         super().__init__(extra_path="news_db")
-        self.df = pd.read_csv("reportparse/news_db/news_df.csv")
+        self.df = pd.read_csv("reportparse/news_db/news_df3.csv")
         self.df = self.df.dropna(subset=["content"])
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.collection = self.client.get_or_create_collection(

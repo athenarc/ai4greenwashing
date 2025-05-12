@@ -60,9 +60,9 @@ class LLMAggregator(BaseAnnotator):
         self.chroma_db_flag = False
         self.reddit_flag = False
         self.aggregator_flag = False
-        self.first_pass_flag = True
+        self.first_pass_flag = False
         # flags for cti metrics
-        self.cti_flag = True
+        self.cti_flag = False
         self.eval = llm_evaluation()
 
         if os.getenv("USE_GROQ_API") == "True":
@@ -88,65 +88,6 @@ class LLMAggregator(BaseAnnotator):
             self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
             self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
-
-    def call_aggregator(self, claim, chroma_result, web_rag_result):
-        messages = [
-            (
-                "system",
-                self.agg_prompt,
-            ),
-            (
-                "human",
-                f"""Statement: {claim}  
-                Database Verdict: {chroma_result}  
-                Web Verdict: {web_rag_result}  
-                """,
-            ),
-        ]
-        try:
-            logger.info("Calling LLM aggregator to verify claim with context")
-            try:
-
-                ai_msg = self.llm.invoke(messages)
-                print("AI message: ", ai_msg.content)
-                return ai_msg.content
-            except Exception as e:
-                print(f"Invokation error: {e}. Invoking with the second llm....")
-                ai_msg = self.llm_2.invoke(messages)
-                print("AI message: ", ai_msg.content)
-                return ai_msg.content
-        except Exception as e:
-            logger.error(f"Error calling LLM: {e}")
-            return "Error: Could not generate a response."
-
-    def call_aggregator_2(self, claim, chroma_result, web_rag_result):
-        messages = [
-            (
-                "system",
-                self.agg_prompt,
-            ),
-            (
-                "human",
-                f"""Statement: {claim}  
-                Web Verdict: {web_rag_result}  
-                Database Verdict: {chroma_result}  
-                """,
-            ),
-        ]
-        try:
-            logger.info("Calling LLM to verify claim with context")
-            try:
-                ai_msg = self.llm.invoke(messages)
-                print("AI message: ", ai_msg.content)
-                return ai_msg.content
-            except Exception as e:
-                print(f"Invokation error: {e}. Invoking with the second llm....")
-                ai_msg = self.llm_2.invoke(messages)
-                print("AI message: ", ai_msg.content)
-                return ai_msg.content
-        except Exception as e:
-            logger.error(f"Error calling LLM: {e}")
-            return "Error: Could not generate a response."
 
     def call_aggregator_final(
         self,

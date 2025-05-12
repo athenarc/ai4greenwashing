@@ -158,3 +158,6 @@ reportparse/asset/example_inputs/
 reportparse/asset/example_outputs/
 cli_results/
 cti_plots.py
+gw_result_exp1.csv
+Greenwashing_claims_esg_reports.csv
+Greenwashing_claims_esg_reports
