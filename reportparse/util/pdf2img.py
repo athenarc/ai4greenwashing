@@ -33,3 +33,4 @@ with tempfile.TemporaryDirectory() as temp_dir:
         output_path = os.path.join(output_dir, output_filename)
         img.save(output_path, 'JPEG')
         print(f"Saved {output_path}")
+
