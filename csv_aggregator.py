@@ -46,15 +46,15 @@ llm_agg = LLMAggregator()
 agg_prompt_final = LLM_AGGREGATOR_PROMPT_FINAL
 # flags for annotator invocation
 news_flag = True
-chroma_esg_flag = False
-web_rag_flag = True
-web_crawler_flag = False
+# chroma_esg_flag = False
+web_rag_flag = False
 chroma_db_flag = True
-reddit_flag = False
-aggregator_flag = False
-first_pass_flag = False
+chroma_db_flag_store = False
 reddit_flag = True
 final_aggregator_flag = True
+first_pass_flag = False
+parse_flag = False
+parse_flag_store = False
 # flags for cti metrics
 eval = llm_evaluation()
 
@@ -106,7 +106,9 @@ df = df.dropna(subset=["Company"])
 df["Year"] = df["Year"].apply(int)
 df = df[df["Year"] >= 2021]
 df = df[["Company", "Year", "Claim"]]
-result_df_path = "gw_result_exp1.csv"
+result_df_path = (
+    "experiment2_with_def.csv"  # name it as you like, change aggregation prompt
+)
 if os.path.exists(result_df_path):
     result_df = pd.read_csv(result_df_path)
 else:
@@ -127,46 +129,60 @@ blacklisted_reports = [
     "jbs_2021",
     "greenavocadomattress_2023",
     "giantgroup_2022",
+    "pepsi_2022",
+    "h&m_2022",
+    "nestle_2023",
 ]
 
+# on Greenwashing_claims_esg_reports, please rename ethiad to etihad and levissima into nestle before parsing
 
 for idx, row in df.iterrows():
 
+    if "id" in result_df.columns and idx in result_df["id"].values:
+        print(f"⚠️ ID {idx} already in result_df — skipping.")
+        continue
+    # chroma_db_flag_store = True
     company = str(row["Company"]).lower().strip()
     year = str(row["Year"]).lower().strip()
     esg_report = company + "_" + year
+    document_name = esg_report + ".pdf"
     claim = row["Claim"]
     print(f"Examining claim with id {idx}")
     print(f"Claim: {claim}")
     print()
-    input_path = f"Greenwashing_claims_esg_reports/{esg_report}.pdf"
+
     # saving the document
-    json_output_path = os.path.join(args.output, f"{esg_report}_{idx}" + ".json")
-    if os.path.exists(json_output_path):
-        print(f"✅ JSON found: {input_path}")
-        print("Skipping procedure....")
-        continue
-    else:
-        print(f"❌ JSON missing: {json_output_path}")
-        print("Starting the procedure...")
+    if True:
+        input_path = f"Greenwashing_claims_esg_reports/{esg_report}.pdf"
+        json_output_path = os.path.join(args.output, f"{esg_report}_{idx}" + ".json")
+        if os.path.exists(json_output_path):
+            print(f"✅ JSON found: {input_path}")
+            print("Skipping parsing....")
+            parse_flag = False
+        else:
+            print(f"❌ JSON missing: {json_output_path}")
+            print("Starting parsing...")
+            parse_flag = True
 
     if esg_report in blacklisted_reports:
         print("Cannot run this report due to size. Skipping it....")
         continue
 
-    try:
-        document = reader.read(input_path=input_path, args=args)
-        # if len(document.pages) >= 401:
-        #     print(f"File {esg_report} is too big. Skipping reading proceduce.....")
-        #     continue
-    except Exception as e:
-        print(f"ERROR: {e}")
-        continue
+    if parse_flag:
+        try:
+            document = reader.read(input_path=input_path, args=args)
+            print(f"Document name: {document.name}")
+            # if len(document.pages) >= 401:
+            #     print(f"File {esg_report} is too big. Skipping reading proceduce.....")
+            #     continue
+        except Exception as e:
+            print(f"ERROR: {e}")
+            continue
     # document.save(json_output_path)
     # logger.info(f'Saved the full output file to: "{json_output_path}".')
     # calling aggregators
 
-    if chroma_db_flag:
+    if chroma_db_flag_store:
         print("Starting storing in Chroma")
         for page in document.pages:
             page_number = page.num
@@ -174,7 +190,7 @@ for idx, row in df.iterrows():
                 target_layouts=["text", "list", "cell"]
             )
             chroma.chroma_db.store_page(
-                doc_name=document.name, page_number=page_number, text=text
+                doc_name=document_name, page_number=page_number, text=text
             )
             print(f"Stored page {page_number}")
         print("Successfully stored all pages in chroma")
@@ -183,27 +199,39 @@ for idx, row in df.iterrows():
         logger.info("Chroma annotator starting")
         chroma_result, chroma_retrieved_pages, chroma_context = chroma.call_chroma(
             claim,
-            document.name,
+            document_name,
             "",
-            page_number,
+            None,
             chroma.chroma_db,
             k=6,
             use_chunks=False,
         )
 
+    if not chroma_db_flag:
+        chroma_result, chroma_retrieved_pages, chroma_context = "", [], ""
+
     if web_rag_flag:
 
         logger.info("Web rag crawler starting")
+
+        llm_claim_result = web_crawler.call_llm(claim, False, company_name=company)
+        claim_query = web_crawler.extract_claim(llm_claim_result)
         # add web_rag aggregation
         web_rag_result, url_list, web_info = web_crawler.web_crawler_rag(
-            claim, 5, company
+            claim_query, 5, company
         )
+
+    if not web_rag_flag:
+        web_rag_result, url_list, web_info, claim_query = "", [], "", ""
 
     if news_flag:
         logger.info("News Annotator starting")
         news_result, news_retrieved_sources, news_context = news_annotator.call_news_db(
             claim, list(company), news_annotator.news_db, k=6
         )
+
+    if not news_flag:
+        news_result, news_retrieved_sources, news_context = "", [], ""
 
     if reddit_flag:
         logger.info("Reddit starting")
@@ -214,6 +242,9 @@ for idx, row in df.iterrows():
             k=6,
         )
 
+    if not reddit_flag:
+        reddit_result, reddit_retrieved_posts, reddit_context = "", [], ""
+
     if final_aggregator_flag:
         logger.info("Final Aggregator starting")
         aggregator_result = llm_agg.call_aggregator_final(
@@ -221,9 +252,18 @@ for idx, row in df.iterrows():
             chroma_result,
             web_rag_result,
             reddit_result,
-            "",
             news_result,
         )
+
+    if not final_aggregator_flag:
+        aggregator_result = ""
+
+    if first_pass_flag:
+        first_pass_result = web_crawler.call_llm(claim)
+        print(f"First pass result: {first_pass_result}")
+        first_pass_result = str(first_pass_result)
+    if not first_pass_flag:
+        first_pass_result = ""
 
     logger.info(f"Adding a new dataframe row....")
     new_data = {
@@ -231,26 +271,37 @@ for idx, row in df.iterrows():
         "Claim": claim,
         "Year": year,
         "Company": company,
-        "ESG_Report": document.name,
-        "Chroma_retrieved_pages": [int(page) + 1 for page in chroma_retrieved_pages],
-        "Chroma_context": chroma_context,
-        "Chroma_label": chroma.extract_label(chroma_result),
-        "Chroma_justification": chroma.extract_justification(chroma_result),
-        "Web_rag_context": web_info,
-        "Web_rag_urls": url_list,
-        "Web_rag_label": web.extract_label(web_rag_result),
-        "Web_rag_justification": web.extract_justification(web_rag_result),
-        "News_context": news_context,
-        "News_retrieved_pages": news_retrieved_sources,
-        "News_label": news_annotator.extract_label(news_result),
-        "News_justification": news_annotator.extract_justification(news_result),
-        "Reddit_context": reddit_context,
-        "Reddit_retrieved_pages": reddit_retrieved_posts,
-        "Reddit_label": reddit.extract_label(reddit_result),
-        "Reddit_justification": reddit.extract_justification(reddit_result),
-        "Aggregator result": aggregator_result,
-        "Aggregator label": chroma.extract_label(aggregator_result),
-        "Aggregator justification": chroma.extract_justification(aggregator_result),
+        # "ESG_Report": document.name,
+        "chroma_retrieved_pages": [int(page) + 1 for page in chroma_retrieved_pages],
+        "chroma_context": chroma_context,
+        "chroma_label": chroma.extract_label(chroma_result),
+        "chroma_score": web_crawler.extract_regression_score(chroma_result),
+        "chroma_justification": chroma.extract_justification(chroma_result),
+        "web_rag_context": web_info,
+        "web_rag_urls": url_list,
+        "web_rag_label": chroma.extract_label(web_rag_result),
+        "web_rag_score": web_crawler.extract_regression_score(web_rag_result),
+        "web_rag_justification": web.extract_justification(web_rag_result),
+        "web_rag_claim_query": claim_query,
+        "news_context": news_context,
+        "news_retrieved_pages": news_retrieved_sources,
+        "news_label": chroma.extract_label(news_result),
+        "news_score": web_crawler.extract_regression_score(news_result),
+        "news_justification": news_annotator.extract_justification(news_result),
+        "reddit_context": reddit_context,
+        "reddit_retrieved_pages": reddit_retrieved_posts,
+        "reddit_label": chroma.extract_label(reddit_result),
+        "reddit_score": web_crawler.extract_regression_score(reddit_result),
+        "reddit_justification": reddit.extract_justification(reddit_result),
+        "aggregator_result": aggregator_result,
+        "aggregator_label": chroma.extract_label(aggregator_result),
+        "aggregator_score": web_crawler.extract_regression_score(aggregator_result),
+        "aggregator_justification": chroma.extract_justification(aggregator_result),
+        "first_pass_label": web_crawler.extract_label(first_pass_result),
+        "first_pass_score": web_crawler.extract_regression_score(first_pass_result),
+        "first_pass_justification": web_crawler.extract_justification(
+            first_pass_result
+        ),
     }
 
     new_data_df = pd.DataFrame([new_data])
@@ -259,6 +310,9 @@ for idx, row in df.iterrows():
 
     logger.info(f"Row added successfully")
 
-    document.save(json_output_path)
-    logger.info(f'Saved the full output file to: "{json_output_path}".')
-    # break
+    if parse_flag_store:
+        document.save(json_output_path)
+        logger.info(f'Saved the full output file to: "{json_output_path}".')
+
+
+print(len(result_df))

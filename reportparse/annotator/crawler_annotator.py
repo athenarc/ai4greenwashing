@@ -3,7 +3,11 @@ from reportparse.util.settings import LAYOUT_NAMES, LEVEL_NAMES
 from reportparse.structure.document import Document
 from reportparse.structure.document import Document, AnnotatableLevel, Annotation
 from reportparse.web_rag.crawl4ai import crawl4ai
-from reportparse.llm_prompts import FIRST_PASS_PROMPT_WEB, WEB_RAG_PROMPT
+from reportparse.llm_prompts import (
+    FIRST_PASS_PROMPT_WEB,
+    WEB_RAG_PROMPT,
+    CLAIM_TRANSFORMATION_PROMPT,
+)
 import argparse
 import re
 import os
@@ -27,6 +31,7 @@ class WebCrawlerAnnotator(BaseAnnotator):
         load_dotenv()
         self.first_pass_prompt = FIRST_PASS_PROMPT_WEB
         self.web_rag_prompt = WEB_RAG_PROMPT
+        self.transform_prompt = CLAIM_TRANSFORMATION_PROMPT
 
         self.llm = ChatGoogleGenerativeAI(
             model=os.getenv("GEMINI_MODEL"),
@@ -46,7 +51,10 @@ class WebCrawlerAnnotator(BaseAnnotator):
             groq_api_key=os.getenv("GROQ_API_KEY_1"),
         )
 
-    def call_llm(self, text):
+    def call_llm(self, text, first_pass, company_name):
+        prompt = self.first_pass_prompt if first_pass else self.transform_prompt
+        text = str(text) + f"Company Name: {company_name}" if not first_pass else text
+
         if os.getenv("USE_GROQ_API") == "True":
 
             self.llm = ChatGoogleGenerativeAI(
@@ -73,9 +81,9 @@ class WebCrawlerAnnotator(BaseAnnotator):
         messages = [
             (
                 "system",
-                self.first_pass_prompt,
+                prompt,
             ),
-            ("human", text),
+            ("human", f"Claim: {text}"),
         ]
 
         try:
@@ -97,12 +105,32 @@ class WebCrawlerAnnotator(BaseAnnotator):
     def extract_label(self, text):
         try:
             match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
+                r"Label:\s*(.*?)\s*(?:regression_score:|Justification:|$)",
+                text,
+                re.IGNORECASE,
             )
             return match.group(1).strip() if match else ""
         except Exception as e:
             print(f"Error during label extraction: {e}")
             return None
+
+    def extract_claim(self, text):
+        try:
+            query_match = re.search(
+                r"Search Query:\s*(.*?)\s*$", text, re.IGNORECASE | re.DOTALL
+            )
+            query = query_match.group(1).strip() if query_match else ""
+            return query
+
+        except Exception as e:
+            print(f"Error during extraction: {e}")
+            return None
+
+    def extract_regression_score(self, text):
+        match = re.search(r"regression_score:\s*([01](?:\.\d+)?)", text, re.IGNORECASE)
+        if match:
+            return float(match.group(1))
+        return None
 
     def extract_justification(self, text):
         try:

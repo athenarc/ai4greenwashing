@@ -11,6 +11,8 @@ result/
 results/
 log/
 .cache/
+csv_results
+*.csv
 
 protobuf/
 

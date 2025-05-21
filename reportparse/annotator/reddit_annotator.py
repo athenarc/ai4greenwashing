@@ -157,7 +157,7 @@ class RedditAnnotator(BaseAnnotator):
     def extract_label(self, text):
         try:
             match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
+                r"Result of the statement:(.*?)regression_score:", text, re.DOTALL
             )
             return match.group(1).strip() if match else ""
         except Exception as e:

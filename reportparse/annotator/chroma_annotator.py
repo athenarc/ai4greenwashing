@@ -85,12 +85,7 @@ class ChromaAnnotator(BaseAnnotator):
             results = collection.query(
                 query_texts=[claim],
                 n_results=k,
-                where={
-                    "$and": [
-                        {"doc_name": document_name},
-                        {"page_number": {"$ne": page_number}},
-                    ]
-                },  # Exclude the current page
+                where={"doc_name": document_name},
             )
             if results is None:
                 return "", []
@@ -154,7 +149,9 @@ class ChromaAnnotator(BaseAnnotator):
     def extract_label(self, text):
         try:
             match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
+                r"Label:\s*(.*?)\s*(?:regression_score:|Justification:|$)",
+                text,
+                re.IGNORECASE,
             )
             return match.group(1).strip() if match else ""
         except Exception as e:

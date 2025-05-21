@@ -95,7 +95,6 @@ class LLMAggregator(BaseAnnotator):
         chroma_result,
         web_rag_result,
         reddit_result,
-        chroma_esg_result,
         news_result,
     ):
 
@@ -110,7 +109,6 @@ class LLMAggregator(BaseAnnotator):
                 Chroma Verdict: {chroma_result}
                 Web Verdict: {web_rag_result }
                 Reddit Verdict: {reddit_result}
-                Chroma-ESG Verdict: {chroma_esg_result}
                 News Verdict: {news_result} 
                 """,
             ),

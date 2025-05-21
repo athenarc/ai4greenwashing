@@ -18,6 +18,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @BaseAnnotator.register("web_rag")
 class WEB_RAG_Annotator(BaseAnnotator):
 
@@ -96,7 +97,7 @@ class WEB_RAG_Annotator(BaseAnnotator):
     def extract_label(self, text):
         try:
             match = re.search(
-                r"Result of the statement:(.*?)Justification:", text, re.DOTALL
+                r"Result of the statement:(.*?)regression_score:", text, re.DOTALL
             )
             return match.group(1).strip() if match else ""
         except Exception as e:
@@ -114,7 +115,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
     # todo: add info truncation if text is too big for llm to handle.
     def search_ddg(self, claim, web_sources, company_name):
         try:
-            pip = pipeline(claim, web_sources, company_name)  # Rename or clarify if needed
+            pip = pipeline(
+                claim, web_sources, company_name
+            )  # Rename or clarify if needed
             result, url_list = pip.retrieve_knowledge()
             if result is None:
                 logger.warning("Retrieved result is None")
@@ -130,7 +133,6 @@ class WEB_RAG_Annotator(BaseAnnotator):
         except Exception as e:
             logger.exception(f"Error during web search: {e}")
             return None, [], None
-
 
     def web_rag(self, claim, web_sources, company_name):
         info, url_list, _ = self.search_ddg(claim, web_sources, company_name)
@@ -217,7 +219,9 @@ class WEB_RAG_Annotator(BaseAnnotator):
                     claims = [c.strip() for c in claims]
                     for c in claims:
 
-                        web_rag_result, url_list, web_info = self.web_rag(c, 1, company_name)
+                        web_rag_result, url_list, web_info = self.web_rag(
+                            c, 1, company_name
+                        )
                         print(f"SEARCHING FOR CLAIM: {c}")
                         claim_dict = {
                             "claim": c,

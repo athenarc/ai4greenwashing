@@ -5,6 +5,7 @@ from crawl4ai import AsyncWebCrawler, CrawlerRunConfig, CacheMode
 from markdown import markdown
 from bs4 import BeautifulSoup
 import nltk
+from reportparse.web_rag.SearchEngine import SearchEngine
 
 nltk.download("punkt")
 from reportparse.web_rag.search import google_search
@@ -15,10 +16,14 @@ class crawl4ai:
         self.claim = claim
         self.meta = metadata
         self.web_sources = web_sources
-        self.model = SentenceTransformer("distiluse-base-multilingual-cased-v2")
+        self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        self.search_engine = SearchEngine(web_sources)
 
     def get_urls(self):
-        self.urls = google_search(self.claim, self.web_sources, self.meta)
+        # self.urls = google_search(self.claim, self.web_sources, self.meta)
+        self.urls = self.search_engine.call_engine(self.claim)
+        print(f"URLS: {self.urls}")
+        print(f"Claim is: {self.claim}")
         return self.urls
 
     def chunk_text(self, text, chunk_size=500, overlap_size=50):
@@ -73,34 +78,27 @@ class crawl4ai:
 
     async def run_crawler(self):
         urls = self.get_urls()
-        print(urls)
         run_conf = CrawlerRunConfig(cache_mode=CacheMode.BYPASS, stream=True)
+
+        similar_texts = []
+        successful_urls = []
 
         async with AsyncWebCrawler() as crawler:
             async for result in await crawler.arun_many(urls, config=run_conf):
-                if result.success:
+                if result.success and len(result.markdown.raw_markdown) > 1:
                     print(
                         f"[OK] {result.url}, length: {len(result.markdown.raw_markdown)}"
                     )
+                    similar_chunks = self.get_sim_text(
+                        self.convert_markdown_to_text(result.markdown.raw_markdown),
+                    )
+                    similar_texts.append(similar_chunks)
+                    successful_urls.append(result.url)
                 else:
                     print(f"[ERROR] {result.url} => {result.error_message}")
 
-            run_conf = run_conf.clone(stream=False)
-            results = await crawler.arun_many(urls, config=run_conf)
-            similar_texts = []
-            for res in results:
-                if res.success:
+        final_info = ""
+        for text in similar_texts:
+            final_info += "\n".join(text) + "\n\n"
 
-                    print(f"[OK] {res.url}, length: {len(res.markdown.raw_markdown)}")
-                    similar_chunks = self.get_sim_text(
-                        self.convert_markdown_to_text(res.markdown.raw_markdown),
-                    )
-                    similar_texts.append(similar_chunks)
-                else:
-                    print(f"[ERROR] {res.url} => {res.error_message}")
-
-            print("Similar texts:")
-            final_info = ""
-            for text in similar_texts:
-                final_info += "\n".join(text) + "\n\n"
-        return final_info, urls
+        return final_info, successful_urls

@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 doc_extensions = ["doc", "docx", "php", "pdf", "txt", "theFile", "file", "xls"]
 
 pattern = r"[./=]([a-zA-Z0-9]+)$"
+blacklist = ["goodonyou.eco", "theedgemalaysia.com"]
 
 
 def is_valid_result(url):
@@ -19,7 +20,10 @@ def filter_urls(url_list, metadata):
     filtered_urls = []
     for url in url_list:
         url_domain = urlparse(url).netloc
-        if str(metadata).lower() not in url_domain.lower():
+        if (
+            str(metadata).lower() not in url_domain.lower()
+            and url_domain not in blacklist
+        ):
             filtered_urls.append(url)
     return [r for r in filtered_urls if is_valid_result(filtered_urls)]
 
@@ -60,7 +64,7 @@ def google_search(query, web_sources, metadata, retries=5, backoff_time=2):
         except Exception as e:
             print(f"Error: {e}, attempt {attempt + 1}/{retries}")
             if attempt < retries - 1:
-                wait_time = backoff_time  # * (2**attempt)  # Exponential backoff
+                wait_time = backoff_time * (attempt)  # Exponential backoff
                 print(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
