@@ -11,7 +11,7 @@ result/
 results/
 log/
 .cache/
-csv_results
+
 *.csv
 
 protobuf/
@@ -163,3 +163,6 @@ cti_plots.py
 gw_result_exp1.csv
 Greenwashing_claims_esg_reports.csv
 Greenwashing_claims_esg_reports
+csv_results
+poster_plots
+searxng

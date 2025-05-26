@@ -9,7 +9,10 @@ from reportparse.annotator.news_annotator import NewsAnnotator
 from reportparse.annotator.crawler_annotator import WebCrawlerAnnotator
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_2
-from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_FINAL
+from reportparse.llm_prompts import (
+    LLM_AGGREGATOR_PROMPT_FINAL,
+    LLM_AGGREGATOR_PROMPT_FINAL_2,
+)
 from reportparse.climate_cti import cti_classification
 from reportparse.llm_evaluation import llm_evaluation
 import argparse
@@ -44,6 +47,7 @@ class LLMAggregator(BaseAnnotator):
         self.mongo_db = self.mongo_client["pdf_annotations"]  # Database name
         self.mongo_collection = self.mongo_db["annotations"]  # Collection name
         self.agg_prompt_final = LLM_AGGREGATOR_PROMPT_FINAL
+        self.agg_prompt_final_2 = LLM_AGGREGATOR_PROMPT_FINAL_2
         self.agg_prompt = LLM_AGGREGATOR_PROMPT
         self.agg_prompt_2 = LLM_AGGREGATOR_PROMPT_2
         self.chroma_result = ""
@@ -110,6 +114,43 @@ class LLMAggregator(BaseAnnotator):
                 Web Verdict: {web_rag_result }
                 Reddit Verdict: {reddit_result}
                 News Verdict: {news_result} 
+                """,
+            ),
+        ]
+        try:
+            logger.info("Calling LLM aggregator to verify claim with context")
+            try:
+                ai_msg = self.llm.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+            except Exception as e:
+                print(f"Invokation error: {e}. Invoking with the second llm....")
+                ai_msg = self.llm_2.invoke(messages)
+                print("AI message: ", ai_msg.content)
+                return ai_msg.content
+        except Exception as e:
+            logger.error(f"Error calling LLM: {e}")
+            return "Error: Could not generate a response."
+
+    def call_aggregator_final_2(
+        self,
+        claim,
+        chroma_result,
+        web_rag_result,
+        news_result,
+    ):
+
+        messages = [
+            (
+                "system",
+                self.agg_prompt_final_2,
+            ),
+            (
+                "human",
+                f"""Statement: {claim}  
+                Chroma Context: {chroma_result}
+                Web Context: {web_rag_result }
+                News Context: {news_result} 
                 """,
             ),
         ]

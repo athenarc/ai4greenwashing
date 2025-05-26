@@ -316,6 +316,59 @@ LLM_AGGREGATOR_PROMPT_FINAL = """You have at your disposal multiple independent 
                 Justification: [short justification about the greenwashing type detected and how the claim fits that type]
                 """
 
+
+LLM_AGGREGATOR_PROMPT_FINAL_2 = """You have at your disposal multiple independent contexes regarding the accuracy of a given statement: '[User Input]'.  
+
+                - The first context (Web context) is derived from information retrieval from the web to assess the claim. If no content was found from the web, the Web context will contain will be empty. Proceed with the analysis using only the rest of the contextes.
+                - The second context (Chroma context) is derived from a structured database containing the entire document from which the statement was extracted. If no content was found from Chroma, the Chroma context will be empty. Proceed with the analysis using only the rest of the contextes.
+                - The third context (News context) is derived from a structured database that analyzes news articles related to the statement. If no content was found from News, the News context will be empty. Proceed with the analysis using only the rest of the contextes.
+                
+                Your task is to analyze all the contexes and reach a final conclusion regarding the statement's accuracy.  
+
+                Use only the provided information in combination with your knowledge to decide whether the statement is one of the labels below.  
+
+                Before making your final decision:  
+
+                1. Analyze the given statement clearly to identify its key elements.  
+                2. Examine the reasoning all of the contexes.
+                3. Compare all the verdicts and resolve any discrepancies by determining which source provides stronger, more reliable justification.  
+                4. Use your own reasoning to synthesize the evidence and reach a final, well-supported conclusion.  
+
+                - NOT_GREENWASHING: If the statement is confirmed by the information and evidence in the rest of the report.
+                
+                - GREENWASHING TYPE 1:  using unreliable sustainability labels (e.g., H&M and Decathlon have used labels such as eco design and conscious
+                                        and were prompted by the Netherlands Authority for Consumers and Markets to stop the practice in 2022 as the
+                                        retailers did not clearly describe why the products received those labels).
+
+                - GREENWASHING TYPE 2:  presenting legal requirements for the product as its distinctive features (e.g., McDonald’s advertises its reduction
+                                        of plastic waste by using reusable cutlery, while this is a legal obligation since January 2023 in France)
+
+                - GREENWASHING TYPE 3:  making green claims about the entire product when the claim applies only to a part/aspect of the product (e.g.,
+                                        Kohl’s and Walmart were fined by the U.S. Federal Trade Commission for the misleading claim that their products
+                                        were made of bamboo, a sustainable material, when they were made out of rayon, which is derived from bamboo
+                                        via a highly toxic process that removes any environmental benefits of bamboo)
+
+                - GREENWASHING TYPE 4:  making environmental claims for which the company cannot provide evidence (e.g., Keurig was fined by Canada’s
+                                        Competition Bureau for misleading claims about the recycling process of its single-use coffee pods). 
+                                                               
+                - UNCLEAR: If the sources do not provide a clear conclusion regarding the statement's accuracy.
+
+                Additionally, output a REGRESSION_SCORE between 0 and 1:
+
+                - 0 means you are completely certain it is NOT greenwashing.
+                - 1 means you are completely certain it is greenwashing.
+                - Values in between represent your degree of uncertainty (e.g., 0.5 = completely uncertain, 0.8 = fairly certain it is greenwashing,  0.2 = fairly certain it is NOT greenwashing).
+                    
+                Finally, explain your reasoning clearly and focus on the provided data and your own knowledge. Avoid unnecessary details and try to be precise and concise in your analysis. Your answers should be in the following format:
+
+                
+                Greenwashing claim: [the greenwashing claim you were given]
+                Label: [The type of greenwashing detected. For example, GREENWASHING TYPE 1]
+                regression_score: [the score between 0 and 1]
+                Justification: [short justification about the greenwashing type detected and how the claim fits that type]
+                """
+
+
 REDDIT_PROMPT = """You have at your disposal information a statement: '[User Input]', extracted from a specific page: '[page_text]' of a report and relavant context: '[Context]' from a database with reddit posts, from a greenwashing subreddit, whose accuracy must be evaluated. 
                 If part of information is missing, proceed with the analysis using only the information you have, or your knowledge.
 
