@@ -80,17 +80,19 @@ class LLMAggregator(BaseAnnotator):
                 google_api_key=os.getenv("GEMINI_API_KEY"),
             )
 
-            self.llm_2 = ChatGroq(
-                model=os.getenv("GROQ_LLM_MODEL_1"),
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=1,
-                groq_api_key=os.getenv("GROQ_API_KEY_1"),
-            )
+            # self.llm_2 = ChatGroq(
+            #     model=os.getenv("GROQ_LLM_MODEL_1"),
+            #     temperature=0,
+            #     max_tokens=None,
+            #     timeout=None,
+            #     max_retries=1,
+            #     groq_api_key=os.getenv("GROQ_API_KEY_1"),
+            # )
+            self.llm_2 = self.llm
         else:
-            self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
-            self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            pass
+            # self.llm = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
+            # self.llm_2 = ChatOllama(model=os.getenv("OLLAMA_MODEL"), temperature=0)
         return
 
     def call_aggregator_final(
