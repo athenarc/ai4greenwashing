@@ -3,9 +3,16 @@
 import ast
 import re
 import pandas as pd
+from dotenv import load_dotenv
 
-df_kg = pd.read_csv("kg_results_sample.csv")
-df_kg.head()
+load_dotenv()
+
+
+df = pd.read_csv(
+    "kg_results_10_per_cent.csv"
+)  # the file where my triplets are stored at
+df_kg = df[df["article_graph"].apply(lambda x: x != "[]")]
+
 
 pattern = re.compile(r"\[\d+\]")
 
@@ -41,98 +48,68 @@ def clean_triplets(triplets):
     return cleaned
 
 
-df_kg["article_graph_cleaned"] = df_kg["article_graph"].apply(clean_triplets)
-
-
 # Step 2: Gather all triplets in a list
-
 triplets_collection = []
 for index, row in df_kg.iterrows():
-    triplets = row["article_graph_cleaned"]
+    triplets = row["article_graph"]
     for triplet in triplets:
         triplets_collection.append(triplet)
 
-# Step 3: Create a knowledge graph using networkx library
 
-import networkx as nx
+# Step 5: create a {article_id1: [(subj1, pred1, obj1), (subj2, pred2, obj2)], article_id2: [...], ...} format
 
+df_kg["article_graph"] = df_kg["article_graph"].apply(clean_triplets)
+# df_kg["neo4js_graph"] = df_kg["article_graph"].apply(ast.literal_eval)
 
-def build_kg(triplets_collection):
-    G = nx.MultiDiGraph()
-    for subj, pred, obj in triplets_collection:
-        # print(f"Adding triplet: {subj} - {pred} -> {obj}")
-        G.add_node(subj)
-        G.add_node(obj)
-        G.add_edge(subj, obj, relation=pred)
-
-    return G
+# Build the dictionary
+triplets_by_article = dict(zip(df_kg["id"], df_kg["article_graph"]))
 
 
-kg_graph = build_kg(triplets_collection)
+# # Step 6: Store the graph in a neo4j database
+from neo4j import GraphDatabase
+import os
+
+uri = os.getenv("NEO4J_URI")
+user = os.getenv("NEO4J_USER")
+password = os.getenv("NEO4J_PASS")
+
+driver = GraphDatabase.driver(uri, auth=(user, password))
 
 
-# Step 4: Visualize results
+# Delete all existing nodes and relationships
+def clear_database():
+    with driver.session() as session:
+        session.run("MATCH (n) DETACH DELETE n")
 
-import matplotlib.pyplot as plt
 
-
-def visualize_existing_graph(G, figsize=(14, 10)):
-    pos = nx.spring_layout(G, k=0.7, iterations=100)
-
-    plt.figure(figsize=figsize)
-
-    # Draw nodes
-    nx.draw_networkx_nodes(G, pos, node_color="lightblue", node_size=2000)
-
-    # Draw edges with arrows
-    nx.draw_networkx_edges(
-        G, pos, arrowstyle="->", arrowsize=20, connectionstyle="arc3,rad=0.1"
-    )
-
-    # Draw node labels
-    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold")
-
-    # Draw edge labels (predicates)
-    edge_labels = {
-        (u, v, k): d["relation"]
-        for u, v, k, d in G.edges(keys=True, data=True)
-        if "relation" in d
-    }
-    nx.draw_networkx_edge_labels(
-        G, pos, edge_labels=edge_labels, font_color="gray", font_size=9
-    )
-
-    plt.title("Knowledge Graph Visualization", fontsize=14)
-    plt.axis("off")
-    plt.tight_layout()
-    plt.savefig(
-        "../example_outputs/knowledge_graph_sample.png", dpi=300, bbox_inches="tight"
+# Create and connect triplets to articles
+def create_triplet_with_article(tx, article_id, subject, predicate, obj):
+    safe_predicate = "".join(c if c.isalnum() else "_" for c in predicate.upper())
+    query = f"""
+    MERGE (article:Article {{id: $article_id}})
+    MERGE (s:Entity {{name: $subject}})
+    MERGE (o:Entity {{name: $object}})
+    MERGE (s)-[:{safe_predicate}]->(o)
+    MERGE (article)-[:CONTEXT_OF]->(s)
+    MERGE (article)-[:CONTEXT_OF]->(o)
+    """
+    tx.run(
+        query, article_id=article_id, subject=subject, predicate=predicate, object=obj
     )
 
 
-# visualize_existing_graph(kg_graph)
+def insert_triplets(triplets_by_article):
+    with driver.session() as session:
+        for article_id, triplets in triplets_by_article.items():
+            for subj, pred, obj in triplets:
+                session.execute_write(
+                    create_triplet_with_article, article_id, subj, pred, obj
+                )
 
 
-def visualize_subgraph(G, center_node=None, depth=1, max_nodes=20):
-    if center_node and center_node in G:
-        nodes = set([center_node])
-        for _ in range(depth):
-            neighbors = set()
-            for node in nodes:
-                neighbors.update(G.successors(node))
-                neighbors.update(G.predecessors(node))
-            nodes.update(neighbors)
-        subgraph = G.subgraph(nodes)
-    else:
-        # Show a random subset of nodes (up to max_nodes)
-        nodes = list(G.nodes())[:max_nodes]
-        subgraph = G.subgraph(nodes)
+# Clear existing data
+# clear_database()
 
-    visualize_existing_graph(subgraph)
-
-
-# Focus around a key concept, like 'Pledge'
-visualize_subgraph(kg_graph, center_node="Pledge", depth=2)
-
-
-# Step 5: Store the graph in a neo4j database
+# Build triplets_by_article dictionary (assumes you have this)
+# Format: {article_id1: [(subj1, pred1, obj1), (subj2, pred2, obj2)], article_id2: [...], ...}
+insert_triplets(triplets_by_article)
