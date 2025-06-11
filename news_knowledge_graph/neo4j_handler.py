@@ -45,21 +45,20 @@ class neo4j_handler:
                         self.create_triplet_with_article, article_id, subj, pred, obj
                     )
 
-    #generate entities from a claim
+    # generate entities from a claim
     def generate_entities(self, claim):
         try:
             llm_extractor = triplet_extractor()
             llm_result = llm_extractor.call_triplet_llm(claim)
             entities = llm_extractor.extract_entities(llm_result)
-            return entities 
+            return entities
         except Exception as e:
-            print(f'Error in entity generation: {e}')
+            print(f"Error in entity generation: {e}")
             return []
 
-
-    #this function traverses the graph knowledge base to find all articles based on an entity
+    # this function traverses the graph knowledge base to find all articles based on an entity
     def retrieve_article_ids_transaction(self, tx, entity_names):
-        
+
         try:
             query = """
             UNWIND $entity_names AS entity_name 
@@ -74,8 +73,8 @@ class neo4j_handler:
             RETURN DISTINCT end_node.id AS reachable_article_id
             """
 
-            result = tx.run(query, entity_name=entity_names).data()
-            return [record['reachable_article_id'] for record in result]
+            result = tx.run(query, entity_names=entity_names).data()
+            return [record["reachable_article_id"] for record in result]
         except Exception as e:
             print(f"Error in article retrieval transaction: {e}")
 
@@ -83,7 +82,7 @@ class neo4j_handler:
 
         entity_names = self.generate_entities(claim)
         print(entity_names)
-        #entity_names = [str(x) for x in entity_names]
+        # entity_names = [str(x) for x in entity_names]
 
         if not isinstance(entity_names, list):
             raise TypeError("entity_names must be a list of strings.")
@@ -93,13 +92,12 @@ class neo4j_handler:
         try:
             with self.driver.session() as session:
                 article_ids = session.execute_read(
-                    self.retrieve_article_ids_transaction,
-                    entity_names 
+                    self.retrieve_article_ids_transaction, entity_names
                 )
-            return list(set(article_ids)) , entity_names
+            return list(set(article_ids)), entity_names
         except Exception as e:
             print(f"An error occurred while fetching articles for entities: {e}")
-            return [] , entity_names
+            return [], entity_names
 
     def retrieve_articles(self, ids):
         pass
