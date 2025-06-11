@@ -9,8 +9,7 @@ load_dotenv()
 
 class neo4j_handler:
 
-    def __init__(self, claim):
-        self.claim = claim
+    def __init__(self):
         uri = os.getenv("NEO4J_URI")
         user = os.getenv("NEO4J_USER")
         password = os.getenv("NEO4J_PASS")
@@ -20,7 +19,7 @@ class neo4j_handler:
         with self.driver.session() as session:
             session.run("MATCH (n) DETACH DELETE n")
 
-    def create_triplet_with_article(self, tx, article_id, subject, predicate, obj):
+    def insert_triplets_transaction(self, tx, article_id, subject, predicate, obj):
         safe_predicate = "".join(c if c.isalnum() else "_" for c in predicate.upper())
         query = f"""
         MERGE (article:Article {{id: $article_id}})
@@ -46,14 +45,61 @@ class neo4j_handler:
                         self.create_triplet_with_article, article_id, subj, pred, obj
                     )
 
-    def generate_query(self, claim):
-        llm_extractor = triplet_extractor()
-        llm_result = llm_extractor.call_triplet_llm(claim)
-        entities = llm_extractor.extract_entities(llm_result)
-        return entities  # todo -> generate neo4j query from entities
+    #generate entities from a claim
+    def generate_entities(self, claim):
+        try:
+            llm_extractor = triplet_extractor()
+            llm_result = llm_extractor.call_triplet_llm(claim)
+            entities = llm_extractor.extract_entities(llm_result)
+            return entities 
+        except Exception as e:
+            print(f'Error in entity generation: {e}')
+            return []
 
-    def retrieve_article_ids(self, query):
-        pass
+
+    #this function traverses the graph knowledge base to find all articles based on an entity
+    def retrieve_article_ids_transaction(self, tx, entity_names):
+        
+        try:
+            query = """
+            UNWIND $entity_names AS entity_name 
+            MATCH (start:Entity {name: entity_name}) 
+            CALL apoc.path.expandConfig(start, {
+                labelFilter: "+Article|+Entity",
+                maxLevel: 10,
+                bfs: true
+            }) YIELD path
+            WITH path, last(nodes(path)) AS end_node
+            WHERE "Article" IN labels(end_node)
+            RETURN DISTINCT end_node.id AS reachable_article_id
+            """
+
+            result = tx.run(query, entity_name=entity_names).data()
+            return [record['reachable_article_id'] for record in result]
+        except Exception as e:
+            print(f"Error in article retrieval transaction: {e}")
+
+    def retrieve_article_ids(self, claim):
+
+        entity_names = self.generate_entities(claim)
+        print(entity_names)
+        #entity_names = [str(x) for x in entity_names]
+
+        if not isinstance(entity_names, list):
+            raise TypeError("entity_names must be a list of strings.")
+        if not entity_names:
+            return [], []
+
+        try:
+            with self.driver.session() as session:
+                article_ids = session.execute_read(
+                    self.retrieve_article_ids_transaction,
+                    entity_names 
+                )
+            return list(set(article_ids)) , entity_names
+        except Exception as e:
+            print(f"An error occurred while fetching articles for entities: {e}")
+            return [] , entity_names
 
     def retrieve_articles(self, ids):
         pass

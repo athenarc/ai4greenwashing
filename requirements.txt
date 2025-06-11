@@ -185,3 +185,6 @@ markdown
 seaborn
 rouge-score
 gliner
+spacy
+nltk
+neo4j

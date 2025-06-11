@@ -153,14 +153,16 @@ class triplet_extractor:
             **Text:**
             {chunk}
             """
+            try: 
+                response = ollama.chat(
+                    model="sciphi/triplex:latest",
+                    messages=[{"role": "user", "content": prompt}],
+                    options={"temperature": 0},
+                )
 
-            response = ollama.chat(
-                model="sciphi/triplex:latest",
-                messages=[{"role": "user", "content": prompt}],
-                options={"temperature": 0},
-            )
-
-            triplet_str = response["message"]["content"]
+                triplet_str = response["message"]["content"]
+            except Exception as e:
+                print(f"Error in ollama model: {e}")
 
             try:
                 triplets = self.json_to_triplets(triplet_str)
@@ -211,4 +213,7 @@ class triplet_extractor:
             )
 
             triplet_str = response["message"]["content"]
+            print(triplet_str)
+            print('------------------------EOF--------------------------')
+            print('\n')
             return triplet_str
