@@ -13,7 +13,13 @@ class neo4j_handler:
         uri = os.getenv("NEO4J_URI")
         user = os.getenv("NEO4J_USER")
         password = os.getenv("NEO4J_PASS")
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        self.driver = GraphDatabase.driver(
+            uri,
+            auth=(user, password),
+            max_connection_lifetime=3600,
+            connection_timeout=30,
+            max_connection_pool_size=50,
+        )
 
     def clear_database(self):
         with self.driver.session() as session:
@@ -58,31 +64,28 @@ class neo4j_handler:
 
     # this function traverses the graph knowledge base to find all articles based on an entity
     def retrieve_article_ids_transaction(self, tx, entity_names):
-
-        try:
-            query = """
-            UNWIND $entity_names AS entity_name 
-            MATCH (start:Entity {name: entity_name}) 
-            CALL apoc.path.expandConfig(start, {
-                labelFilter: "+Article|+Entity",
-                maxLevel: 10,
-                bfs: true
-            }) YIELD path
-            WITH path, last(nodes(path)) AS end_node
-            WHERE "Article" IN labels(end_node)
-            RETURN DISTINCT end_node.id AS reachable_article_id
-            """
-
-            result = tx.run(query, entity_names=entity_names).data()
-            return [record["reachable_article_id"] for record in result]
-        except Exception as e:
-            print(f"Error in article retrieval transaction: {e}")
+        query = """
+        UNWIND $entity_names AS entity_name 
+        MATCH (start:Entity {name: entity_name}) 
+        CALL apoc.path.expandConfig(start, {
+            labelFilter: "+Article|+Entity",
+            maxLevel: 3,  
+            bfs: true
+        }) YIELD path
+        WITH path, last(nodes(path)) AS end_node
+        WHERE "Article" IN labels(end_node)
+        RETURN DISTINCT end_node.id AS reachable_article_id
+        """
+        result = tx.run(query, entity_names=entity_names)
+        return [record["reachable_article_id"] for record in result]
 
     def retrieve_article_ids(self, claim):
-
-        entity_names = self.generate_entities(claim)
+        entity_names = [
+            "dishwashing liquid",
+            "automatic dish detergents",
+            "renewable, plant-based ingredients",
+        ]
         print(entity_names)
-        # entity_names = [str(x) for x in entity_names]
 
         if not isinstance(entity_names, list):
             raise TypeError("entity_names must be a list of strings.")
@@ -91,6 +94,7 @@ class neo4j_handler:
 
         try:
             with self.driver.session() as session:
+                # pass the transaction function and entity_names as parameter
                 article_ids = session.execute_read(
                     self.retrieve_article_ids_transaction, entity_names
                 )
