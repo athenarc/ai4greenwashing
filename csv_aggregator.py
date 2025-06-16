@@ -15,6 +15,8 @@ from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_2
 from reportparse.llm_prompts import LLM_AGGREGATOR_PROMPT_FINAL
 from reportparse.climate_cti import cti_classification
 from reportparse.llm_evaluation import llm_evaluation
+from news_knowledge_graph.neo4j_handler import neo4j_handler
+from news_knowledge_graph.traverse_graph import traverse_graph
 import argparse
 import re
 from pymongo import MongoClient
@@ -42,17 +44,19 @@ reddit = RedditAnnotator()
 chroma_esg = ChromaESGAnnotator()
 news_annotator = NewsAnnotator()
 llm_agg = LLMAggregator()
-
+neo4j = neo4j_handler()
+news_kg_annotator = traverse_graph()
 # final aggregator prompt
 agg_prompt_final = LLM_AGGREGATOR_PROMPT_FINAL
 # flags for annotator invocation
 news_flag = True
+news_kg_flag = True
 # chroma_esg_flag = False
-web_rag_flag = True
-chroma_db_flag = True
+web_rag_flag = False
+chroma_db_flag = False
 chroma_db_flag_store = False
 reddit_flag = False
-final_aggregator_flag = True
+final_aggregator_flag = False
 first_pass_flag = False
 parse_flag = False
 parse_flag_store = False
@@ -108,7 +112,7 @@ df = df.dropna(subset=["Company"])
 df["Year"] = df["Year"].apply(int)
 df = df[df["Year"] >= 2021]
 df = df[["Company", "Year", "Claim"]]
-result_df_path = "experiment1_with_def_gemini_only.csv"  # name it as you like, change aggregation prompt
+result_df_path = "news_db_comparison_better_claim.csv"  # name it as you like, change aggregation prompt
 if os.path.exists(result_df_path):
     result_df = pd.read_csv(result_df_path)
 else:
@@ -136,29 +140,33 @@ blacklisted_reports = [
 
 # on Greenwashing_claims_esg_reports, please rename ethiad to etihad and levissima into nestle before parsing
 
-for idx, row in df.iterrows():
-
-    if "id" in result_df.columns and idx in result_df["id"].values:
+for idx, row in df_meta.iterrows():
+    df_meta_id = row["id"]
+    if "id" in result_df.columns and df_meta_id in result_df["id"].values:
         print(f"⚠️ ID {idx} already in result_df — skipping.")
         continue
     # chroma_db_flag_store = True
-    try:
-        df_meta_id = df_meta.loc[df_meta["Claim"] == row["Claim"], "id"].values[0]
-    except Exception as e:
-        continue
+    # try:
+    #     # df_meta_id = df_meta.loc[df_meta["Claim"] == row["Claim"], "id"].values[0]
+    #     df_meta_id = row["id"]
+    # except Exception as e:
+    #     continue
     company = str(row["Company"]).lower().strip()
     year = str(row["Year"]).lower().strip()
     esg_report = company + "_" + year
     document_name = esg_report + ".pdf"
-    claim = row["Claim"]
-    print(f"Examining claim with id {idx}")
+    claim = row["web_rag_claim_query"]
+    ground_truth = row["ground_truth"]
+    print(f"Examining claim with id {row['id']}")
     print(f"Claim: {claim}")
     print()
 
     # saving the document
     if True:
         input_path = f"Greenwashing_claims_esg_reports/{esg_report}.pdf"
-        json_output_path = os.path.join(args.output, f"{esg_report}_{idx}" + ".json")
+        json_output_path = os.path.join(
+            args.output, f"{esg_report}_{df_meta_id}" + ".json"
+        )
         if os.path.exists(json_output_path):
             print(f"✅ JSON found: {input_path}")
             print("Skipping parsing....")
@@ -276,6 +284,36 @@ for idx, row in df.iterrows():
     if not news_flag:
         news_result, news_retrieved_sources, news_context = "", [], ""
 
+    if news_kg_flag:
+        graph = traverse_graph()
+        graph_result = graph.verify_claim_with_kg(neo4j, claim)
+        news_kg_retrieved_sources = None
+        news_kg_retrieved_texts = (
+            graph_result["chunk_texts"] if graph_result["chunk_texts"] else None
+        )
+        news_kg_retrieved_ids = (
+            graph_result["chunk_ids"] if graph_result["chunk_ids"] else None
+        )
+        news_kg_result = (
+            graph_result["llm_answer"] if graph_result["llm_answer"] else None
+        )
+
+        if graph_result["chunk_ids"] and graph_result["chunk_texts"]:
+            news_kg_retrieved_sources = [
+                {"chunk_id": cid, "chunk_text": ctext}
+                for cid, ctext in zip(
+                    graph_result["chunk_ids"], graph_result["chunk_texts"]
+                )
+            ]
+
+    if not news_kg_flag:
+        (
+            news_kg_result,
+            news_kg_retrieved_sources,
+            news_kg_retrieved_texts,
+            news_kg_retrieved_ids,
+        ) = ("", [], "", [])
+
     if reddit_flag:
         logger.info("Reddit starting")
         reddit_result, reddit_retrieved_posts, reddit_context = reddit.call_reddit(
@@ -331,6 +369,12 @@ for idx, row in df.iterrows():
         "news_label": chroma.extract_label(news_result),
         "news_score": web_crawler.extract_regression_score(news_result),
         "news_justification": news_annotator.extract_justification(news_result),
+        # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        "news_kg_context": news_kg_retrieved_texts,
+        "news_kg_retrieved_pages": news_kg_retrieved_sources,
+        "news_kg_label": chroma.extract_label(news_kg_result),
+        "news_kg_score": web_crawler.extract_regression_score(news_kg_result),
+        "news_kg_justification": news_annotator.extract_justification(news_kg_result),
         "reddit_context": reddit_context,
         "reddit_retrieved_pages": reddit_retrieved_posts,
         "reddit_label": chroma.extract_label(reddit_result),
@@ -345,6 +389,7 @@ for idx, row in df.iterrows():
         "first_pass_justification": web_crawler.extract_justification(
             first_pass_result
         ),
+        "ground_truth": ground_truth,
     }
 
     new_data_df = pd.DataFrame([new_data])

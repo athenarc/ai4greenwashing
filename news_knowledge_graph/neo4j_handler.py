@@ -2,7 +2,11 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
-from triplet_extractor import triplet_extractor
+from news_knowledge_graph.triplet_extractor import triplet_extractor
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
 
 load_dotenv()
 
@@ -16,9 +20,6 @@ class neo4j_handler:
         self.driver = GraphDatabase.driver(
             uri,
             auth=(user, password),
-            max_connection_lifetime=3600,
-            connection_timeout=30,
-            max_connection_pool_size=50,
         )
 
     def clear_database(self):
@@ -80,11 +81,7 @@ class neo4j_handler:
         return [record["reachable_article_id"] for record in result]
 
     def retrieve_article_ids(self, claim):
-        entity_names = [
-            "dishwashing liquid",
-            "automatic dish detergents",
-            "renewable, plant-based ingredients",
-        ]
+        entity_names = self.generate_entities(claim)
         print(entity_names)
 
         if not isinstance(entity_names, list):
@@ -105,3 +102,56 @@ class neo4j_handler:
 
     def retrieve_articles(self, ids):
         pass
+
+    def find_most_similar_chunk(self, claim_embedding):
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (c:Chunk)
+                RETURN c.chunk_id AS chunk_id, c.embedding AS embedding
+            """
+            )
+            data = result.data()
+
+        # Prepare data
+        chunk_ids = [row["chunk_id"] for row in data]
+        embeddings = np.array([row["embedding"] for row in data])
+
+        # Compute similarity
+        similarities = cosine_similarity([claim_embedding], embeddings)[0]
+        best_index = np.argmax(similarities)
+
+        return chunk_ids[best_index], similarities[best_index]
+
+    def get_subgraph(self, chunk_id, claim_embedding, depth=2):
+        with self.driver.session() as session:
+            result = session.run(
+                f"""
+                MATCH (c:Chunk {{chunk_id: $chunk_id}})
+                CALL apoc.path.subgraphNodes(c, {{
+                    relationshipFilter: "|SIMILAR_TO",
+                    minLevel: 0,
+                    maxLevel: {depth}
+                }})
+                YIELD node
+                RETURN node.chunk_id AS chunk_id, node.chunk_text AS chunk_text, node.publish_date AS publish_date, node.embedding AS embedding
+            """,
+                {"chunk_id": chunk_id},
+            )
+
+            data = result.data()
+
+            if not data:
+                return []
+
+            # Filter by similarity to claim_embedding
+            embeddings = np.array([node["embedding"] for node in data])
+            similarities = cosine_similarity([claim_embedding], embeddings)[0]
+
+            filtered_data = [
+                node
+                for node, sim in zip(data, similarities)
+                if sim >= 0.4  # <--Threshold value
+            ]
+
+            return filtered_data
