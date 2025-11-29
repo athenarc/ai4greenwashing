@@ -11,7 +11,7 @@ result/
 results/
 log/
 .cache/
-
+esg_db/chromadb/
 protobuf/
 
 .idea/
