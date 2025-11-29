@@ -8,10 +8,9 @@ data/*
 *.pickle
 runs/
 result/
-results/
+EmeraldDB/chromadb/
 log/
 .cache/
-esg_db/chromadb/
 protobuf/
 
 .idea/
