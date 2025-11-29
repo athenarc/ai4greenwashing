@@ -37,9 +37,11 @@ cp .env.example .env
 # Edit .env
 
 # Extract pre-processed reports
-unzip reports_kpi_text_desc.zip
-
-mv reports_kpi_text_desc/reports .
+cd data
+ls *.gz |xargs -n1 tar -xzf
+cd ..
+mkdir reports
+cp -r data/*/* reports/
 ```
 
 ---
