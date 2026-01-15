@@ -282,11 +282,11 @@ def parse_llm_response(response_text: str, article_id: str = None) -> List[Dict]
             claims = json.loads(json_str)
             return claims
         else:
-            print(f"⚠️  No JSON array found in response for article {article_id}")
+            print(f"No JSON array found in response for article {article_id}")
             print(f"Response preview: {response_text[:300]}...")
             return []
     except json.JSONDecodeError as e:
-        print(f"❌ Failed to parse JSON for article {article_id}: {e}")
+        print(f"Failed to parse JSON for article {article_id}: {e}")
         print(f"Response preview: {response_text[:500]}...")
 
         # Save problematic response to file for debugging
@@ -300,7 +300,7 @@ def parse_llm_response(response_text: str, article_id: str = None) -> List[Dict]
                     f.write(f"Full Response:\n")
                     f.write(f"{'='*60}\n")
                     f.write(response_text)
-                print(f"📝 Saved problematic response to {error_file}")
+                print(f"Saved problematic response to {error_file}")
             except Exception as save_error:
                 print(f"Could not save error file: {save_error}")
 
@@ -342,7 +342,7 @@ def save_checkpoint(
     }
     with open(checkpoint_path, "w") as f:
         json.dump(checkpoint_data, f, indent=2)
-    print(f"✓ Saved checkpoint with {len(processed_ids)} processed articles")
+    print(f"Saved checkpoint with {len(processed_ids)} processed articles")
 
     # Save all LLM responses
     if llm_responses:
@@ -350,11 +350,10 @@ def save_checkpoint(
         responses_path = os.path.join("claims_data", responses_file)
         with open(responses_path, "w") as f:
             json.dump(llm_responses, f, indent=2)
-        print(f"✓ Saved {len(llm_responses)} LLM responses to {responses_path}")
+        print(f"Saved {len(llm_responses)} LLM responses to {responses_path}")
 
 
 def load_checkpoint(checkpoint_file: str, claims_file: str):
-    """Load previous progress from checkpoint files"""
     checkpoint_path = os.path.join("claims_data", checkpoint_file)
     claims_path = os.path.join("claims_data", claims_file)
 
@@ -368,8 +367,8 @@ def load_checkpoint(checkpoint_file: str, claims_file: str):
                 checkpoint_data = json.load(f)
                 processed_ids = set(checkpoint_data.get("processed_ids", []))
                 timestamp = checkpoint_data.get("timestamp", "unknown")
-                print(f"✓ Loaded checkpoint from {timestamp}")
-                print(f"✓ Found {len(processed_ids)} previously processed articles")
+                print(f"Loaded checkpoint from {timestamp}")
+                print(f"Found {len(processed_ids)} previously processed articles")
         except Exception as e:
             print(f"Warning: Could not load checkpoint: {e}")
 
@@ -445,7 +444,7 @@ def generate_claims_dataset(
             claims = parse_llm_response(response_text, article_id)
 
             if len(claims) == 0:
-                print(f"⚠️  No claims generated for article {article_id}")
+                print(f"No claims generated for article {article_id}")
                 failed_articles.append(
                     {
                         "article_id": article_id,
@@ -467,14 +466,14 @@ def generate_claims_dataset(
 
             # Save checkpoint at intervals
             if articles_since_checkpoint >= checkpoint_interval:
-                print(f"\n📌 Saving checkpoint...")
+                print(f"\nSaving checkpoint...")
                 save_checkpoint(all_claims, processed_ids, checkpoint_file, output_csv)
                 articles_since_checkpoint = 0
 
         except ValueError as e:
             if "All API keys are exhausted" in str(e):
-                print(f"\n❌ API keys exhausted!")
-                print(f"📌 Saving progress before stopping...")
+                print(f"\nAPI keys exhausted!")
+                print(f"Saving progress before stopping...")
                 save_checkpoint(all_claims, processed_ids, checkpoint_file, output_csv)
 
                 # Save failed articles report
@@ -484,7 +483,7 @@ def generate_claims_dataset(
                     )
                     with open(failed_report_path, "w") as f:
                         json.dump(failed_articles, f, indent=2)
-                    print(f"📝 Saved failed articles report to {failed_report_path}")
+                    print(f"Saved failed articles report to {failed_report_path}")
 
                 print(f"\n{'='*60}")
                 print(f"Progress saved! You can resume later.")
@@ -494,7 +493,7 @@ def generate_claims_dataset(
                 print(f"{'='*60}")
                 raise
         except Exception as e:
-            print(f"❌ Unexpected error processing article {article_id}: {e}")
+            print(f"Unexpected error processing article {article_id}: {e}")
             failed_articles.append(
                 {"article_id": article_id, "reason": f"Unexpected error: {str(e)}"}
             )
@@ -503,7 +502,7 @@ def generate_claims_dataset(
             continue
 
     # Final save
-    print(f"\n📌 Saving final results...")
+    print(f"\nSaving final results...")
     save_checkpoint(all_claims, processed_ids, checkpoint_file, output_csv)
 
     # Save failed articles report
@@ -511,10 +510,8 @@ def generate_claims_dataset(
         failed_report_path = os.path.join("claims_data", "failed_articles.json")
         with open(failed_report_path, "w") as f:
             json.dump(failed_articles, f, indent=2)
-        print(
-            f"📝 Saved failed articles report: {len(failed_articles)} articles failed"
-        )
-        print(f"   Report location: {failed_report_path}")
+        print(f"Saved failed articles report: {len(failed_articles)} articles failed")
+        print(f"Report location: {failed_report_path}")
 
     # Create final DataFrame
     claims_df = pd.DataFrame(all_claims)
@@ -537,8 +534,8 @@ def generate_claims_dataset(
 
 if __name__ == "__main__":
 
-    input_file = "your_news_file.csv"  # Input CSV file with news articles
-    output_file = "your_input_file.csv"  # Output CSV file for claims
+    input_file = "articles.csv"  # Input CSV file with news articles
+    output_file = "new_claims.csv"  # Output CSV file for claims
 
     try:
         claims_df = generate_claims_dataset(
@@ -546,7 +543,7 @@ if __name__ == "__main__":
         )
     except ValueError as e:
         if "All API keys are exhausted" in str(e):
-            print("\n⚠️  Script stopped due to API key exhaustion")
+            print("\nScript stopped due to API key exhaustion")
             print("✓ Progress has been saved")
             print("✓ Simply run the script again to resume from where you stopped")
         else:

@@ -136,7 +136,7 @@ def approximate_token_count(text: str, model="gemini-2.0-flash"):
         tokens = tokenizer.encode(text)
         return len(tokens)
     except Exception as e:
-        print(f"⚠️ Token count approximation failed: {e}")
+        print(f"Token count approximation failed: {e}")
         return 0
 
 

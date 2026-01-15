@@ -168,37 +168,37 @@ def load_processed_claims(save_path):
 
 
 file_mapping = {
-    "mixed_few_shot": {
-        "baseline": "path_to_mixed_few_shot_baseline_results.csv",
-        "rag": "path_to_mixed_few_shot_rag_results.csv",
-        "graphrag": "path_to_mixed_few_shot_graphrag_results.csv",
-        "hybrid": "path_to_mixed_few_shot_hybrid_results.csv",
+    "emerald_few_shot": {
+        "baseline": "path_to_emerald_few_shot_baseline_results.csv",
+        "rag": "path_to_emerald_few_shot_rag_results.csv",
+        "graphrag": "path_to_emerald_few_shot_graphrag_results.csv",
+        "hybrid": "path_to_emerald_few_shot_hybrid_results.csv",
     },
-    "mixed_zero_shot": {
-        "baseline": "path_to_mixed_zero_shot_baseline_results.csv",
-        "rag": "path_to_mixed_zero_shot_rag_results.csv",
-        "graphrag": "path_to_mixed_zero_shot_graphrag_results.csv",
-        "hybrid": "path_to_mixed_zero_shot_hybrid_results.csv",
+    "emerald_zero_shot": {
+        "baseline": "path_to_emerald_zero_shot_baseline_results.csv",
+        "rag": "path_to_emerald_zero_shot_rag_results.csv",
+        "graphrag": "path_to_emerald_zero_shot_graphrag_results.csv",
+        "hybrid": "path_to_emerald_zero_shot_hybrid_results.csv",
     },
-    "small_few_shot": {
-        "baseline": "path_to_small_few_shot_baseline_results.csv",
-        "rag": "path_to_small_few_shot_rag_results.csv",
-        "graphrag": "path_to_small_few_shot_graphrag_results.csv",
-        "hybrid": "path_to_small_few_shot_hybrid_results.csv",
+    "green_few_shot": {
+        "baseline": "path_to_green_few_shot_baseline_results.csv",
+        "rag": "path_to_green_few_shot_rag_results.csv",
+        "graphrag": "path_to_green_few_shot_graphrag_results.csv",
+        "hybrid": "path_to_green_few_shot_hybrid_results.csv",
     },
-    "small_zero_shot": {
-        "baseline": "path_to_small_zero_shot_baseline_results.csv",
-        "rag": "path_to_small_zero_shot_rag_results.csv",
-        "graphrag": "path_to_small_zero_shot_graphrag_results.csv",
-        "hybrid": "path_to_small_zero_shot_hybrid_results.csv",
+    "green_zero_shot": {
+        "baseline": "path_to_green_zero_shot_baseline_results.csv",
+        "rag": "path_to_green_zero_shot_rag_results.csv",
+        "graphrag": "path_to_green_zero_shot_graphrag_results.csv",
+        "hybrid": "path_to_green_zero_shot_hybrid_results.csv",
     },
 }
 
 
-os.makedirs(f"results_ilora_final", exist_ok=True)
+os.makedirs(f"results_ilora", exist_ok=True)
 
 
-error_log_path = f"results_ilora_final/parsing_errors.log"
+error_log_path = f"results_ilora/parsing_errors.log"
 print(f"Error logs will be saved to: {error_log_path}\n", flush=True)
 
 
@@ -424,7 +424,6 @@ for setting_name, files in file_mapping.items():
             "Readability": eval_scores["Readability"],
             "Accuracy": eval_scores["Accuracy"],
             "OverallScore": eval_scores["OverallScore"],
-            
         }
 
         with open(save_path, "a", newline="", encoding="utf-8") as f:
