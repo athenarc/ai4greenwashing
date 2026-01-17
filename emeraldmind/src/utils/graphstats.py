@@ -29,7 +29,7 @@ def calculate_shortest_paths_gds(sample_size=500):
             # Drop existing projection
             try:
                 session.run(f"CALL gds.graph.drop('{GRAPH_NAME}', false)")
-                print("✓ Dropped existing projection")
+                print("Dropped existing projection")
             except:
                 pass
             
@@ -126,7 +126,7 @@ def calculate_shortest_paths_gds(sample_size=500):
                 median_distance = statistics.median(all_distances)
                 
                 print("\n" + "="*60)
-                print("✓ SUCCESS - Shortest Path Statistics:")
+                print("SUCCESS - Shortest Path Statistics:")
                 print("="*60)
                 print(f"  Average Shortest Path: {avg_distance:.2f}")
                 print(f"  Median Shortest Path: {median_distance:.2f}")
@@ -152,7 +152,7 @@ def calculate_shortest_paths_gds(sample_size=500):
             # Cleanup
             print("\nCleaning up...")
             session.run(f"CALL gds.graph.drop('{GRAPH_NAME}', false)")
-            print("✓ Dropped projection")
+            print("Dropped projection")
             
             return sp_stats
             
@@ -198,7 +198,7 @@ def main():
         with open(output_file, 'w') as f:
             json.dump(stats, f, indent=2)
         
-        print(f"\n✓ Saved to: {output_file}")
+        print(f"\nSaved to: {output_file}")
 
 if __name__ == "__main__":
     main()

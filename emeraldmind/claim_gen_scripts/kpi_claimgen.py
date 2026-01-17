@@ -332,7 +332,7 @@ def save_checkpoint(
         claims_df = claims_df[column_order]
         claims_path = os.path.join("claims_data", claims_file)
         claims_df.to_csv(claims_path, index=False)
-        print(f"✓ Saved {len(claims)} claims to {claims_path}")
+        print(f"Saved {len(claims)} claims to {claims_path}")
 
     # Save processed IDs to checkpoint
     checkpoint_path = os.path.join("claims_data", checkpoint_file)
@@ -377,7 +377,7 @@ def load_checkpoint(checkpoint_file: str, claims_file: str):
         try:
             claims_df = pd.read_csv(claims_path)
             all_claims = claims_df.to_dict("records")
-            print(f"✓ Loaded {len(all_claims)} existing claims")
+            print(f"Loaded {len(all_claims)} existing claims")
         except Exception as e:
             print(f"Warning: Could not load existing claims: {e}")
 
@@ -413,7 +413,7 @@ def generate_claims_dataset(
     print(f"Remaining to process: {len(df_remaining)}")
 
     if len(df_remaining) == 0:
-        print("\n✓ All articles already processed!")
+        print("\nAll articles already processed!")
         return pd.DataFrame(all_claims)
 
     # Process each remaining article
@@ -452,7 +452,7 @@ def generate_claims_dataset(
                     }
                 )
             else:
-                print(f"✓ Generated {len(claims)} claims")
+                print(f"Generated {len(claims)} claims")
 
             # Add article_id to each claim
             for claim in claims:
@@ -544,7 +544,7 @@ if __name__ == "__main__":
     except ValueError as e:
         if "All API keys are exhausted" in str(e):
             print("\nScript stopped due to API key exhaustion")
-            print("✓ Progress has been saved")
-            print("✓ Simply run the script again to resume from where you stopped")
+            print("Progress has been saved")
+            print("Simply run the script again to resume from where you stopped")
         else:
             raise
