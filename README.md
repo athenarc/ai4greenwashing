@@ -1,5 +1,6 @@
 # EmeraldMind: A Knowledge Graph–Augmented Framework for Greenwashing Detection
 
+
 ---
 
 ## Overview
@@ -8,7 +9,7 @@ This repository includes:
 
 **Key Features:**
 
-- A domain-specific Knowledge Graph, its schema and the full pipeline for its construction
+- EmeraldGraph, a domain-specific Knowledge Graph, its schema and the full pipeline for its construction
 - EmeraldDB, a document store extracted from ESG reports for text-based retrieval
 - Claim grounding, retrieval, and classification modules
 - Scripts for reproducible end-to-end ESG knowledge extraction
@@ -17,6 +18,22 @@ This README provides instructions for installation, environment setup, pipeline 
 
 ---
 
+## Citation
+
+If you use EmeraldMind, EmeraldGraph, or EmeraldData in your research, please cite our paper as follows
+
+```
+@inproceedings{kaoukis2026emeraldmind,
+  author = {Kaoukis, Georgios and Koufopoulos, Ioannis-Aris and Psaroudaki, Eleni and Karidi, Danae Pla and Pitoura, Evaggelia and Papastefanatos, George and Tsaparas, Panayiotis},
+  title = {EmeraldMind: A Knowledge Graph-Augmented Framework for Greenwashing Detection},
+  booktitle = {Proceedings of the ACM Web Conference 2026 (WWW '26)},
+  year = {2026},
+  location = {Dubai, United Arab Emirates},
+  publisher = {ACM},
+  address = {New York, NY, USA},
+  pages = {11}
+}
+```
 ## Final directory structure
 
 ```
@@ -327,3 +344,4 @@ GEMINI_API_KEY_7=your_key_7
 GEMINI_API_KEY_8=your_key_8
 HF_TOKEN=your_hf_token
 ```
+
