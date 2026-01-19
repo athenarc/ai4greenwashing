@@ -1,11 +1,11 @@
-# EmeraldMind: A Knowledge Graph–Augmented Framework for Greenwashing Detection
+# EmeraldApp: An AI-Driven Tool for Detecting Greenwashing in Sustainability Claims
 
 
 ---
 
 ## Overview
 
-EmeraldApp is an application designed to utilize the [EmeraldMind framework](https://github.com/athenarc/ai4greenwashing/blob/main/README.md), a knowledge graph–augmented approach for automated greenwashing detection. The EmeraldMind framework integrates a domain-specific ESG knowledge graph with retrieval-augmented generation to verify corporate sustainability claims against verifiable evidence, producing transparent, fact-based justifications and responsibly abstaining when evidence is insufficient.
+EmeraldApp is an application designed to utilize the [EmeraldMind framework](https://github.com/athenarc/ai4greenwashing/blob/main/emeraldmind/README.md), a knowledge graph–augmented approach for automated greenwashing detection. The EmeraldMind framework integrates a domain-specific ESG knowledge graph with retrieval-augmented generation to verify corporate sustainability claims against verifiable evidence, producing transparent, fact-based justifications and responsibly abstaining when evidence is insufficient.
 
 EmeraldApp classifies claims as greenwashing, not greenwashing, or abstains, and generates evidence-backed explanations grounded in structured corporate ESG data and retrieval methods. The tool supports different LLM pipelines presented below:
 
@@ -81,7 +81,7 @@ streamlit run app.py
 ## Installation of EmeraldDB and EmeraldGraph
 
 To run the **EmeraldApp** successfully, you must first load the **EmeraldDB** and the **EmeraldGraph** into the repository.  
-For detailed instructions, please refer to [this guide](https://github.com/athenarc/ai4greenwashing/blob/main/README.md#installation) and the steps outlined below.
+For detailed instructions, please refer to [this guide](https://github.com/athenarc/ai4greenwashing/blob/main/emeraldmind/README.md#pipeline-execution) and the steps outlined below.
 
 ## Environment Variables
 
