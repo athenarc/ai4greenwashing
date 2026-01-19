@@ -1,0 +1,44 @@
+{
+    "pipeline": "EM-RAG",
+    "few_shot": false,
+    "company_key": "Acme Inc.",
+    "company_display": "Acme Inc.",
+    "year": null,
+    "claim": "Acme Inc. has over 22% GHG reduction in 2022.",
+    "result": {
+        "label": "not_greenwashing",
+        "justification": "According to the passages from Acme Inc.'s ESG report, they reduced GHG emissions by 7% in 2022.",
+        "subgraph": null,
+        "passages": [
+            {
+                "snippet_id": 1,
+                "content": "In 2022, Acme Inc. achieved a 7% reduction in greenhouse gas emissions intensity compared to 2019, while delivering 65% more packages globally."
+            },
+            {
+                "snippet_id": 2,
+                "content": "Our absolute carbon emissions decreased from 51.17 million metric tons CO2e in 2019 to 47.59 million metric tons CO2e in 2022."
+            },
+            {
+                "snippet_id": 3,
+                "content": "This reduction was driven by investments in renewable energy, with Acme Inc. reaching 65% renewable electricity across operations."
+            },
+            {
+                "snippet_id": 4,
+                "content": "In 2022, Acme Inc. achieved a 7% reduction in greenhouse gas emissions intensity compared to 2019, while delivering 65% more packages globally."
+            },
+            {
+            "snippet_id": 5,
+            "content": "absolute greenhouse gas emissions increased in 2022 compared to the prior year due to rapid business expansion, additional facilities, and higher transportation demand. Acme Inc. emphasized that growth-related emissions increases were partially offset by efficiency improvements and investments in renewable energy. Absolute emissions performance therefore should not be interpreted as a large percentage reduction for the reporting year."
+            },
+            {
+            "snippet_id": 6,
+            "content": "In its sustainability reporting, the Company highlighted reductions in emissions intensity rather than absolute greenhouse gas emissions. Reported progress included improved energy efficiency, optimization of logistics networks, and increased deployment of renewable electricity. These actions contributed to lower emissions per unit of economic output, but did not result in a greenhouse gas reduction greater than 22% in 2022."
+            },
+            {
+            "snippet_id": 7,
+            "content": "The Company’s climate disclosures clarify that claims regarding emissions reductions must distinguish between absolute emissions and intensity-based metrics. For 2022, reported results indicate incremental improvements in efficiency and carbon intensity, while overall greenhouse gas emissions remained influenced by substantial year-over-year growth in operations."
+            }
+        ]
+    },
+    "timestamp": 1765727090
+}

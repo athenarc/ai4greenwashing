@@ -1,0 +1,48 @@
+{
+    "pipeline": "EM-RAG",
+    "few_shot": false,
+    "company_key": "amazon",
+    "company_display": "Amazon",
+    "year": null,
+    "claim": "Amazon reduced GHG emissions by 7% in 2020.",
+    "result": {
+        "label": "not_greenwashing",
+        "justification": "According to the passages from Amazon's ESG report, they reduced GHG emissions by 7% in 2020.",
+        "subgraph": null,
+        "passages": [
+            {
+                "snippet_id": 1,
+                "content": "In 2020, Amazon achieved a 7% reduction in greenhouse gas emissions intensity compared to 2019, while delivering 65% more packages globally."
+            },
+            {
+                "snippet_id": 2,
+                "content": "Our absolute carbon emissions decreased from 51.17 million metric tons CO2e in 2019 to 47.59 million metric tons CO2e in 2020."
+            },
+            {
+                "snippet_id": 3,
+                "content": "This reduction was driven by investments in renewable energy, with Amazon reaching 65% renewable electricity across operations."
+            },
+            {
+                "snippet_id": 4,
+                "content": "In 2020, Amazon achieved a 7% reduction in greenhouse gas emissions intensity compared to 2019, while delivering 65% more packages globally."
+            },
+            {
+                "snippet_id": 5,
+                "content": "Our absolute carbon emissions decreased from 51.17 million metric tons CO2e in 2019 to 47.59 million metric tons CO2e in 2020."
+            },
+            {
+                "snippet_id": 6,
+                "content": "This reduction was driven by investments in renewable energy, with Amazon reaching 65% renewable electricity across operations."
+            },
+            {
+                "snippet_id": 7,
+                "content": "In 2020, Amazon achieved a 7% reduction in greenhouse gas emissions intensity compared to 2019, while delivering 65% more packages globally."
+            },
+            {
+                "snippet_id": 8,
+                "content": "Our absolute carbon emissions decreased from 51.17 million metric tons CO2e in 2019 to 47.59 million metric tons CO2e in 2020."
+            }
+        ]
+    },
+    "timestamp": 1765727086
+}

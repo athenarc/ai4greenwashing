@@ -1,0 +1,109 @@
+companies:
+  - key: allbirds
+    display: Allbirds
+    years: ["2023"]
+  - key: amazon
+    display: Amazon
+    years: ["2022"]
+  - key: asos
+    display: ASOS
+    years: ["2022"]
+  - key: boohoo
+    display: Boohoo
+    years: ["2023"]
+  - key: brewdog
+    display: BrewDog
+    years: ["2023"]
+  - key: burtsbees
+    display: Burt's Bees
+    years: ["2023"]
+  - key: chopvalue
+    display: ChopValue
+    years: ["2023"]
+  - key: delta
+    display: Delta Airlines
+    years: ["2023"]
+  - key: deutschepost
+    display: Deutsche Post
+    years: ["2023"]
+  - key: etihad
+    display: Etihad Airways
+    years: ["2023"]
+  - key: evian
+    display: Evian
+    years: ["2023"]
+  - key: fairphone
+    display: Fairphone
+    years: ["2023"]
+  - key: garnier
+    display: Garnier
+    years: ["2022"]
+  - key: h&m
+    display: H&M
+    years: ["2022"]
+  - key: hsbc
+    display: HSBC
+    years: ["2021"]
+  - key: hyundai
+    display: Hyundai
+    years: ["2021"]
+  - key: innocent
+    display: Innocent Drinks
+    years: ["2021"]
+  - key: interface
+    display: Interface
+    years: ["2022", "2023"]
+  - key: keurig
+    display: Keurig
+    years: ["2022"]
+  - key: lufthansa
+    display: Lufthansa
+    years: ["2023"]
+  - key: lush
+    display: Lush
+    years: ["2023"]
+  - key: naturepedic2023
+    display: Naturepedic
+    years: ["2023"]
+  - key: oatly
+    display: Oatly
+    years: ["2022", "2023"]
+  - key: patagonia
+    display: Patagonia
+    years: ["2023"]
+  - key: quornfoods
+    display: Quorn Foods
+    years: ["2021"]
+  - key: reynoldsconsumerproducts
+    display: Reynolds Consumer Products
+    years: ["2021"]
+  - key: rituals
+    display: Rituals
+    years: ["2023"]
+  - key: romerquelle
+    display: Römerquelle
+    years: ["2023"]
+  - key: seventhgeneration
+    display: Seventh Generation
+    years: ["2023"]
+  - key: shein
+    display: Shein
+    years: ["2023"]
+  - key: shell
+    display: Shell
+    years: ["2023"]
+  - key: starbucks
+    display: Starbucks
+    years: ["2022"]
+  - key: thebodyshop
+    display: The Body Shop
+    years: ["2022"]
+  - key: uniqlo
+    display: Uniqlo
+    years: ["2023"]
+  - key: windex
+    display: Windex
+    years: ["2021"]
+  - key: zara
+    display: Zara
+    years: ["2022"]

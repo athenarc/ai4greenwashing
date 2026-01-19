@@ -1,0 +1,28 @@
+{
+    "pipeline": "EM-RAG",
+    "few_shot": true,
+    "company_key": "Acme Inc.",
+    "company_display": "Acme Inc.",
+    "year": null,
+    "claim": "Acme Inc. reduced GHG emissions by 10% in 2022.",
+    "result": {
+        "label": "greenwashing",
+        "justification": "According to the passages from Acme Inc.'Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.Acme Inc. reduced GHG emissions by 10% in 2022.s ESG report, they reduced GHG emissions by 7% in 2022.",
+        "subgraph": null,
+        "passages": [
+            {
+            "snippet_id": 1,
+            "content": "Compared to the 2019 baseline year, the Company achieved a 7% reduction in greenhouse gas emissions intensity during fiscal year 2022. This improvement was realized while total business activity increased substantially, including higher product volumes and expanded global distribution. Management considers emissions intensity a key performance indicator for tracking environmental efficiency as operations scale, and the 2022 result reflects progress toward reducing the carbon footprint per unit of activity rather than an absolute percentage reduction in total emissions."
+            },
+            {
+            "snippet_id": 2,
+            "content": "absolute greenhouse gas emissions decreased year over year, declining from approximately 51.17 million metric tons of CO2e in 2019 to approximately 47.59 million metric tons of CO2e in 2022. The reduction was driven by operational efficiency initiatives and changes in sourcing and logistics. While absolute emissions declined during the reporting period, the Company did not report a 10% reduction in total greenhouse gas emissions for 2022, and results should be interpreted in the context of business growth and external market conditions."
+            },
+            {
+            "snippet_id": 3,
+            "content": "During 2022, the Company increased the share of renewable electricity used across owned and operated facilities to approximately 65%. This transition supported reductions in Scope 2 emissions and contributed to improved overall emissions performance. Additional measures implemented during the year included supply-chain optimization, materials innovation, and ongoing assessment of lifecycle impacts, which together supported the reported reduction in greenhouse gas emissions intensity."
+            }
+        ]
+    },
+    "timestamp": 1765727088
+}

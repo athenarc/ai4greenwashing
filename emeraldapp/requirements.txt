@@ -1,0 +1,15 @@
+streamlit
+matplotlib
+PyYAML
+numpy
+chromadb
+torch
+transformers
+sentence-transformers
+pymupdf
+neo4j
+rapidfuzz
+google-genai
+graphdatascience
+accelerate
+python-dotenv
