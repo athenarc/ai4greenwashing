@@ -1,9 +1,9 @@
-# Emerald: AI-Powered Greenwashing Detection
+# AI against Greenwashing: AI-Powered Greenwashing Detection
 
 
 ## Introduction
 
-Corporate sustainability reporting has become ubiquitous, yet distinguishing genuine environmental commitments from misleading claims—known as **greenwashing**—remains a significant challenge. The Emerald project addresses this gap by combining domain-specific knowledge graphs with retrieval-augmented generation to provide transparent, evidence-based verification of ESG (Environmental, Social, Governance) claims.
+Corporate sustainability reporting has become ubiquitous, yet distinguishing genuine environmental commitments from misleading claims—known as **greenwashing**—remains a significant challenge. The AI against Greenwashing project addresses this gap by combining domain-specific knowledge graphs with retrieval-augmented generation to provide transparent, evidence-based verification of ESG (Environmental, Social, Governance) claims.
 
 This repository contains two complementary components:
 
